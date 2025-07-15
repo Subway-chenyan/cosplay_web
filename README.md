@@ -1,307 +1,183 @@
-# Cosplay舞台剧视频数据库
+# Cosplay舞台剧视频数据库 - 前端
 
-一个专业的中国cosplay舞台剧视频数据库平台，支持视频管理、分类、展示和播放功能。
+这是一个基于React + TypeScript + Tailwind CSS构建的现代化前端应用，用于展示cosplay舞台剧视频。
 
-## 🎭 项目特性
+## 功能特性
 
-- **视频管理**: 支持B站视频链接，内嵌播放功能
-- **智能分类**: 多维度标签系统（年份/社团/剧目类型/比赛类型）
-- **完整数据库**: 包含视频、社团、比赛、奖项等完整信息
-- **现代化界面**: React + TypeScript + Ant Design
-- **RESTful API**: Django REST Framework 提供强大的后端支持
-- **容器化部署**: Docker Compose 一键部署
+### 🎭 主要功能
+- **主页**: 展示精彩的舞台剧视频列表
+- **社团页面**: 浏览和了解各个cosplay社团
+- **比赛页面**: 查看历年比赛信息和作品
+- **智能筛选**: 根据社团、比赛、标签进行多维度筛选
+- **响应式设计**: 支持桌面端和移动端
 
-## 🚀 快速开始
+### 🚀 技术栈
+- **React 18** - 现代化UI框架
+- **TypeScript** - 类型安全的JavaScript
+- **Tailwind CSS** - 实用优先的CSS框架
+- **Redux Toolkit** - 状态管理
+- **React Router** - 路由管理
+- **Vite** - 快速构建工具
+- **Lucide React** - 美观的图标库
+
+### 🎨 设计特点
+- 现代化的渐变色彩搭配
+- 精美的卡片式布局
+- 流畅的动画效果
+- 直观的用户交互
+- 完善的筛选系统
+
+## 快速开始
 
 ### 环境要求
+- Node.js 16+
+- npm 或 yarn
 
-- Docker & Docker Compose
-- Node.js 16+ (开发环境)
-- Python 3.8+ (开发环境)
-- PostgreSQL 13+ (生产环境)
-
-### 使用Docker部署 (推荐)
-
+### 安装依赖
 ```bash
-# 克隆项目
-git clone <项目地址>
-cd cosplay_web
-
-# 启动所有服务
-docker-compose up -d
-
-# 查看服务状态
-docker-compose ps
-
-# 查看日志
-docker-compose logs -f
-```
-
-访问地址：
-- 前端: http://localhost:3000
-- 后端API: http://localhost:8000
-- 数据库: localhost:5432
-
-### 本地开发环境
-
-#### 1. 设置数据库
-
-```bash
-# 创建PostgreSQL数据库
-createdb cosplay_db
-
-# 导入数据库结构
-psql cosplay_db < database/init.sql
-```
-
-#### 2. 启动后端
-
-```bash
-cd backend
-
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或 venv\Scripts\activate  # Windows
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 设置环境变量
-cp .env.example .env
-# 编辑.env文件配置数据库连接
-
-# 运行迁移
-python manage.py makemigrations
-python manage.py migrate
-
-# 创建超级用户
-python manage.py createsuperuser
-
-# 启动开发服务器
-python manage.py runserver
-```
-
-#### 3. 启动前端
-
-```bash
-cd frontend
-
-# 安装依赖
 npm install
+```
 
-# 启动开发服务器
+### 启动开发服务器
+```bash
 npm run dev
 ```
 
-## 📊 数据库结构
+访问 http://localhost:3000 查看应用
 
-### 核心表
-
-- **videos**: 视频信息表（BV号、标题、链接、简介等）
-- **groups**: 社团信息表（名称、成立时间、简介、获奖历史等）
-- **competitions**: 比赛信息表（名称、官网、奖项等）
-- **performances**: 剧目信息表（标题、类型、首演日期等）
-- **tags**: 标签信息表（支持分类标签）
-- **awards**: 奖项信息表
-- **award_records**: 获奖记录表
-
-### 关联表
-
-- **video_tags**: 视频-标签关联
-- **video_groups**: 视频-社团关联
-- **video_performances**: 视频-剧目关联
-
-### 扩展表
-
-- **users**: 用户管理
-- **video_favorites**: 视频收藏
-- **video_ratings**: 视频评分
-- **import_logs**: 数据导入日志
-
-## 🎯 核心功能
-
-### 1. 视频管理
-
-- B站视频内嵌播放
-- 视频信息自动抓取
-- 多维度标签分类
-- 搜索和筛选功能
-
-### 2. 社团管理
-
-- 社团信息展示
-- 社团作品统计
-- 获奖历史记录
-
-### 3. 比赛管理
-
-- 比赛信息维护
-- 奖项设置
-- 获奖记录管理
-
-### 4. 数据分析
-
-- 热门视频统计
-- 社团表现分析
-- 比赛数据可视化
-
-## 🔧 API文档
-
-### 主要端点
-
-```
-GET /api/videos/          # 获取视频列表
-GET /api/videos/{id}/     # 获取视频详情
-GET /api/groups/          # 获取社团列表  
-GET /api/competitions/    # 获取比赛列表
-GET /api/tags/            # 获取标签列表
-GET /api/awards/          # 获取奖项列表
-```
-
-### 搜索和筛选
-
-```
-GET /api/videos/?search=关键词
-GET /api/videos/?tags=1,2,3
-GET /api/videos/?groups=1,2
-GET /api/videos/?year=2023
-GET /api/videos/?ordering=-view_count
-```
-
-详细API文档：http://localhost:8000/api/docs/
-
-## 🎨 前端组件
-
-### 核心组件
-
-- **VideoPlayer**: B站视频播放器
-- **VideoCard**: 视频卡片展示
-- **TagFilter**: 标签筛选器
-- **SearchBar**: 搜索栏
-- **VideoGrid**: 视频网格布局
-
-### 页面结构
-
-```
-src/
-├── components/       # 通用组件
-├── pages/           # 页面组件
-│   ├── VideoList/   # 视频列表页
-│   ├── VideoDetail/ # 视频详情页
-│   ├── GroupList/   # 社团列表页
-│   └── ...
-├── store/           # Redux状态管理
-├── services/        # API服务
-└── types/           # TypeScript类型定义
-```
-
-## 📱 部署配置
-
-### 生产环境部署
-
+### 构建生产版本
 ```bash
-# 使用生产配置启动
-docker-compose --profile production up -d
-
-# 或使用环境变量
-export DJANGO_ENV=production
-docker-compose up -d
-```
-
-### 环境配置
-
-```bash
-# .env 配置示例
-DATABASE_URL=postgresql://user:password@localhost:5432/cosplay_db
-REDIS_URL=redis://localhost:6379/0
-SECRET_KEY=your-secret-key
-DEBUG=False
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-```
-
-## 🔄 数据导入
-
-### 支持格式
-
-- CSV文件批量导入
-- JSON格式导入
-- B站视频信息自动抓取
-
-### 导入示例
-
-```python
-# 视频数据导入
-python manage.py import_videos videos.csv
-
-# 社团数据导入
-python manage.py import_groups groups.json
-```
-
-## 🧪 开发指南
-
-### 后端开发
-
-```bash
-# 创建新的Django应用
-python manage.py startapp new_app
-
-# 运行测试
-python manage.py test
-
-# 代码格式化
-black .
-```
-
-### 前端开发
-
-```bash
-# 类型检查
-npm run type-check
-
-# 代码规范检查
-npm run lint
-
-# 构建生产版本
 npm run build
 ```
 
-## 📈 扩展功能
+### 预览构建结果
+```bash
+npm run preview
+```
 
-### 已规划功能
+## 项目结构
 
-- [ ] 移动端适配 (PWA)
-- [ ] 用户评论系统
-- [ ] 智能推荐算法
-- [ ] 数据可视化大屏
-- [ ] 多语言支持
-- [ ] API接口开放
+```
+src/
+├── components/          # 可复用组件
+│   ├── Header.tsx      # 头部导航
+│   ├── Layout.tsx      # 布局组件
+│   ├── VideoCard.tsx   # 视频卡片
+│   └── VideoFilters.tsx # 筛选组件
+├── pages/              # 页面组件
+│   ├── HomePage.tsx    # 主页
+│   ├── GroupsPage.tsx  # 社团页面
+│   └── CompetitionsPage.tsx # 比赛页面
+├── store/              # Redux状态管理
+│   ├── store.ts        # Store配置
+│   └── slices/         # Redux切片
+├── types/              # TypeScript类型定义
+└── App.tsx             # 主应用组件
+```
 
-### 自定义扩展
+## 主要页面
 
-项目采用模块化设计，支持：
+### 主页 (/)
+- **Hero区域**: 展示网站介绍和统计数据
+- **统计卡片**: 最新视频、热门推荐、社团展示
+- **筛选面板**: 多维度筛选功能
+- **视频网格**: 响应式视频卡片布局
 
-- 自定义标签分类
-- 自定义数据字段
-- 自定义API端点
-- 自定义前端组件
+### 社团页面 (/groups)
+- **社团统计**: 活跃社团、认证社团、总成员数
+- **社团卡片**: 显示社团信息、成员数、视频数
+- **认证标识**: 区分认证社团和普通社团
+- **社交链接**: 官网、哔哩哔哩等链接
 
-## 🤝 贡献指南
+### 比赛页面 (/competitions)
+- **年份分组**: 按年份组织比赛信息
+- **比赛状态**: 区分进行中和已结束的比赛
+- **详细信息**: 比赛描述、特色功能
+- **状态标识**: 直观的进度标识
 
-1. Fork 项目
-2. 创建功能分支
-3. 提交代码
-4. 创建 Pull Request
+## 筛选功能
 
-## 📄 许可证
+### 多维度筛选
+- **社团筛选**: 按社团名称筛选
+- **比赛筛选**: 按比赛名称和年份筛选
+- **标签筛选**: 按分类标签筛选
+  - 游戏IP: 原神、王者荣耀、崩坏三、FGO等
+  - 风格: 古风、现代、幻想等
+  - 其他分类: 年份、类型、地区等
 
-本项目采用 MIT 许可证
+### 交互特性
+- **颜色编码**: 标签使用不同颜色区分
+- **实时更新**: 筛选条件实时生效
+- **状态保持**: 筛选状态在页面间保持
+- **清除功能**: 一键清除所有筛选条件
 
-## 📞 联系我们
+## 响应式设计
 
-- 问题反馈: [GitHub Issues]
-- 功能建议: [GitHub Discussions]
+### 断点设置
+- **移动端**: < 768px
+- **平板端**: 768px - 1024px
+- **桌面端**: > 1024px
 
----
+### 适配特性
+- 导航菜单自动折叠
+- 卡片网格自适应列数
+- 筛选面板可折叠
+- 触摸友好的交互
 
-**🎭 让我们一起打造最棒的cosplay舞台剧视频数据库！** 
+## 开发指南
+
+### 添加新组件
+1. 在 `src/components/` 创建组件文件
+2. 使用TypeScript定义组件props
+3. 遵循现有的样式规范
+4. 导出并在需要的地方引入
+
+### 状态管理
+- 使用Redux Toolkit管理全局状态
+- 每个数据类型对应一个slice
+- 使用createAsyncThunk处理异步操作
+- 组件中使用useSelector和useDispatch
+
+### 样式规范
+- 使用Tailwind CSS类名
+- 遵循响应式设计原则
+- 使用自定义CSS类处理复杂样式
+- 保持设计的一致性
+
+## 后端集成
+
+### API接口
+当前使用模拟数据，后续将集成以下API：
+- `GET /api/videos/` - 获取视频列表
+- `GET /api/groups/` - 获取社团列表
+- `GET /api/competitions/` - 获取比赛列表
+- `GET /api/tags/` - 获取标签列表
+
+### 代理配置
+Vite已配置API代理，将 `/api` 请求转发到 `http://localhost:8000`
+
+## 部署
+
+### 环境变量
+创建 `.env` 文件：
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+### 部署步骤
+1. 构建项目: `npm run build`
+2. 将 `dist/` 目录部署到服务器
+3. 配置nginx反向代理
+4. 设置API接口地址
+
+## 贡献指南
+
+1. Fork项目
+2. 创建功能分支: `git checkout -b feature/amazing-feature`
+3. 提交更改: `git commit -m 'Add amazing feature'`
+4. 推送到分支: `git push origin feature/amazing-feature`
+5. 提交Pull Request
+
+## 许可证
+
+本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情 

@@ -7,6 +7,7 @@
 ## 技术栈选择
 
 ### 后端技术栈
+
 - **框架**: Django 4.0 + Django REST Framework
 - **数据库**: PostgreSQL 13+
 - **缓存**: Redis (用于会话和缓存)
@@ -14,6 +15,7 @@
 - **认证**: Django-allauth + JWT
 
 ### 前端技术栈
+
 - **框架**: React 18 + TypeScript
 - **状态管理**: Redux Toolkit + RTK Query
 - **UI组件库**: Ant Design 或 Material-UI
@@ -22,6 +24,7 @@
 - **路由**: React Router 6
 
 ### 开发工具
+
 - **代码质量**: ESLint + Prettier + Black
 - **打包**: Vite (前端) + Django Webpack Loader
 - **容器化**: Docker + Docker Compose
@@ -43,7 +46,6 @@ cosplay_web/
 │   │   ├── videos/           # 视频管理
 │   │   ├── groups/           # 社团管理
 │   │   ├── competitions/     # 比赛管理
-│   │   ├── performances/     # 剧目管理
 │   │   ├── tags/            # 标签管理
 │   │   └── awards/          # 奖项管理
 │   ├── utils/               # 工具函数
@@ -112,13 +114,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ bvNumber, title, autoplay = f
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    
+  
     @action(detail=False, methods=['get'])
     def categories(self, request):
         """获取所有标签分类"""
         categories = Tag.objects.values_list('category', flat=True).distinct()
         return Response(list(categories))
-    
+  
     @action(detail=False, methods=['get'])
     def popular(self, request):
         """获取热门标签"""
@@ -151,7 +153,7 @@ const VideoSearch: React.FC = () => {
       <TagFilter onTagChange={(tags) => setFilters({...filters, tags})} />
       <GroupFilter onGroupChange={(groups) => setFilters({...filters, groups})} />
       <YearRangeFilter onYearChange={(yearRange) => setFilters({...filters, yearRange})} />
-      
+    
       <VideoGrid videos={videos} loading={isLoading} />
     </div>
   );
@@ -218,7 +220,7 @@ class VideoViewSet(viewsets.ModelViewSet):
     filterset_class = VideoFilter
     ordering_fields = ['upload_date', 'view_count', 'performance_date']
     search_fields = ['title', 'description']
-    
+  
     @action(detail=True, methods=['post'])
     def favorite(self, request, pk=None):
         """收藏视频"""
@@ -227,7 +229,7 @@ class VideoViewSet(viewsets.ModelViewSet):
             user=request.user, video=video
         )
         return Response({'favorited': created})
-    
+  
     @action(detail=True, methods=['post'])
     def rate(self, request, pk=None):
         """评分视频"""
@@ -238,7 +240,7 @@ class VideoViewSet(viewsets.ModelViewSet):
             defaults={'rating': rating_value}
         )
         return Response({'rating': rating.rating})
-    
+  
     @action(detail=False, methods=['get'])
     def trending(self, request):
         """获取热门视频"""
@@ -246,7 +248,7 @@ class VideoViewSet(viewsets.ModelViewSet):
             avg_rating=Avg('video_ratings__rating'),
             favorite_count=Count('video_favorites')
         ).order_by('-view_count', '-favorite_count')[:20]
-        
+      
         serializer = self.get_serializer(trending_videos, many=True)
         return Response(serializer.data)
 ```
@@ -315,18 +317,21 @@ volumes:
 ## 开发阶段规划
 
 ### 第一阶段：基础功能 (2-3周)
+
 1. 数据库设计和部署
 2. 后端API开发
 3. 前端基础页面搭建
 4. B站视频播放功能
 
-### 第二阶段：核心功能 (2-3周)  
+### 第二阶段：核心功能 (2-3周)
+
 1. 标签系统和搜索功能
 2. 社团和比赛管理页面
 3. 奖项展示功能
 4. 数据导入功能
 
 ### 第三阶段：优化和扩展 (2-3周)
+
 1. 用户系统和权限管理
 2. 收藏和评分功能
 3. 数据分析和统计
@@ -341,4 +346,4 @@ volumes:
 5. **API开放**: 为第三方开发者提供API接口
 6. **多语言支持**: 国际化和本地化
 
-这个架构设计具有良好的可扩展性，可以根据实际需求逐步完善和优化。 
+这个架构设计具有良好的可扩展性，可以根据实际需求逐步完善和优化。
