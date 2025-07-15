@@ -1,7 +1,194 @@
----
-description:
-globs:
+# Cosplay 视频数据库项目开发规范
+
+## 项目概述
+
+这是一个专业的中国cosplay舞台剧视频数据库平台，使用Django + React技术栈构建。
+
+### 技术栈
+- **后端**: Django 4.2.7 + DRF 3.14.0 + PostgreSQL + Redis
+- **前端**: React 18.3.1 + TypeScript + Vite + Ant Design
+- **部署**: Docker + Docker Compose
+
+## 项目结构
+
+```
+cosplay_web/
+├── backend/              # Django 后端
+│   ├── cosplay_api/      # 主项目配置
+│   ├── apps/            # 业务应用模块
+│   │   ├── videos/      # 视频管理
+│   │   ├── groups/      # 社团管理
+│   │   ├── competitions/ # 比赛管理
+│   │   ├── performances/ # 剧目管理
+│   │   ├── tags/        # 标签管理
+│   │   ├── awards/      # 奖项管理
+│   │   └── users/       # 用户管理
+│   └── requirements.txt
+├── frontend/            # React 前端
+│   ├── src/
+│   │   ├── components/  # 通用组件
+│   │   ├── pages/       # 页面组件
+│   │   ├── services/    # API 服务
+│   │   ├── store/       # Redux 状态管理
+│   │   ├── types/       # TypeScript 类型
+│   │   └── utils/       # 工具函数
+│   └── package.json
+└── docker-compose.yml
+```
+
+## 代码规范
+
+### 后端 (Django)
+- 模型类使用 PascalCase: `VideoModel`, `GroupModel`
+- 变量/函数使用 snake_case: `video_title`, `get_video_list`
+- URL 使用 kebab-case: `video-list`, `group-detail`
+- 必须包含 verbose_name 和 `__str__` 方法
+- 使用 DRF ViewSet 和 Serializer
+- 遵循 RESTful API 设计原则
+
+### 前端 (React)
+- 组件使用 PascalCase: `VideoCard`, `GroupList`
+- 变量/函数使用 camelCase: `videoTitle`, `getVideoList`
+- 使用 TypeScript 强类型
+- 组件必须定义 Props 接口
+- 使用 React.FC 类型注解
+- 优先使用函数组件和 Hooks
+
+## API 响应格式
+
+### 成功响应
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 1,
+    "title": "视频标题"
+  }
+}
+```
+
+### 分页响应
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "count": 100,
+    "next": "http://api.example.com/videos/?page=3",
+    "previous": "http://api.example.com/videos/?page=1",
+    "results": [...]
+  }
+}
+```
+
+### 错误响应
+```json
+{
+  "code": 400,
+  "message": "参数错误",
+  "errors": {
+    "title": ["这个字段是必需的。"]
+  }
+}
+```
+
+## 核心业务模型
+
+### 视频 (Video)
+- bv_number: B站BV号
+- title: 视频标题
+- url: 视频链接
+- thumbnail: 封面图
+- description: 描述
+- upload_date: 上传日期
+- performance_date: 演出日期
+
+### 社团 (Group)
+- name: 社团名称
+- logo: 社团标志
+- founded_date: 成立日期
+- description: 简介
+
+### 比赛 (Competition)
+- name: 比赛名称
+- year: 举办年份
+- location: 举办地点
+- start_date/end_date: 比赛时间
+
+### 剧目 (Performance)
+- title: 剧目标题
+- original_work: 原作
+- type: 剧目类型
+- debut_date: 首演日期
+
+## 开发要求
+
+### 后端开发
+- 使用 Django ORM 进行数据库操作
+- 使用 select_related/prefetch_related 优化查询
+- 实现适当的缓存策略
+- 添加适当的索引
+- 使用 django-filter 实现过滤功能
+- 添加适当的权限控制
+
+### 前端开发
+- 使用 TypeScript 严格模式
+- 组件要支持 loading 和 error 状态
+- 使用 React Query 或 RTK Query 管理 API 状态
+- 实现响应式设计
+- 使用 Ant Design 组件库
+- 实现图片懒加载和组件懒加载
+
+### 通用要求
+- 所有代码必须有适当的注释
+- 组件和函数必须有 JSDoc/docstring 文档
+- 实现适当的错误处理
+- 添加必要的单元测试
+- 遵循项目的命名规范
+
+## B站视频集成
+
+### 播放器嵌入
+使用 iframe 嵌入 B站播放器：
+```typescript
+const iframeUrl = `https://player.bilibili.com/player.html?bvid=${bvNumber}&autoplay=0`;
+```
+
+### BV号验证
+```python
+def validate_bv_number(value):
+    if not value.startswith('BV'):
+        raise ValidationError("BV号必须以'BV'开头")
+    return value
+```
+
+## 性能优化
+
+### 后端优化
+- 使用 Redis 缓存热门数据
+- 实现数据库查询优化
+- 使用分页减少数据传输
+- 压缩 API 响应
+
+### 前端优化
+- 组件懒加载
+- 图片懒加载
+- 使用 React.memo 防止不必要渲染
+- 实现虚拟滚动（大列表）
+
+## 部署配置
+
+### 环境变量
+- 使用 .env 文件管理环境变量
+- 敏感信息不能硬编码
+- 区分开发/生产环境配置
+
+### Docker 部署
+- 前后端分离部署
+- 使用 nginx 作为反向代理
+- PostgreSQL 和 Redis 使用 Docker 容器
+
+请始终遵循这些规范进行开发，确保代码质量和项目的可维护性。
 alwaysApply: false
-后端开发语言: python
-数据库: postgresql
 ---

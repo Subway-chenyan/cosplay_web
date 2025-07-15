@@ -58,7 +58,6 @@ LOCAL_APPS = [
     'apps.videos',
     'apps.groups',
     'apps.competitions',
-    'apps.performances',
     'apps.tags',
     'apps.awards',
     'apps.users',

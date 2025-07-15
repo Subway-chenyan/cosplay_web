@@ -1,0 +1,1031 @@
+# React 前端开发规范
+
+## 项目技术栈
+
+### 核心框架
+- React 18.3.1 + TypeScript
+- Vite 7.0.3 (构建工具)
+- React Router 6.30.1 (路由管理)
+- Redux + React-Redux 状态管理
+
+### UI 和样式
+- Ant Design 5.26.4 (UI 组件库)
+- Tailwind CSS 3.4.17 (CSS 框架)
+- Styled Components 6.1.19 (CSS-in-JS)
+
+### 功能库
+- Axios 1.10.0 (HTTP 请求)
+- React Player 2.16.0 (视频播放)
+- React Query 3.39.3 (数据获取和缓存)
+- React Infinite Scroll Component 6.1.0 (无限滚动)
+
+### 开发工具
+- ESLint + Prettier (代码质量)
+- TypeScript 5.8.3 (类型系统)
+
+## 项目结构规范
+
+### 目录组织
+```
+frontend/
+├── public/                 # 静态资源
+├── src/
+│   ├── components/        # 通用组件
+│   │   ├── Layout/       # 布局组件
+│   │   ├── VideoCard/    # 视频卡片
+│   │   ├── VideoPlayer/  # 视频播放器
+│   │   └── HeroBanner/   # 轮播图组件
+│   ├── pages/            # 页面组件
+│   │   ├── HomePage/     # 首页
+│   │   ├── VideoListPage/     # 视频列表页
+│   │   ├── VideoDetailPage/   # 视频详情页
+│   │   ├── GroupListPage/     # 社团列表页
+│   │   └── CompetitionListPage/ # 比赛列表页
+│   ├── services/         # API 服务
+│   │   ├── videosApi.ts  # 视频相关API
+│   │   ├── groupsApi.ts  # 社团相关API
+│   │   └── competitionsApi.ts # 比赛相关API
+│   ├── store/            # Redux 状态管理
+│   │   ├── index.ts      # Store 配置
+│   │   ├── slices/       # Redux slices
+│   │   └── hooks.ts      # Redux hooks
+│   ├── hooks/            # 自定义 Hooks
+│   ├── utils/            # 工具函数
+│   ├── types/            # TypeScript 类型定义
+│   │   ├── video.ts      # 视频相关类型
+│   │   ├── group.ts      # 社团相关类型
+│   │   └── common.ts     # 通用类型
+│   ├── constants/        # 常量定义
+│   ├── styles/           # 全局样式
+│   ├── App.tsx           # 根组件
+│   └── main.tsx          # 应用入口
+├── package.json
+├── tsconfig.json         # TypeScript 配置
+├── vite.config.ts        # Vite 配置
+└── tailwind.config.js    # Tailwind 配置
+```
+
+## 代码规范
+
+### 命名约定
+- **组件**: 使用 PascalCase，如 `VideoCard`, `GroupList`
+- **文件**: 组件文件使用 PascalCase，其他文件使用 camelCase
+- **变量和函数**: 使用 camelCase，如 `videoTitle`, `getVideoList`
+- **常量**: 使用 UPPER_SNAKE_CASE，如 `API_BASE_URL`
+- **类型接口**: 使用 PascalCase，如 `VideoType`, `ApiResponse`
+
+### TypeScript 类型定义
+```typescript
+// types/video.ts
+export interface Video {
+  id: number;
+  bvNumber: string;
+  title: string;
+  url: string;
+  thumbnail?: string;
+  description?: string;
+  uploadDate?: string;
+  viewCount: number;
+  performanceDate?: string;
+  tags: Tag[];
+  groups: Group[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VideoListParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  tags?: number[];
+  groups?: number[];
+  sortBy?: 'uploadDate' | 'viewCount' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+```
+
+### 组件设计规范
+
+#### 函数组件标准格式
+```typescript
+// components/VideoCard/VideoCard.tsx
+import React from 'react';
+import { Card, Tag, Button } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
+import { Video } from '../../types/video';
+import './VideoCard.css';
+
+interface VideoCardProps {
+  video: Video;
+  onPlay?: (video: Video) => void;
+  onFavorite?: (videoId: number) => void;
+  loading?: boolean;
+  showTags?: boolean;
+}
+
+const VideoCard: React.FC<VideoCardProps> = ({
+  video,
+  onPlay,
+  onFavorite,
+  loading = false,
+  showTags = true
+}) => {
+  const handlePlay = () => {
+    onPlay?.(video);
+  };
+
+  const handleFavorite = () => {
+    onFavorite?.(video.id);
+  };
+
+  return (
+    <Card
+      className="video-card"
+      loading={loading}
+      cover={
+        <div className="video-thumbnail">
+          <img
+            alt={video.title}
+            src={video.thumbnail}
+            onError={(e) => {
+              e.currentTarget.src = '/default-thumbnail.jpg';
+            }}
+          />
+          <div className="play-overlay" onClick={handlePlay}>
+            <PlayCircleOutlined className="play-icon" />
+          </div>
+        </div>
+      }
+      actions={[
+        <Button type="text" onClick={handlePlay}>播放</Button>,
+        <Button type="text" onClick={handleFavorite}>收藏</Button>
+      ]}
+    >
+      <Card.Meta
+        title={video.title}
+        description={
+          <div>
+            <p className="video-description">{video.description}</p>
+            {showTags && (
+              <div className="video-tags">
+                {video.tags.map(tag => (
+                  <Tag key={tag.id} color="blue">{tag.name}</Tag>
+                ))}
+              </div>
+            )}
+          </div>
+        }
+      />
+    </Card>
+  );
+};
+
+export default VideoCard;
+```
+
+#### 页面组件标准格式
+```typescript
+// pages/VideoListPage/VideoListPage.tsx
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Input, Select, Pagination, Spin } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import VideoCard from '../../components/VideoCard/VideoCard';
+import { useGetVideosQuery } from '../../services/videosApi';
+import { VideoListParams } from '../../types/video';
+import './VideoListPage.css';
+
+const { Search } = Input;
+const { Option } = Select;
+
+const VideoListPage: React.FC = () => {
+  const [params, setParams] = useState<VideoListParams>({
+    page: 1,
+    pageSize: 20,
+    sortBy: 'createdAt',
+    sortOrder: 'desc'
+  });
+
+  const {
+    data: videosResponse,
+    isLoading,
+    error,
+    refetch
+  } = useGetVideosQuery(params);
+
+  const handleSearch = (value: string) => {
+    setParams(prev => ({
+      ...prev,
+      search: value,
+      page: 1
+    }));
+  };
+
+  const handleSortChange = (value: string) => {
+    const [sortBy, sortOrder] = value.split('-');
+    setParams(prev => ({
+      ...prev,
+      sortBy: sortBy as any,
+      sortOrder: sortOrder as any,
+      page: 1
+    }));
+  };
+
+  const handlePageChange = (page: number, pageSize: number) => {
+    setParams(prev => ({
+      ...prev,
+      page,
+      pageSize
+    }));
+  };
+
+  if (error) {
+    return <div className="error-message">加载失败，请重试</div>;
+  }
+
+  return (
+    <div className="video-list-page">
+      <div className="page-header">
+        <h1>视频列表</h1>
+        <div className="filters">
+          <Search
+            placeholder="搜索视频标题或描述"
+            allowClear
+            enterButton={<SearchOutlined />}
+            size="large"
+            onSearch={handleSearch}
+            style={{ width: 300, marginRight: 16 }}
+          />
+          <Select
+            value={`${params.sortBy}-${params.sortOrder}`}
+            onChange={handleSortChange}
+            style={{ width: 200 }}
+          >
+            <Option value="createdAt-desc">最新发布</Option>
+            <Option value="viewCount-desc">最多观看</Option>
+            <Option value="uploadDate-desc">最新上传</Option>
+          </Select>
+        </div>
+      </div>
+
+      <Spin spinning={isLoading}>
+        <Row gutter={[16, 16]}>
+          {videosResponse?.data.results.map(video => (
+            <Col key={video.id} xs={24} sm={12} md={8} lg={6}>
+              <VideoCard
+                video={video}
+                onPlay={(video) => {
+                  // 处理播放逻辑
+                  window.open(`/videos/${video.id}`, '_blank');
+                }}
+                onFavorite={(videoId) => {
+                  // 处理收藏逻辑
+                  console.log('收藏视频:', videoId);
+                }}
+              />
+            </Col>
+          ))}
+        </Row>
+      </Spin>
+
+      {videosResponse?.data && (
+        <div className="pagination-container">
+          <Pagination
+            current={params.page}
+            pageSize={params.pageSize}
+            total={videosResponse.data.count}
+            onChange={handlePageChange}
+            showSizeChanger
+            showQuickJumper
+            showTotal={(total, range) =>
+              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            }
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default VideoListPage;
+```
+
+### 自定义 Hooks
+
+```typescript
+// hooks/useVideoPlayer.ts
+import { useState, useCallback } from 'react';
+import { Video } from '../types/video';
+
+interface UseVideoPlayerReturn {
+  currentVideo: Video | null;
+  isPlaying: boolean;
+  playVideo: (video: Video) => void;
+  pauseVideo: () => void;
+  stopVideo: () => void;
+}
+
+export const useVideoPlayer = (): UseVideoPlayerReturn => {
+  const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const playVideo = useCallback((video: Video) => {
+    setCurrentVideo(video);
+    setIsPlaying(true);
+  }, []);
+
+  const pauseVideo = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+
+  const stopVideo = useCallback(() => {
+    setCurrentVideo(null);
+    setIsPlaying(false);
+  }, []);
+
+  return {
+    currentVideo,
+    isPlaying,
+    playVideo,
+    pauseVideo,
+    stopVideo
+  };
+};
+```
+
+## API 服务层
+
+### RTK Query API 定义
+```typescript
+// services/videosApi.ts
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { Video, VideoListParams, ApiResponse, PaginatedResponse } from '../types/video';
+
+export const videosApi = createApi({
+  reducerPath: 'videosApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: '/api/',
+    prepareHeaders: (headers, { getState }) => {
+      // 添加认证token
+      const token = (getState() as any).auth.token;
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`);
+      }
+      headers.set('content-type', 'application/json');
+      return headers;
+    },
+  }),
+  tagTypes: ['Video', 'VideoList'],
+  endpoints: (builder) => ({
+    getVideos: builder.query<ApiResponse<PaginatedResponse<Video>>, VideoListParams>({
+      query: (params) => ({
+        url: 'videos/',
+        params: {
+          page: params.page,
+          page_size: params.pageSize,
+          search: params.search,
+          tags: params.tags?.join(','),
+          groups: params.groups?.join(','),
+          ordering: params.sortOrder === 'desc' 
+            ? `-${params.sortBy}` 
+            : params.sortBy
+        },
+      }),
+      providesTags: ['VideoList'],
+    }),
+    
+    getVideo: builder.query<ApiResponse<Video>, number>({
+      query: (id) => `videos/${id}/`,
+      providesTags: (result, error, id) => [{ type: 'Video', id }],
+    }),
+    
+    createVideo: builder.mutation<ApiResponse<Video>, Partial<Video>>({
+      query: (video) => ({
+        url: 'videos/',
+        method: 'POST',
+        body: video,
+      }),
+      invalidatesTags: ['VideoList'],
+    }),
+    
+    updateVideo: builder.mutation<ApiResponse<Video>, { id: number; video: Partial<Video> }>({
+      query: ({ id, video }) => ({
+        url: `videos/${id}/`,
+        method: 'PUT',
+        body: video,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Video', id },
+        'VideoList'
+      ],
+    }),
+    
+    deleteVideo: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `videos/${id}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Video', id },
+        'VideoList'
+      ],
+    }),
+    
+    favoriteVideo: builder.mutation<ApiResponse<{ favorited: boolean }>, number>({
+      query: (id) => ({
+        url: `videos/${id}/favorite/`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, id) => [{ type: 'Video', id }],
+    }),
+  }),
+});
+
+export const {
+  useGetVideosQuery,
+  useGetVideoQuery,
+  useCreateVideoMutation,
+  useUpdateVideoMutation,
+  useDeleteVideoMutation,
+  useFavoriteVideoMutation,
+} = videosApi;
+```
+
+### Axios 服务配置
+```typescript
+// services/apiClient.ts
+import axios, { AxiosResponse, AxiosError } from 'axios';
+import { message } from 'antd';
+
+const apiClient = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// 请求拦截器
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器
+apiClient.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (error: AxiosError) => {
+    const { response } = error;
+    
+    if (response?.status === 401) {
+      // 清除token并跳转到登录页
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+    } else if (response?.status === 403) {
+      message.error('没有权限执行此操作');
+    } else if (response?.status === 404) {
+      message.error('请求的资源不存在');
+    } else if (response?.status >= 500) {
+      message.error('服务器错误，请稍后重试');
+    } else {
+      message.error('请求失败，请稍后重试');
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
+```
+
+## 状态管理
+
+### Redux Store 配置
+```typescript
+// store/index.ts
+import { configureStore } from '@reduxjs/toolkit';
+import { videosApi } from '../services/videosApi';
+import { groupsApi } from '../services/groupsApi';
+import authSlice from './slices/authSlice';
+import uiSlice from './slices/uiSlice';
+
+export const store = configureStore({
+  reducer: {
+    auth: authSlice,
+    ui: uiSlice,
+    [videosApi.reducerPath]: videosApi.reducer,
+    [groupsApi.reducerPath]: groupsApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST'],
+      },
+    })
+      .concat(videosApi.middleware)
+      .concat(groupsApi.middleware),
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+### Redux Slice 定义
+```typescript
+// store/slices/authSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+}
+
+const initialState: AuthState = {
+  user: null,
+  token: localStorage.getItem('authToken'),
+  isAuthenticated: false,
+  loading: false,
+};
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    loginStart: (state) => {
+      state.loading = true;
+    },
+    loginSuccess: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      state.loading = false;
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      localStorage.setItem('authToken', action.payload.token);
+    },
+    loginFailure: (state) => {
+      state.loading = false;
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      localStorage.removeItem('authToken');
+    },
+    logout: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      localStorage.removeItem('authToken');
+    },
+  },
+});
+
+export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions;
+export default authSlice.reducer;
+```
+
+## 样式规范
+
+### Tailwind CSS 使用规范
+```typescript
+// 推荐的 Tailwind 类名使用方式
+const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      <div className="relative">
+        <img
+          src={video.thumbnail}
+          alt={video.title}
+          className="w-full h-48 object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+          <PlayCircleOutlined className="text-white text-4xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
+        </div>
+      </div>
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+          {video.title}
+        </h3>
+        <p className="text-gray-600 text-sm line-clamp-3 mb-3">
+          {video.description}
+        </p>
+        <div className="flex flex-wrap gap-1">
+          {video.tags.map(tag => (
+            <span
+              key={tag.id}
+              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### Styled Components 使用
+```typescript
+// components/VideoPlayer/VideoPlayer.styled.ts
+import styled from 'styled-components';
+
+export const VideoPlayerContainer = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  
+  .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  .video-info {
+    color: white;
+    
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  }
+`;
+```
+
+## 路由管理
+
+### React Router 配置
+```typescript
+// App.tsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout/Layout';
+import HomePage from './pages/HomePage/HomePage';
+import VideoListPage from './pages/VideoListPage/VideoListPage';
+import VideoDetailPage from './pages/VideoDetailPage/VideoDetailPage';
+import GroupListPage from './pages/GroupListPage/GroupListPage';
+import CompetitionListPage from './pages/CompetitionListPage/CompetitionListPage';
+
+function App() {
+  return (
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/videos" element={<VideoListPage />} />
+          <Route path="/videos/:id" element={<VideoDetailPage />} />
+          <Route path="/groups" element={<GroupListPage />} />
+          <Route path="/competitions" element={<CompetitionListPage />} />
+        </Routes>
+      </Layout>
+    </Router>
+  );
+}
+
+export default App;
+```
+
+## 性能优化
+
+### 组件懒加载
+```typescript
+// 使用 React.lazy 进行组件懒加载
+import { lazy, Suspense } from 'react';
+import { Spin } from 'antd';
+
+const VideoDetailPage = lazy(() => import('./pages/VideoDetailPage/VideoDetailPage'));
+const GroupListPage = lazy(() => import('./pages/GroupListPage/GroupListPage'));
+
+function App() {
+  return (
+    <Suspense fallback={<Spin size="large" className="page-loading" />}>
+      <Routes>
+        <Route path="/videos/:id" element={<VideoDetailPage />} />
+        <Route path="/groups" element={<GroupListPage />} />
+      </Routes>
+    </Suspense>
+  );
+}
+```
+
+### 图片懒加载
+```typescript
+// hooks/useImageLazyLoad.ts
+import { useState, useEffect, useRef } from 'react';
+
+export const useImageLazyLoad = (src: string, threshold = 0.1) => {
+  const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    let observer: IntersectionObserver;
+    
+    if (imageRef && imageSrc !== src) {
+      observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              setImageSrc(src);
+              observer.unobserve(imageRef);
+            }
+          });
+        },
+        { threshold }
+      );
+      observer.observe(imageRef);
+    }
+    
+    return () => {
+      if (observer && observer.unobserve) {
+        observer.unobserve(imageRef!);
+      }
+    };
+  }, [imageRef, imageSrc, src, threshold]);
+
+  return [setImageRef, imageSrc];
+};
+```
+
+### React.memo 优化
+```typescript
+// 使用 React.memo 避免不必要的重渲染
+const VideoCard: React.FC<VideoCardProps> = React.memo(({ 
+  video, 
+  onPlay, 
+  onFavorite 
+}) => {
+  // 组件实现
+}, (prevProps, nextProps) => {
+  // 自定义比较函数
+  return (
+    prevProps.video.id === nextProps.video.id &&
+    prevProps.video.title === nextProps.video.title
+  );
+});
+```
+
+## 错误处理
+
+### 错误边界组件
+```typescript
+// components/ErrorBoundary/ErrorBoundary.tsx
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Result, Button } from 'antd';
+
+interface Props {
+  children: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false
+  };
+
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo);
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return (
+        <Result
+          status="error"
+          title="页面出错了"
+          subTitle="抱歉，页面遇到了一些问题。"
+          extra={
+            <Button 
+              type="primary" 
+              onClick={() => window.location.reload()}
+            >
+              刷新页面
+            </Button>
+          }
+        />
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+```
+
+## 测试规范
+
+### 组件测试
+```typescript
+// components/VideoCard/__tests__/VideoCard.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import VideoCard from '../VideoCard';
+import { Video } from '../../../types/video';
+
+const mockVideo: Video = {
+  id: 1,
+  bvNumber: 'BV1234567890',
+  title: '测试视频',
+  url: 'https://www.bilibili.com/video/BV1234567890',
+  thumbnail: 'https://example.com/thumbnail.jpg',
+  description: '这是一个测试视频',
+  viewCount: 1000,
+  tags: [{ id: 1, name: '测试标签' }],
+  groups: [],
+  createdAt: '2023-01-01T00:00:00Z',
+  updatedAt: '2023-01-01T00:00:00Z'
+};
+
+describe('VideoCard', () => {
+  test('renders video title and description', () => {
+    render(<VideoCard video={mockVideo} />);
+    
+    expect(screen.getByText('测试视频')).toBeInTheDocument();
+    expect(screen.getByText('这是一个测试视频')).toBeInTheDocument();
+  });
+
+  test('calls onPlay when play button is clicked', () => {
+    const mockOnPlay = jest.fn();
+    render(<VideoCard video={mockVideo} onPlay={mockOnPlay} />);
+    
+    fireEvent.click(screen.getByText('播放'));
+    expect(mockOnPlay).toHaveBeenCalledWith(mockVideo);
+  });
+});
+```
+
+## 构建和部署
+
+### Vite 配置优化
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@services': path.resolve(__dirname, './src/services'),
+      '@types': path.resolve(__dirname, './src/types'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+    },
+  },
+  build: {
+    target: 'es2015',
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'antd-vendor': ['antd'],
+          'router-vendor': ['react-router-dom'],
+          'redux-vendor': ['@reduxjs/toolkit', 'react-redux'],
+        },
+      },
+    },
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+      },
+    },
+  },
+});
+```
+
+### 环境变量配置
+```bash
+# .env.development
+VITE_API_BASE_URL=http://localhost:8000/api
+VITE_APP_TITLE=Cosplay视频数据库
+VITE_ENABLE_DEVTOOLS=true
+
+# .env.production
+VITE_API_BASE_URL=https://api.cosplay-database.com/api
+VITE_APP_TITLE=Cosplay视频数据库
+VITE_ENABLE_DEVTOOLS=false
+```
+
+### 代码检查配置
+```json
+// .eslintrc.json
+{
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
+}
+```
+
+## 开发工具推荐
+
+### VSCode 插件
+- ES7+ React/Redux/React-Native snippets
+- TypeScript Importer
+- Auto Rename Tag
+- Bracket Pair Colorizer
+- GitLens
+- Prettier - Code formatter
+- ESLint
+
+### 开发辅助脚本
+```json
+// package.json scripts
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "analyze": "npx vite-bundle-analyzer"
+  }
+}
+```
+description:
+globs:
+alwaysApply: false
+---

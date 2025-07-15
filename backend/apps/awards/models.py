@@ -17,8 +17,7 @@ class Award(models.Model):
     competition = models.ForeignKey('competitions.Competition', on_delete=models.CASCADE,
                                    related_name='awards', verbose_name='所属比赛')
     
-    # 等级信息
-    rank = models.IntegerField(default=1, verbose_name='等级')
+    # 级别信息
     level = models.CharField(max_length=20, blank=True, verbose_name='级别')
     
     # 奖品信息
@@ -35,7 +34,7 @@ class Award(models.Model):
     class Meta:
         verbose_name = '奖项'
         verbose_name_plural = '奖项'
-        ordering = ['rank', 'name']
+        ordering = ['name']
     
     def __str__(self):
         return f"{self.competition.name} - {self.name}"
@@ -49,12 +48,9 @@ class AwardRecord(models.Model):
     award = models.ForeignKey(Award, on_delete=models.CASCADE, 
                              related_name='records', verbose_name='奖项')
     
-    # 获奖者信息 (可能是视频、演出、社团中的任意一个或多个)
+    # 获奖者信息 (可能是视频、社团中的任意一个或多个)
     video = models.ForeignKey('videos.Video', on_delete=models.SET_NULL, null=True, blank=True,
                              related_name='award_records', verbose_name='获奖视频')
-    performance = models.ForeignKey('performances.Performance', on_delete=models.SET_NULL, 
-                                   null=True, blank=True, related_name='award_records', 
-                                   verbose_name='获奖演出')
     group = models.ForeignKey('groups.Group', on_delete=models.SET_NULL, null=True, blank=True,
                              related_name='award_records', verbose_name='获奖社团')
     

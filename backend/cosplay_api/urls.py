@@ -50,7 +50,6 @@ urlpatterns = [
     path('api/videos/', include('apps.videos.urls')),
     path('api/groups/', include('apps.groups.urls')),
     path('api/competitions/', include('apps.competitions.urls')),
-    path('api/performances/', include('apps.performances.urls')),
     path('api/tags/', include('apps.tags.urls')),
     path('api/awards/', include('apps.awards.urls')),
     path('api/users/', include('apps.users.urls')),
