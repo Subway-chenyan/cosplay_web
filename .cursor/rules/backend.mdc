@@ -6,17 +6,14 @@
 - Django 4.2.7
 - Django REST Framework 3.14.0
 - PostgreSQL 数据库
-- Redis 缓存和会话存储
-- Celery 异步任务处理
+- Redis 缓存和会话存储（可选）
 
 ### 主要依赖
-- psycopg2-binary: PostgreSQL 数据库适配器
+- psycopg2-binary: PostgreSQL 适配器
 - django-cors-headers: 跨域请求处理
 - django-filter: API 过滤功能
 - drf-spectacular: OpenAPI 文档生成
-- django-allauth: 用户认证系统
 - djangorestframework-simplejwt: JWT 令牌认证
-- django-redis: Redis 集成
 
 ## 项目结构规范
 
@@ -25,20 +22,18 @@
 backend/
 ├── cosplay_api/           # 主项目配置
 │   ├── settings.py        # 项目设置
-│   ├── urls.py           # 主路由配置
-│   ├── wsgi.py           # WSGI 配置
-│   └── asgi.py           # ASGI 配置
-├── apps/                 # 业务应用模块
-│   ├── videos/          # 视频管理模块
-│   ├── groups/          # 社团管理模块
-│   ├── competitions/    # 比赛管理模块
-│   ├── performances/    # 剧目管理模块
-│   ├── tags/           # 标签管理模块
-│   ├── awards/         # 奖项管理模块
-│   └── users/          # 用户管理模块
-├── utils/              # 工具函数
-├── requirements.txt    # 依赖列表
-└── manage.py          # Django 管理脚本
+│   ├── urls.py            # 主路由配置
+│   ├── wsgi.py            # WSGI 配置
+│   └── asgi.py            # ASGI 配置
+├── apps/                  # 业务应用模块
+│   ├── videos/            # 视频管理模块
+│   ├── groups/            # 社团管理模块
+│   ├── competitions/      # 比赛管理模块
+│   ├── tags/              # 标签管理模块
+│   ├── awards/            # 奖项管理模块
+│   └── users/             # 用户管理模块
+├── requirements.txt       # 依赖列表
+└── manage.py              # Django 管理脚本
 ```
 
 ### 每个应用模块结构
@@ -46,124 +41,55 @@ backend/
 app_name/
 ├── __init__.py
 ├── admin.py           # Django 管理后台配置
-├── apps.py           # 应用配置
-├── models.py         # 数据模型
-├── serializers.py    # DRF 序列化器
-├── views.py          # API 视图
-├── urls.py           # 路由配置
-├── filters.py        # 过滤器（如果需要）
-├── permissions.py    # 权限类（如果需要）
-├── validators.py     # 验证器（如果需要）
-└── migrations/       # 数据库迁移文件
+├── apps.py            # 应用配置
+├── models.py          # 数据模型
+├── serializers.py     # DRF 序列化器
+├── views.py           # API 视图
+├── urls.py            # 路由配置
+├── filters.py         # 过滤器（如需要）
+├── permissions.py     # 权限类（如需要）
+├── validators.py      # 校验器（如需要）
+└── migrations/        # 数据库迁移文件
 ```
 
 ## 代码规范
 
 ### 命名约定
-- **模型类**: 使用 PascalCase，如 `VideoModel`, `GroupModel`
+- **模型类**: 使用 PascalCase，如 `Video`、`Group`
 - **变量和函数**: 使用 snake_case，如 `video_title`, `get_video_list`
 - **常量**: 使用 UPPER_SNAKE_CASE，如 `MAX_UPLOAD_SIZE`
-- **URL 名称**: 使用 kebab-case，如 `video-list`, `group-detail`
+- **URL 命名**: 使用 kebab-case，如 `video-list`, `group-detail`
 
 ### 模型设计规范
-```python
-class Video(models.Model):
-    """视频模型"""
-    
-    # 主键字段
-    id = models.AutoField(primary_key=True)
-    
-    # 必填字段在前
-    bv_number = models.CharField(max_length=20, unique=True, verbose_name="BV号")
-    title = models.CharField(max_length=255, verbose_name="标题")
-    url = models.URLField(verbose_name="视频链接")
-    
-    # 可选字段在后
-    thumbnail = models.URLField(blank=True, null=True, verbose_name="封面图")
-    description = models.TextField(blank=True, verbose_name="描述")
-    upload_date = models.DateField(blank=True, null=True, verbose_name="上传日期")
-    
-    # 时间戳字段放在最后
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
-    
-    class Meta:
-        db_table = 'videos'
-        verbose_name = '视频'
-        verbose_name_plural = '视频'
-        ordering = ['-created_at']
-        
-    def __str__(self):
-        return self.title
-```
+- 只保留核心模型：User（仅管理员/编辑）、Video、Group、Tag、Competition、Award、AwardRecord
+- 不包含剧目、收藏、评分、评论、观看记录等模型
+- 字段命名统一、主键为 `id`，外键为 `{model_name}_id`
+- 时间戳字段：`created_at`, `updated_at`
 
 ### 序列化器规范
-```python
-class VideoSerializer(serializers.ModelSerializer):
-    """视频序列化器"""
-    
-    # 只读字段
-    id = serializers.IntegerField(read_only=True)
-    created_at = serializers.DateTimeField(read_only=True)
-    
-    # 嵌套序列化器
-    tags = TagSerializer(many=True, read_only=True)
-    groups = GroupSerializer(many=True, read_only=True)
-    
-    class Meta:
-        model = Video
-        fields = '__all__'
-        
-    def validate_bv_number(self, value):
-        """验证BV号格式"""
-        if not value.startswith('BV'):
-            raise serializers.ValidationError("BV号必须以'BV'开头")
-        return value
-```
+- 只为核心模型编写序列化器
+- 字段只读属性合理设置
 
 ### 视图类规范
-```python
-class VideoViewSet(viewsets.ModelViewSet):
-    """视频API视图集"""
-    
-    queryset = Video.objects.all()
-    serializer_class = VideoSerializer
-    filterset_class = VideoFilter
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    ordering_fields = ['upload_date', 'created_at']
-    search_fields = ['title', 'description']
-    
-    def get_queryset(self):
-        """自定义查询集"""
-        queryset = super().get_queryset()
-        return queryset.select_related('performance').prefetch_related('tags', 'groups')
-    
-    @action(detail=True, methods=['post'])
-    def add_tag(self, request, pk=None):
-        """为视频添加标签"""
-        video = self.get_object()
-        tag_id = request.data.get('tag_id')
-        # 业务逻辑处理
-        return Response({'success': True})
-```
+- 只为核心模型编写ViewSet
+- 遵循RESTful API设计
 
 ## API 设计规范
 
 ### RESTful URL 设计
-```python
+```
 # urls.py
 urlpatterns = [
-    # 资源列表和详情
     path('videos/', VideoListCreateView.as_view(), name='video-list'),
     path('videos/<int:pk>/', VideoRetrieveUpdateDestroyView.as_view(), name='video-detail'),
-    
-    # 嵌套资源
-    path('videos/<int:video_id>/tags/', VideoTagListView.as_view(), name='video-tag-list'),
-    path('videos/<int:video_id>/comments/', VideoCommentListView.as_view(), name='video-comment-list'),
-    
-    # 操作性接口
-    path('videos/<int:pk>/favorite/', VideoFavoriteView.as_view(), name='video-favorite'),
-    path('videos/<int:pk>/rate/', VideoRateView.as_view(), name='video-rate'),
+    path('groups/', GroupListCreateView.as_view(), name='group-list'),
+    path('groups/<int:pk>/', GroupRetrieveUpdateDestroyView.as_view(), name='group-detail'),
+    path('competitions/', CompetitionListCreateView.as_view(), name='competition-list'),
+    path('competitions/<int:pk>/', CompetitionRetrieveUpdateDestroyView.as_view(), name='competition-detail'),
+    path('awards/', AwardListCreateView.as_view(), name='award-list'),
+    path('awards/<int:pk>/', AwardRetrieveUpdateDestroyView.as_view(), name='award-detail'),
+    path('tags/', TagListCreateView.as_view(), name='tag-list'),
+    path('tags/<int:pk>/', TagRetrieveUpdateDestroyView.as_view(), name='tag-detail'),
 ]
 ```
 
@@ -178,270 +104,21 @@ urlpatterns = [
 - `500 Internal Server Error`: 服务器错误
 
 ### 响应格式规范
-```python
-# 成功响应格式
+```json
 {
-    "code": 200,
-    "message": "success",
-    "data": {
-        "id": 1,
-        "title": "视频标题",
-        "url": "https://..."
-    }
-}
-
-# 列表响应格式（分页）
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "count": 100,
-        "next": "http://api.example.com/videos/?page=3",
-        "previous": "http://api.example.com/videos/?page=1",
-        "results": [...]
-    }
-}
-
-# 错误响应格式
-{
-    "code": 400,
-    "message": "参数错误",
-    "errors": {
-        "title": ["这个字段是必需的。"],
-        "bv_number": ["BV号已存在。"]
-    }
+  "code": 200,
+  "message": "success",
+  "data": { ... }
 }
 ```
 
 ## 数据库设计规范
+- 只保留核心表结构
+- 表命名使用复数形式：`videos`, `groups`, `competitions`, `awards`, `tags`, `users`, `award_records`
+- 关联表使用下划线连接：`video_tags`, `video_groups`
+- 字段命名、索引、外键等遵循一致性
 
-### 表命名规范
-- 使用复数形式: `videos`, `groups`, `competitions`
-- 关联表使用下划线连接: `video_tags`, `video_groups`
-
-### 字段设计规范
-- 主键统一使用 `id` (AutoField)
-- 外键字段命名: `{model_name}_id`
-- 时间戳字段: `created_at`, `updated_at`
-- 软删除字段: `is_deleted`, `deleted_at`
-- 状态字段使用choices: `status`, `type`
-
-### 索引策略
-```python
-class Meta:
-    indexes = [
-        models.Index(fields=['upload_date']),
-        models.Index(fields=['created_at']),
-        models.Index(fields=['title']),
-        models.Index(fields=['bv_number']),
-    ]
-```
-
-## 错误处理规范
-
-### 自定义异常处理
-```python
-# exceptions.py
-class BusinessException(Exception):
-    """业务异常基类"""
-    def __init__(self, message, code=400):
-        self.message = message
-        self.code = code
-        super().__init__(message)
-
-# views.py 中的使用
-def some_business_logic(self):
-    if not self.validate_business_rule():
-        raise BusinessException("业务规则验证失败", code=400)
-```
-
-### 统一异常处理器
-```python
-# utils/exception_handler.py
-def custom_exception_handler(exc, context):
-    """自定义异常处理器"""
-    response = exception_handler(exc, context)
-    
-    if response is not None:
-        custom_response_data = {
-            'code': response.status_code,
-            'message': 'error',
-            'errors': response.data
-        }
-        response.data = custom_response_data
-    
-    return response
-```
-
-## 测试规范
-
-### 测试文件组织
-```python
-# tests/
-├── test_models.py      # 模型测试
-├── test_views.py       # 视图测试
-├── test_serializers.py # 序列化器测试
-└── test_utils.py       # 工具函数测试
-```
-
-### 测试示例
-```python
-class VideoModelTest(TestCase):
-    """视频模型测试"""
-    
-    def setUp(self):
-        self.video = Video.objects.create(
-            bv_number="BV1234567890",
-            title="测试视频",
-            url="https://www.bilibili.com/video/BV1234567890"
-        )
-    
-    def test_str_representation(self):
-        """测试字符串表示"""
-        self.assertEqual(str(self.video), "测试视频")
-    
-    def test_bv_number_validation(self):
-        """测试BV号验证"""
-        with self.assertRaises(ValidationError):
-            video = Video(bv_number="invalid", title="test", url="http://test.com")
-            video.full_clean()
-```
-
-## 缓存策略
-
-### Redis 缓存使用
-```python
-from django.core.cache import cache
-
-class VideoViewSet(viewsets.ModelViewSet):
-    def list(self, request, *args, **kwargs):
-        # 缓存热门视频列表
-        cache_key = 'hot_videos'
-        videos = cache.get(cache_key)
-        
-        if videos is None:
-            videos = self.get_queryset().filter(is_hot=True)
-            cache.set(cache_key, videos, timeout=3600)  # 缓存1小时
-        
-        # 序列化和返回
-        serializer = self.get_serializer(videos, many=True)
-        return Response(serializer.data)
-```
-
-## 性能优化规范
-
-### 数据库查询优化
-```python
-# 使用 select_related 优化一对一/多对一查询
-videos = Video.objects.select_related('performance').all()
-
-# 使用 prefetch_related 优化一对多/多对多查询
-videos = Video.objects.prefetch_related('tags', 'groups').all()
-
-# 使用 only 和 defer 优化字段选择
-videos = Video.objects.only('title', 'url', 'upload_date').all()
-```
-
-### 分页处理
-```python
-from rest_framework.pagination import PageNumberPagination
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 20
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-```
-
-## 安全规范
-
-### 权限控制
-```python
-from rest_framework.permissions import BasePermission
-
-class IsOwnerOrReadOnly(BasePermission):
-    """只有所有者可以编辑"""
-    
-    def has_object_permission(self, request, view, obj):
-        # 读权限对所有请求开放
-        if request.method in SAFE_METHODS:
-            return True
-        
-        # 写权限只给所有者
-        return obj.owner == request.user
-```
-
-### 敏感信息处理
-```python
-# settings.py 中敏感信息使用环境变量
-import os
-from decouple import config
-
-SECRET_KEY = config('SECRET_KEY')
-DATABASE_PASSWORD = config('DB_PASSWORD')
-
-# 序列化器中排除敏感字段
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        exclude = ['password']
-```
-
-## 部署配置
-
-### 环境变量配置
-```bash
-# .env 文件示例
-SECRET_KEY=your-secret-key
-DEBUG=False
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname
-REDIS_URL=redis://localhost:6379/0
-ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
-```
-
-### 日志配置
-```python
-# settings.py
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': 'logs/django.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
-```
-
-## 开发工具配置
-
-### 代码格式化
-- 使用 Black 进行代码格式化
-- 使用 isort 进行导入排序
-- 使用 flake8 进行代码检查
-
-### 预提交钩子
-```yaml
-# .pre-commit-config.yaml
-repos:
-  - repo: https://github.com/psf/black
-    rev: 22.3.0
-    hooks:
-      - id: black
-  - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-```
-description:
-globs:
-alwaysApply: false
----
+## 其它
+- 代码需有适当注释
+- 重要业务逻辑需有单元测试
+- 遵循本规范进行开发，确保代码质量和项目可维护性
