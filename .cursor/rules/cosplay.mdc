@@ -1,0 +1,7 @@
+---
+description:
+globs:
+alwaysApply: false
+后端开发语言: python
+数据库: postgresql
+---

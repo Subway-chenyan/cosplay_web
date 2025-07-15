@@ -1,0 +1,84 @@
+/* App.css */
+
+.App {
+  min-height: 100vh;
+  background: #141414;
+  color: #ffffff;
+}
+
+/* 全局样式重置 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #141414;
+  color: #ffffff;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff6b6b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5252;
+}
+
+/* Ant Design 暗色主题自定义 */
+.ant-layout {
+  background: #141414 !important;
+}
+
+.ant-card {
+  background: #1f1f1f !important;
+  border-color: #2a2a2a !important;
+}
+
+.ant-typography {
+  color: inherit !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #ff5252, #ff7043);
+}
+
+/* 响应式工具类 */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+} 

@@ -1,0 +1,557 @@
+.competition-list-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding-bottom: 40px;
+}
+
+/* 页面头部 */
+.page-header {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+  padding: 60px 0;
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="trophy" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><text x="10" y="15" font-size="12" fill="rgba(255,255,255,0.1)" text-anchor="middle">🏆</text></pattern></defs><rect width="100" height="100" fill="url(%23trophy)"/></svg>');
+  opacity: 0.3;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.page-title {
+  color: #fff !important;
+  margin-bottom: 16px !important;
+  font-size: 3rem;
+  font-weight: 700;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.title-icon {
+  margin-right: 16px;
+  color: #fbbf24;
+  filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.3));
+}
+
+.page-description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.2rem;
+  display: block;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 搜索区域 */
+.search-section {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+
+.search-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-input {
+  width: 100%;
+}
+
+.search-input .ant-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 16px;
+}
+
+.search-input .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-input .ant-input:focus,
+.search-input .ant-input:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+.search-input .ant-btn {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  height: 48px;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+}
+
+.search-input .ant-btn:hover {
+  background: linear-gradient(135deg, #6d28d9, #9333ea);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+}
+
+.year-select .ant-select-selector {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  color: #fff !important;
+}
+
+.year-select .ant-select-selection-placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.year-select .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.year-select:hover .ant-select-selector,
+.year-select.ant-select-focused .ant-select-selector {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2) !important;
+}
+
+/* 统计信息 */
+.stats-bar {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stats-bar .ant-statistic {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  min-width: 150px;
+  transition: all 0.3s ease;
+}
+
+.stats-bar .ant-statistic:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+.stats-bar .ant-statistic-title {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.stats-bar .ant-statistic-content {
+  color: #fff !important;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.stats-bar .anticon {
+  color: #7c3aed;
+  margin-right: 8px;
+}
+
+/* 比赛列表区域 */
+.competitions-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 比赛卡片 */
+.competition-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+.competition-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+.competition-card .ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.competition-card .ant-card-actions {
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 0;
+}
+
+.competition-cover {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  padding: 40px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.competition-image {
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+}
+
+.competition-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.status-tag {
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.competition-title h4 {
+  color: #fff !important;
+  margin: 0 !important;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.competition-description {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.description-text {
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin-bottom: 0 !important;
+  line-height: 1.6;
+}
+
+.description-text .ant-typography {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.competition-details {
+  margin: 8px 0;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.detail-icon {
+  color: #7c3aed;
+  font-size: 14px;
+  min-width: 16px;
+}
+
+.detail-text {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 13px;
+}
+
+.competition-tags {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.competition-tags .ant-tag {
+  margin-right: 8px;
+  margin-bottom: 4px;
+  border: none;
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.card-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  flex-direction: column;
+}
+
+.card-action:hover {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.card-action .anticon {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.card-action span {
+  font-size: 11px;
+  color: inherit;
+  text-align: center;
+}
+
+/* 骨架屏 */
+.competition-card-skeleton {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+  height: 480px;
+}
+
+.competition-card-skeleton .ant-skeleton-image {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.competition-card-skeleton .ant-skeleton-title,
+.competition-card-skeleton .ant-skeleton-paragraph > li {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 分页 */
+.pagination-container {
+  margin-top: 60px;
+  text-align: center;
+}
+
+.pagination-container .ant-pagination {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pagination-container .ant-pagination-item {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0 4px;
+  border-radius: 8px;
+}
+
+.pagination-container .ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  display: block;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.pagination-container .ant-pagination-item:hover {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.pagination-container .ant-pagination-item-active {
+  border-color: #7c3aed;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.pagination-container .ant-pagination-item-active a {
+  color: #fff;
+}
+
+.pagination-container .ant-pagination-prev,
+.pagination-container .ant-pagination-next,
+.pagination-container .ant-pagination-jump-prev,
+.pagination-container .ant-pagination-jump-next {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0 4px;
+  border-radius: 8px;
+}
+
+.pagination-container .ant-pagination-prev:hover,
+.pagination-container .ant-pagination-next:hover {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.pagination-container .ant-pagination-prev .ant-pagination-item-link,
+.pagination-container .ant-pagination-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.8);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+.pagination-container .ant-pagination-total-text {
+  color: rgba(255, 255, 255, 0.7);
+  margin-right: 16px;
+}
+
+/* 错误和空状态 */
+.error-section {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.error-section .ant-empty {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.error-section .ant-empty-description {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2.2rem !important;
+  }
+  
+  .search-container {
+    padding: 20px;
+  }
+  
+  .search-container .ant-row {
+    flex-direction: column;
+  }
+  
+  .stats-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .competition-card {
+    height: auto;
+    min-height: 420px;
+  }
+  
+  .competition-cover {
+    height: 150px;
+    padding: 30px;
+  }
+  
+  .card-action {
+    flex-direction: row;
+    gap: 8px;
+  }
+  
+  .card-action .anticon {
+    margin-bottom: 0;
+    margin-right: 4px;
+  }
+  
+  .card-action span {
+    font-size: 12px;
+  }
+  
+  .pagination-container .ant-pagination {
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: 40px 0;
+  }
+  
+  .page-title {
+    font-size: 1.8rem !important;
+  }
+  
+  .title-icon {
+    margin-right: 8px;
+  }
+  
+  .search-container {
+    padding: 16px;
+  }
+  
+  .search-input .ant-input {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+  
+  .search-input .ant-btn {
+    height: 42px;
+    padding: 0 16px;
+  }
+  
+  .year-select {
+    width: 100% !important;
+  }
+  
+  .competition-cover {
+    height: 120px;
+    padding: 20px;
+  }
+  
+  .competition-image .anticon {
+    font-size: 36px !important;
+  }
+}
+
+/* Ant Design Select Dropdown样式 */
+.ant-select-dropdown {
+  background: rgba(30, 30, 46, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+}
+
+.ant-select-item {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.ant-select-item:hover {
+  background: rgba(124, 58, 237, 0.2) !important;
+  color: #fff !important;
+}
+
+.ant-select-item-option-selected {
+  background: rgba(124, 58, 237, 0.3) !important;
+  color: #fff !important;
+} 

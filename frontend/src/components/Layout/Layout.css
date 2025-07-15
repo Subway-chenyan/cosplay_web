@@ -1,0 +1,242 @@
+/* Layout.css */
+
+.layout-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid #ff6b6b33;
+  padding: 0;
+  height: 64px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.menu-trigger {
+  color: #ffffff;
+  font-size: 18px;
+  border: none;
+  background: transparent;
+}
+
+.menu-trigger:hover {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ff6b6b, #ffa500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-center {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 32px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.layout-sider {
+  position: fixed;
+  left: 0;
+  top: 64px;
+  bottom: 0;
+  background: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  overflow-y: auto;
+}
+
+.layout-sider .ant-menu {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+}
+
+.layout-sider .ant-menu-item {
+  margin: 4px 8px;
+  border-radius: 8px;
+  color: #b3b3b3;
+  transition: all 0.3s ease;
+}
+
+.layout-sider .ant-menu-item:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+}
+
+.layout-sider .ant-menu-item-selected {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: #ffffff;
+}
+
+.layout-sider .ant-menu-submenu {
+  color: #b3b3b3;
+}
+
+.layout-sider .ant-menu-submenu-title:hover {
+  color: #ff6b6b;
+}
+
+.layout-content {
+  margin-left: 200px;
+  margin-top: 64px;
+  min-height: calc(100vh - 64px);
+  background: #141414;
+  transition: margin-left 0.2s ease;
+}
+
+.layout-content.collapsed {
+  margin-left: 80px;
+}
+
+.content-wrapper {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 16px;
+  }
+  
+  .header-center {
+    margin: 0 16px;
+  }
+  
+  .logo-text {
+    display: none;
+  }
+  
+  .layout-sider {
+    position: fixed;
+    z-index: 1001;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .layout-sider.open {
+    transform: translateX(0);
+  }
+  
+  .layout-content {
+    margin-left: 0;
+  }
+  
+  .content-wrapper {
+    padding: 16px;
+  }
+}
+
+/* 搜索框样式增强 */
+.ant-input-search-button {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  border: none;
+  color: #ffffff;
+}
+
+.ant-input-search-button:hover {
+  background: linear-gradient(135deg, #ff5252, #ff7043);
+}
+
+/* 自定义滚动条 */
+.layout-sider::-webkit-scrollbar {
+  width: 4px;
+}
+
+.layout-sider::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.layout-sider::-webkit-scrollbar-thumb {
+  background: #ff6b6b;
+  border-radius: 2px;
+}
+
+.layout-sider::-webkit-scrollbar-thumb:hover {
+  background: #ff5252;
+}
+
+/* 暗色主题优化 */
+.ant-dropdown {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+}
+
+.ant-dropdown .ant-dropdown-menu {
+  background: #2a2a2a;
+  border: none;
+}
+
+.ant-dropdown .ant-dropdown-menu-item {
+  color: #ffffff;
+}
+
+.ant-dropdown .ant-dropdown-menu-item:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+}
+
+/* 动画效果 */
+.header-content,
+.layout-sider,
+.layout-content {
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* 加载动画 */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading {
+  animation: pulse 2s infinite;
+} 
