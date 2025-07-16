@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchVideos, setSearchQuery, clearSearch, setFilters, setCurrentPage } from '../store/slices/videosSlice'
+import { fetchVideos, setSearchQuery, clearSearch, setCurrentPage } from '../store/slices/videosSlice'
 import VideoCard from '../components/VideoCard'
 import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
@@ -12,9 +12,9 @@ function HomePage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { videos, loading, error, pagination, searchQuery, filters, currentPage } = useSelector((state: RootState) => state.videos)
+  const [inputValue, setInputValue] = useState(searchQuery)
 
   useEffect(() => {
-    // 获取视频数据，包含搜索和筛选参数
     dispatch(fetchVideos({
       page: currentPage,
       searchQuery,
@@ -23,16 +23,21 @@ function HomePage() {
   }, [dispatch, currentPage, searchQuery, filters])
 
   const handleVideoClick = (videoId: string) => {
-    // 跳转到视频详情页
     navigate(`/video/${videoId}`)
   }
 
-  const handleSearchChange = (query: string) => {
-    dispatch(setSearchQuery(query) as any)
+  const handleInputChange = (value: string) => {
+    setInputValue(value)
   }
 
   const handleClearSearch = () => {
+    setInputValue('')
     dispatch(clearSearch() as any)
+  }
+
+  const handleSearch = () => {
+    dispatch(setSearchQuery(inputValue) as any)
+    dispatch(setCurrentPage(1) as any)
   }
 
   if (loading && videos.length === 0) {
@@ -97,9 +102,10 @@ function HomePage() {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">搜索视频</h2>
         <SearchBar
-          value={searchQuery}
-          onChange={handleSearchChange}
+          value={inputValue}
+          onChange={handleInputChange}
           onClear={handleClearSearch}
+          onSearch={handleSearch}
           placeholder="搜索视频标题、描述、BV号、社团、比赛或标签..."
           className="max-w-2xl"
         />

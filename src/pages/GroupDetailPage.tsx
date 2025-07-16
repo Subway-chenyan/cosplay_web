@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store/store'
 import { fetchGroups } from '../store/slices/groupsSlice'
 import { fetchVideos } from '../store/slices/videosSlice'
-import { fetchAwards } from '../store/slices/awardsSlice'
+import { fetchAwardRecords } from '../store/slices/awardsSlice'
 import VideoCard from '../components/VideoCard'
 import { 
   ArrowLeft, 
@@ -24,7 +24,7 @@ function GroupDetailPage() {
   const navigate = useNavigate()
   const { groups } = useSelector((state: RootState) => state.groups)
   const { videos } = useSelector((state: RootState) => state.videos)
-  const { awards } = useSelector((state: RootState) => state.awards)
+  const { awardRecords } = useSelector((state: RootState) => state.awards)
 
   useEffect(() => {
     if (groups.length === 0) {
@@ -33,10 +33,10 @@ function GroupDetailPage() {
     if (videos.length === 0) {
       dispatch(fetchVideos() as any)
     }
-    if (awards.length === 0) {
-      dispatch(fetchAwards() as any)
+    if (awardRecords.length === 0) {
+      dispatch(fetchAwardRecords() as any)
     }
-  }, [dispatch, groups.length, videos.length, awards.length])
+  }, [dispatch, groups.length, videos.length, awardRecords.length])
 
   const group = groups.find(g => g.id === id)
   
@@ -45,19 +45,25 @@ function GroupDetailPage() {
     video.group === id
   )
 
+  // 调试信息
+  console.log('社团ID:', id)
+  console.log('所有视频数量:', videos.length)
+  console.log('社团视频数量:', groupVideos.length)
+  console.log('社团视频:', groupVideos.map(v => ({ id: v.id, title: v.title, group: v.group, group_name: v.group_name })))
+
   // 获取该社团获得的奖项
-  const groupAwards = awards.filter(award => 
-    award.group_id === id
+  const groupAwards = awardRecords.filter(awardRecord => 
+    awardRecord.group === id
   )
 
   // 获取获奖视频
   const awardedVideos = groupVideos.filter(video => 
-    groupAwards.some(award => award.video_id === video.id)
+    groupAwards.some(awardRecord => awardRecord.video === video.id)
   )
 
   // 获取其他视频（非获奖视频）
   const otherVideos = groupVideos.filter(video => 
-    !groupAwards.some(award => award.video_id === video.id)
+    !groupAwards.some(awardRecord => awardRecord.video === video.id)
   )
 
   const formatDate = (dateString: string) => {
@@ -213,12 +219,12 @@ function GroupDetailPage() {
           </div>
 
           <div className="space-y-6">
-            {groupAwards.map((award) => {
-              const awardVideo = awardedVideos.find(v => v.id === award.video_id)
+            {groupAwards.map((awardRecord) => {
+              const awardVideo = awardedVideos.find(v => v.id === awardRecord.video)
               if (!awardVideo) return null
 
               return (
-                <div key={award.id} className="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
+                <div key={awardRecord.id} className="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
                   <div className="flex items-start space-x-4">
                     <div className="flex-shrink-0">
                       <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
@@ -228,14 +234,17 @@ function GroupDetailPage() {
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-semibold text-yellow-800">{award.name}</h3>
+                        <h3 className="text-lg font-semibold text-yellow-800">{awardRecord.award_name || '获奖记录'}</h3>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          {award.competition}
+                          {awardRecord.competition_name || ''}
+                        </span>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {awardRecord.year}年
                         </span>
                       </div>
                       
-                      {award.description && (
-                        <p className="text-yellow-700 text-sm mb-3">{award.description}</p>
+                      {awardRecord.description && (
+                        <p className="text-yellow-700 text-sm mb-3">{awardRecord.description}</p>
                       )}
                       
                       <div className="bg-white rounded-lg p-3 border border-yellow-200">

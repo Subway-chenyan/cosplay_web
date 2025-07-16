@@ -75,7 +75,9 @@ export const fetchPopularGroups = createAsyncThunk(
 export const searchGroups = createAsyncThunk(
   'groups/searchGroups',
   async (query: string) => {
+    console.log('groupsSlice - searchGroups thunk called with query:', query)
     const response = await groupService.searchGroups(query)
+    console.log('groupsSlice - searchGroups response:', response)
     return response
   }
 )

@@ -67,7 +67,7 @@ function CompetitionsPage() {
           <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-100" />
           <h1 className="text-4xl font-bold mb-2">比赛展示</h1>
           <p className="text-xl text-yellow-100">
-            了解各类cosplay比赛，见证精彩时刻
+            历年Cosplay舞台剧比赛合集
           </p>
         </div>
       </div>
@@ -114,11 +114,9 @@ function CompetitionsPage() {
                   <div className="flex items-center space-x-4">
                     <span className="flex items-center space-x-1">
                       <Award className="w-4 h-4" />
-                      <span>官方认证</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <Users className="w-4 h-4" />
-                      <span>多支队伍</span>
                     </span>
                   </div>
                   <span className="text-primary-600 font-medium">查看详情 →</span>
@@ -139,7 +137,7 @@ function CompetitionsPage() {
         </div>
       )}
 
-      {/* Stats Section */}
+      {/* Stats Section
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">比赛统计</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -162,7 +160,7 @@ function CompetitionsPage() {
             <div className="text-gray-600">最新年份</div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

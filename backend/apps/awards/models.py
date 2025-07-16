@@ -17,9 +17,6 @@ class Award(models.Model):
     competition = models.ForeignKey('competitions.Competition', on_delete=models.CASCADE,
                                    related_name='awards', verbose_name='所属比赛')
     
-    # 级别信息
-    level = models.CharField(max_length=20, blank=True, verbose_name='级别')
-    
     # 奖品信息
     prize_money = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, 
                                      verbose_name='奖金')

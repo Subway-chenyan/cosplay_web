@@ -8,6 +8,8 @@ router = DefaultRouter()
 urlpatterns = [
     path('', views.AwardViewSet.as_view({'get': 'list', 'post': 'create'}), name='award-list'),
     path('<uuid:pk>/', views.AwardViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='award-detail'),
+    path('by_competition/', views.AwardViewSet.as_view({'get': 'by_competition'}), name='award-by-competition'),
     path('records/', views.AwardRecordViewSet.as_view({'get': 'list', 'post': 'create'}), name='awardrecord-list'),
     path('records/<uuid:pk>/', views.AwardRecordViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='awardrecord-detail'),
+    path('records/by_competition/', views.AwardRecordViewSet.as_view({'get': 'by_competition'}), name='awardrecord-by-competition'),
 ] 

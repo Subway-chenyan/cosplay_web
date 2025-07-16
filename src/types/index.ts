@@ -96,7 +96,6 @@ export interface Award {
   name: string
   description: string
   competition: string
-  level: string
   prize_money?: number
   prize_description: string
   winner_count: number

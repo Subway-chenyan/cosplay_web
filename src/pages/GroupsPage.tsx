@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
@@ -10,24 +10,30 @@ function GroupsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { groups, loading, error } = useSelector((state: RootState) => state.groups)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {
     dispatch(fetchGroups() as any)
   }, [dispatch])
 
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query)
-    if (query.trim()) {
-      dispatch(searchGroups(query))
-    } else {
-      dispatch(fetchGroups())
-    }
+  const handleInputChange = (value: string) => {
+    setInputValue(value)
   }
 
   const handleClearSearch = () => {
-    setSearchQuery('')
+    setInputValue('')
     dispatch(fetchGroups())
+  }
+
+  const handleSearch = () => {
+    console.log('GroupsPage - handleSearch called with inputValue:', inputValue)
+    if (inputValue.trim()) {
+      console.log('GroupsPage - dispatching searchGroups')
+      dispatch(searchGroups(inputValue))
+    } else {
+      console.log('GroupsPage - dispatching fetchGroups')
+      dispatch(fetchGroups())
+    }
   }
 
   const handleGroupClick = (groupId: string) => {
@@ -68,9 +74,10 @@ function GroupsPage() {
         <div className="mt-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">搜索社团</h2>
           <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
+            value={inputValue}
+            onChange={handleInputChange}
             onClear={handleClearSearch}
+            onSearch={handleSearch}
             placeholder="搜索社团名称、描述或地区..."
             className="max-w-xl"
           />
@@ -193,7 +200,7 @@ function GroupsPage() {
       </div>
 
       {/* Empty State */}
-              {groups.length === 0 && searchQuery && (
+              {groups.length === 0 && inputValue && (
         <div className="text-center py-12">
           <div className="bg-gray-50 rounded-lg p-8">
             <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />

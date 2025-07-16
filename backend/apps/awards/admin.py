@@ -7,8 +7,8 @@ class AwardAdmin(admin.ModelAdmin):
     """
     奖项管理后台
     """
-    list_display = ['name', 'competition', 'level', 'prize_money', 'winner_count', 'created_at']
-    list_filter = ['level', 'competition', 'created_at']
+    list_display = ['name', 'competition', 'prize_money', 'winner_count', 'created_at']
+    list_filter = ['competition', 'created_at']
     search_fields = ['name', 'description', 'competition__name']
     ordering = ['competition', 'name']
     readonly_fields = ['winner_count']

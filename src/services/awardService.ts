@@ -39,12 +39,8 @@ class AwardService {
 
   // 获取比赛的所有奖项
   async getCompetitionAwards(competitionId: string): Promise<Award[]> {
-    const response = await this.getAwards({
-      competition: competitionId,
-      page_size: 100,
-      ordering: 'level,name'
-    })
-    return response.results
+    const queryString = api.buildQueryParams({ competition: competitionId })
+    return api.get<Award[]>(`/awards/by_competition/${queryString}`)
   }
 
   // 获取获奖记录列表
@@ -61,21 +57,13 @@ class AwardService {
 
   // 获取比赛的所有获奖记录
   async getCompetitionAwardRecords(competitionId: string, year?: number): Promise<AwardRecord[]> {
-    const queryParams: AwardRecordQueryParams = {
-      page_size: 200,
-      ordering: '-year,award__level'
-    }
-    
+    const queryParams: any = {}
     if (year) {
       queryParams.year = year
     }
     
-    // 通过奖项关联筛选比赛
-    const response = await this.getAwardRecords(queryParams)
-    
-    // 由于API限制，这里需要在前端进行额外筛选
-    // 实际应用中建议在后端增加competition参数支持
-    return response.results
+    const queryString = api.buildQueryParams({ ...queryParams, competition: competitionId })
+    return api.get<AwardRecord[]>(`/awards/records/by_competition/${queryString}`)
   }
 
   // 获取视频的获奖记录

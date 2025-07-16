@@ -57,8 +57,8 @@ class VideoListSerializer(serializers.ModelSerializer):
         model = Video
         fields = [
             'id', 'bv_number', 'title', 'thumbnail', 'duration', 'view_count',
-            'like_count', 'performance_date', 'uploaded_by_username', 'group_name', 
-            'competition_name', 'competition_year', 'tags', 'created_at'
+            'like_count', 'performance_date', 'uploaded_by_username', 'group', 'group_name', 
+            'competition', 'competition_name', 'competition_year', 'tags', 'created_at'
         ]
 
 

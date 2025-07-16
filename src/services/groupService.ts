@@ -20,6 +20,7 @@ class GroupService {
     }
     
     const queryString = api.buildQueryParams(queryParams)
+    console.log('GroupService - API URL:', `/groups/${queryString}`)
     return api.get<PaginatedResponse<Group>>(`/groups/${queryString}`)
   }
 
@@ -45,6 +46,7 @@ class GroupService {
 
   // 搜索社团
   async searchGroups(query: string): Promise<PaginatedResponse<Group>> {
+    console.log('GroupService - searchGroups called with query:', query)
     return this.getGroups({ search: query })
   }
 
