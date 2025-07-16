@@ -55,24 +55,16 @@ function VideoCard({ video, onClick }: VideoCardProps) {
         </p>
 
         {/* 社团 */}
-        {video.groups.length > 0 && (
+        {video.group_name && (
           <div className="mb-3">
             <span className="text-sm text-gray-500">社团: </span>
             <span className="text-sm font-medium text-primary-600">
-              {video.groups[0].name}
+              {video.group_name}
             </span>
           </div>
         )}
 
-        {/* 比赛 */}
-        {video.competitions.length > 0 && (
-          <div className="mb-3">
-            <span className="text-sm text-gray-500">比赛: </span>
-            <span className="text-sm font-medium text-secondary-600">
-              {video.competitions[0].name}
-            </span>
-          </div>
-        )}
+        {/* 比赛信息暂时移除 - 需要通过awards关联获取 */}
 
         {/* 标签 */}
         {video.tags.length > 0 && (

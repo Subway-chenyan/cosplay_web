@@ -7,7 +7,7 @@ class CompetitionViewSet(viewsets.ModelViewSet):
     """
     比赛视图集
     """
-    queryset = Competition.objects.filter(is_active=True)
+    queryset = Competition.objects.filter()
     serializer_class = CompetitionSerializer
     
     def get_permissions(self):

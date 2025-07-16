@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '../store/store'
-import { setFilters, clearFilters } from '../store/slices/videosSlice'
+import { RootState, AppDispatch } from '../store/store'
+import { setFilters, clearFilters, setCurrentPage } from '../store/slices/videosSlice'
 import { fetchGroups } from '../store/slices/groupsSlice'
 import { fetchCompetitions } from '../store/slices/competitionsSlice'
 import { fetchTags } from '../store/slices/tagsSlice'
@@ -9,8 +9,8 @@ import { VideoFilters as VideoFiltersType } from '../types'
 import { Filter, X } from 'lucide-react'
 
 function VideoFilters() {
-  const dispatch = useDispatch()
-  const { filters } = useSelector((state: RootState) => state.videos)
+  const dispatch = useDispatch<AppDispatch>()
+  const { filters, pagination } = useSelector((state: RootState) => state.videos)
   const { groups } = useSelector((state: RootState) => state.groups)
   const { competitions } = useSelector((state: RootState) => state.competitions)
   const { tags } = useSelector((state: RootState) => state.tags)
@@ -18,9 +18,9 @@ function VideoFilters() {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    dispatch(fetchGroups() as any)
-    dispatch(fetchCompetitions() as any)
-    dispatch(fetchTags() as any)
+    dispatch(fetchGroups())
+    dispatch(fetchCompetitions())
+    dispatch(fetchTags())
   }, [dispatch])
 
   const handleFilterChange = (filterType: keyof VideoFiltersType, value: string) => {
@@ -29,17 +29,16 @@ function VideoFilters() {
       ? currentValues.filter(v => v !== value)
       : [...currentValues, value]
     
-    dispatch(setFilters({ [filterType]: newValues }) as any)
+    dispatch(setFilters({ [filterType]: newValues }))
+    dispatch(setCurrentPage(1)) // 重置到第一页
   }
 
   const handleClearFilters = () => {
-    dispatch(clearFilters() as any)
+    dispatch(clearFilters())
+    dispatch(setCurrentPage(1)) // 重置到第一页
   }
 
   const hasActiveFilters = filters.groups.length > 0 || filters.competitions.length > 0 || filters.tags.length > 0
-  
-  // 统计筛选后的视频数量
-  const { filteredVideos } = useSelector((state: RootState) => state.videos)
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -152,24 +151,20 @@ function VideoFilters() {
       </div>
 
       {/* 当前筛选条件摘要 */}
-      {(hasActiveFilters || filteredVideos.length !== undefined) && (
+      {hasActiveFilters && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">
-              {hasActiveFilters && (
-                <>
-                  当前筛选: 
-                  <span className="ml-2">
-                    {filters.groups.length > 0 && `社团 ${filters.groups.length}个`}
-                    {filters.competitions.length > 0 && ` 比赛 ${filters.competitions.length}个`}
-                    {filters.tags.length > 0 && ` 标签 ${filters.tags.length}个`}
-                  </span>
-                </>
-              )}
+              当前筛选: 
+              <span className="ml-2">
+                {filters.groups.length > 0 && `社团 ${filters.groups.length}个`}
+                {filters.competitions.length > 0 && ` 比赛 ${filters.competitions.length}个`}
+                {filters.tags.length > 0 && ` 标签 ${filters.tags.length}个`}
+              </span>
             </div>
             
             <div className="text-sm font-medium text-primary-600">
-              共找到 {filteredVideos.length} 个视频
+              共找到 {pagination.count} 个视频
             </div>
           </div>
         </div>

@@ -93,33 +93,104 @@ cosplay_web/
 ## 核心业务模型
 
 ### 视频 (Video)
-- bv_number: B站BV号
+- bv_number: B站BV号（唯一）
 - title: 视频标题
+- description: 视频描述
 - url: 视频链接
-- thumbnail: 封面图
-- description: 描述
-- upload_date: 上传日期
-- performance_date: 表演日期
+- thumbnail: 缩略图链接
+- duration: 视频时长
+- resolution: 分辨率
+- file_size: 文件大小
+- view_count: 播放量
+- like_count: 点赞数
+- share_count: 分享数
+- upload_date: 上传时间
+- performance_date: 表演时间
+- status: 状态（draft/published/private/deleted）
+- is_featured: 是否推荐
+- is_original: 是否原创
+- uploaded_by: 上传者（外键到User）
+- group: 所属社团（外键到Group）
+- tags: 标签（多对多关联Tag）
 
 ### 社团 (Group)
-- name: 社团名称
-- logo: 社团标志
-- founded_date: 成立日期
-- description: 简介
+- name: 社团名称（唯一）
+- description: 社团描述
+- logo: 社团logo
+- founded_date: 成立时间
+- location: 所在地
+- website: 官方网站
+- email: 联系邮箱
+- phone: 联系电话
+- weibo: 微博链接
+- wechat: 微信号
+- qq_group: QQ群
+- bilibili: B站链接
+- is_active: 是否活跃
+- is_verified: 是否认证
+- is_featured: 是否推荐
+- video_count: 视频数量
+- award_count: 获奖数量
+- created_by: 创建者（外键到User）
+
+### 标签 (Tag)
+- name: 标签名称
+- category: 分类（游戏IP/动漫IP/年份/类型/风格/地区/其他）
+- description: 描述
+- color: 颜色
+- usage_count: 使用次数
+- is_active: 是否启用
+- is_featured: 是否推荐
 
 ### 比赛 (Competition)
 - name: 比赛名称
-- year: 举办年份
 - description: 比赛描述
+- website: 官网链接
 
 ### 奖项 (Award)
 - name: 奖项名称
-- competition: 所属比赛
-- level: 奖项级别
-- winner_count: 获奖数量
+- description: 奖项描述
+- competition: 所属比赛（外键到Competition）
+- level: 级别
+- prize_money: 奖金
+- prize_description: 奖品描述
+- winner_count: 获奖者数量
+
+### 获奖记录 (AwardRecord)
+- award: 奖项（外键到Award）
+- video: 获奖视频（外键到Video）
+- group: 获奖社团（外键到Group）
+- year: 获奖年份
+- description: 获奖描述
 
 ### 用户 (User)
-- 仅管理员/编辑，无注册功能
+- 仅管理员/编辑使用，无注册功能
+- username: 用户名
+- email: 邮箱
+- first_name: 名
+- last_name: 姓
+- role: 角色（admin/editor）
+- is_staff: 是否为员工
+- is_superuser: 是否为超级用户
+
+### 视频标签关联 (VideoTag)
+- video: 视频（外键到Video）
+- tag: 标签（外键到Tag）
+- created_at: 创建时间
+
+## 关联关系
+
+### 一对多关系
+- User → Video (uploaded_by)
+- User → Group (created_by)
+- Group → Video (group)
+- Competition → Award (competition)
+- Award → AwardRecord (award)
+- Video → AwardRecord (video)
+- Group → AwardRecord (group)
+
+### 多对多关系
+- Video ↔ Tag (通过VideoTag中间表)
 
 ## 开发要求
 
@@ -130,6 +201,50 @@ cosplay_web/
 - 前端使用 TypeScript 严格模式
 - 组件支持 loading 和 error 状态
 - 遵循项目的命名规范
+
+## API 端点
+
+### 视频管理
+- `GET /api/videos/` - 获取视频列表
+- `POST /api/videos/` - 创建视频
+- `GET /api/videos/{id}/` - 获取视频详情
+- `PUT /api/videos/{id}/` - 更新视频
+- `DELETE /api/videos/{id}/` - 删除视频
+
+### 社团管理
+- `GET /api/groups/` - 获取社团列表
+- `POST /api/groups/` - 创建社团
+- `GET /api/groups/{id}/` - 获取社团详情
+- `PUT /api/groups/{id}/` - 更新社团
+- `DELETE /api/groups/{id}/` - 删除社团
+
+### 标签管理
+- `GET /api/tags/` - 获取标签列表
+- `POST /api/tags/` - 创建标签
+- `GET /api/tags/{id}/` - 获取标签详情
+- `PUT /api/tags/{id}/` - 更新标签
+- `DELETE /api/tags/{id}/` - 删除标签
+
+### 比赛管理
+- `GET /api/competitions/` - 获取比赛列表
+- `POST /api/competitions/` - 创建比赛
+- `GET /api/competitions/{id}/` - 获取比赛详情
+- `PUT /api/competitions/{id}/` - 更新比赛
+- `DELETE /api/competitions/{id}/` - 删除比赛
+
+### 奖项管理
+- `GET /api/awards/` - 获取奖项列表
+- `POST /api/awards/` - 创建奖项
+- `GET /api/awards/{id}/` - 获取奖项详情
+- `PUT /api/awards/{id}/` - 更新奖项
+- `DELETE /api/awards/{id}/` - 删除奖项
+
+### 获奖记录管理
+- `GET /api/award-records/` - 获取获奖记录列表
+- `POST /api/award-records/` - 创建获奖记录
+- `GET /api/award-records/{id}/` - 获取获奖记录详情
+- `PUT /api/award-records/{id}/` - 更新获奖记录
+- `DELETE /api/award-records/{id}/` - 删除获奖记录
 
 请始终遵循这些规范进行开发，确保代码质量和项目的可维护性。
 alwaysApply: false

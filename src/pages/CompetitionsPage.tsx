@@ -1,17 +1,17 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { RootState } from '../store/store'
+import { RootState, AppDispatch } from '../store/store'
 import { fetchCompetitions } from '../store/slices/competitionsSlice'
 import { Trophy, Calendar, Award, Users } from 'lucide-react'
 
 function CompetitionsPage() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { competitions, loading, error } = useSelector((state: RootState) => state.competitions)
 
   useEffect(() => {
-    dispatch(fetchCompetitions() as any)
+    dispatch(fetchCompetitions())
   }, [dispatch])
 
   const handleCompetitionClick = (competitionId: string) => {
@@ -34,20 +34,26 @@ function CompetitionsPage() {
       <div className="text-center py-12">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
           <p className="text-red-600">加载失败: {error}</p>
+          <button
+            onClick={() => dispatch(fetchCompetitions())}
+            className="mt-4 btn-primary"
+          >
+            重新加载
+          </button>
         </div>
       </div>
     )
   }
 
   // 按年份分组比赛
-  const competitionsByYear = competitions.reduce((acc, competition) => {
+  const competitionsByYear = competitions?.reduce((acc, competition) => {
     const year = competition.year
     if (!acc[year]) {
       acc[year] = []
     }
     acc[year].push(competition)
     return acc
-  }, {} as Record<number, typeof competitions>)
+  }, {} as Record<number, typeof competitions>) || {}
 
   const years = Object.keys(competitionsByYear)
     .map(Number)
@@ -75,87 +81,55 @@ function CompetitionsPage() {
             <Calendar className="w-6 h-6 text-primary-600" />
             <h2 className="text-2xl font-bold text-gray-900">{year}年</h2>
             <span className="text-sm text-gray-500">
-              ({competitionsByYear[year].length} 项比赛)
+              ({competitionsByYear[year]?.length || 0} 项比赛)
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {competitionsByYear[year].map((competition) => (
+            {(competitionsByYear[year] || []).map((competition) => (
               <div
                 key={competition.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 card-hover border border-gray-200 cursor-pointer"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => handleCompetitionClick(competition.id)}
               >
-                <div className="p-6">
-                  {/* Competition Header */}
-                  <div className="flex items-start space-x-4 mb-4">
-                    <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-3 rounded-lg flex-shrink-0">
-                      <Trophy className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {competition.name}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        <span>{competition.year}年</span>
-                      </div>
-                    </div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {competition.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {competition.description}
+                    </p>
                   </div>
-
-                  {/* Description */}
-                  <p className="text-gray-600 text-sm mb-6 line-clamp-3">
-                    {competition.description}
-                  </p>
-
-                  {/* Features */}
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-sm">
-                      <Award className="w-4 h-4 text-yellow-500 mr-2" />
-                      <span className="text-gray-600">专业评审团</span>
+                  
+                  <div className="ml-4 flex flex-col items-center">
+                    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-2">
+                      <Trophy className="w-6 h-6 text-yellow-600" />
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Users className="w-4 h-4 text-blue-500 mr-2" />
-                      <span className="text-gray-600">多元化参赛作品</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Trophy className="w-4 h-4 text-orange-500 mr-2" />
-                      <span className="text-gray-600">丰厚奖品</span>
-                    </div>
-                  </div>
-
-                  {/* Competition Status */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      {competition.year === new Date().getFullYear() ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          进行中
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          已结束
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                      查看详情 →
-                    </div>
+                    <span className="text-xs text-gray-500">{competition.year}</span>
                   </div>
                 </div>
 
-                {/* Highlight for current year */}
-                {competition.year === new Date().getFullYear() && (
-                  <div className="h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-b-lg"></div>
-                )}
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center space-x-4">
+                    <span className="flex items-center space-x-1">
+                      <Award className="w-4 h-4" />
+                      <span>官方认证</span>
+                    </span>
+                    <span className="flex items-center space-x-1">
+                      <Users className="w-4 h-4" />
+                      <span>多支队伍</span>
+                    </span>
+                  </div>
+                  <span className="text-primary-600 font-medium">查看详情 →</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       ))}
 
-      {/* Empty State */}
-      {competitions.length === 0 && (
+      {years.length === 0 && (
         <div className="text-center py-12">
           <div className="bg-gray-50 rounded-lg p-8">
             <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -164,6 +138,31 @@ function CompetitionsPage() {
           </div>
         </div>
       )}
+
+      {/* Stats Section */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">比赛统计</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary-600 mb-2">
+              {competitions?.length || 0}
+            </div>
+            <div className="text-gray-600">总比赛数</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-secondary-600 mb-2">
+              {years.length}
+            </div>
+            <div className="text-gray-600">参与年份</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-yellow-600 mb-2">
+              {Math.max(...years, 0) || '暂无'}
+            </div>
+            <div className="text-gray-600">最新年份</div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

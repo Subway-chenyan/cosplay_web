@@ -1,21 +1,26 @@
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { RootState } from '../store/store'
-import { fetchVideos, setSearchQuery, clearSearch } from '../store/slices/videosSlice'
+import { RootState, AppDispatch } from '../store/store'
+import { fetchVideos, setSearchQuery, clearSearch, setFilters, setCurrentPage } from '../store/slices/videosSlice'
 import VideoCard from '../components/VideoCard'
 import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
 import { Loader, Tv } from 'lucide-react'
 
 function HomePage() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { videos, filteredVideos, loading, error, pagination, searchQuery } = useSelector((state: RootState) => state.videos)
+  const { videos, loading, error, pagination, searchQuery, filters, currentPage } = useSelector((state: RootState) => state.videos)
 
   useEffect(() => {
-    dispatch(fetchVideos() as any)
-  }, [dispatch])
+    // 获取视频数据，包含搜索和筛选参数
+    dispatch(fetchVideos({
+      page: currentPage,
+      searchQuery,
+      filters
+    }))
+  }, [dispatch, currentPage, searchQuery, filters])
 
   const handleVideoClick = (videoId: string) => {
     // 跳转到视频详情页
@@ -30,7 +35,7 @@ function HomePage() {
     dispatch(clearSearch() as any)
   }
 
-  if (loading && filteredVideos.length === 0) {
+  if (loading && videos.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
@@ -121,7 +126,7 @@ function HomePage() {
           )}
         </div>
 
-        {filteredVideos.length === 0 ? (
+        {videos.length === 0 ? (
           <div className="text-center py-12">
             <div className="bg-gray-50 rounded-lg p-8">
               <Tv className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -131,7 +136,7 @@ function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredVideos.map((video) => (
+            {videos.map((video) => (
               <VideoCard
                 key={video.id}
                 video={video}
@@ -147,8 +152,7 @@ function HomePage() {
         <div className="text-center">
           <button
             onClick={() => {
-              // TODO: 实现加载更多功能
-              console.log('加载更多')
+              dispatch(setCurrentPage(currentPage + 1))
             }}
             className="btn-primary"
             disabled={loading}

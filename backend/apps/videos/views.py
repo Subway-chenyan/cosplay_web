@@ -1,17 +1,23 @@
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.core.cache import cache
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Q
+import pandas as pd
+import io
 
-from .models import Video, VideoFavorite, VideoRating, VideoComment
+from .models import Video
 from .serializers import (
-    VideoSerializer, VideoListSerializer, VideoFavoriteSerializer,
-    VideoRatingSerializer, VideoCommentSerializer
+    VideoSerializer, VideoListSerializer,  BulkImportSerializer,
+    ImportResultSerializer
 )
 from .filters import VideoFilter
+from .bulk_import import process_bulk_import, get_import_template
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -44,80 +50,113 @@ class VideoViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(uploaded_by=self.request.user)
     
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def toggle_favorite(self, request, pk=None):
+    @action(
+        detail=False,
+        methods=['post'],
+        parser_classes=[MultiPartParser, FormParser],
+        permission_classes=[permissions.IsAuthenticated],
+        url_path='bulk-import'
+    )
+    def bulk_import(self, request):
         """
-        切换收藏状态
+        批量导入数据
         """
-        video = self.get_object()
-        favorite, created = VideoFavorite.objects.get_or_create(
-            user=request.user,
-            video=video
+        serializer = BulkImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        file = serializer.validated_data['file']
+        import_type = serializer.validated_data['import_type']
+        validate_only = serializer.validated_data['validate_only']
+        
+        try:
+            # 读取文件内容
+            file_content = file.read()
+            
+            # 启动异步任务
+            task = process_bulk_import.delay(
+                file_content=file_content,
+                filename=file.name,
+                import_type=import_type,
+                user_id=request.user.id,
+                validate_only=validate_only
+            )
+            
+            return Response({
+                'task_id': task.id,
+                'message': '导入任务已启动，请稍后查看结果',
+                'status': 'pending'
+            }, status=status.HTTP_202_ACCEPTED)
+            
+        except Exception as e:
+            return Response({
+                'error': f'文件处理失败: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticated],
+        url_path='import-status/(?P<task_id>[^/.]+)'
+    )
+    def import_status(self, request, task_id=None):
+        """
+        查询导入任务状态
+        """
+        cache_key = f"import_task_{task_id}"
+        task_data = cache.get(cache_key)
+        
+        if not task_data:
+            return Response({
+                'error': '任务不存在或已过期'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(task_data)
+    
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticated],
+        url_path='import-template'
+    )
+    def import_template(self, request):
+        """
+        下载导入模板
+        """
+        import_type = request.query_params.get('type', 'video')
+        template_info = get_import_template(import_type)
+        
+        if not template_info:
+            return Response({
+                'error': '不支持的模板类型'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 创建Excel模板
+        df = pd.DataFrame(template_info['sample_data'])
+        
+        # 设置响应
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
+        response['Content-Disposition'] = f'attachment; filename="{import_type}_import_template.xlsx"'
         
-        if created:
-            message = '收藏成功'
-        else:
-            favorite.delete()
-            message = '取消收藏'
+        # 写入Excel数据
+        with pd.ExcelWriter(response, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='数据')
+            
+            # 添加说明sheet
+            instructions_df = pd.DataFrame([
+                ['字段名', '说明', '是否必填', '示例'],
+                ['bv_number', 'B站视频BV号', '是', 'BV1234567890'],
+                ['title', '视频标题', '是', '精彩的cosplay表演'],
+                ['description', '视频描述', '否', '详细的视频描述信息'],
+                ['url', '视频链接', '是', 'https://www.bilibili.com/video/BV1234567890'],
+                ['thumbnail', '缩略图链接', '否', 'https://example.com/thumb.jpg'],
+                ['view_count', '播放量', '否', '1000'],
+                ['like_count', '点赞数', '否', '100'],
+                ['performance_date', '表演日期', '否', '2024-01-01']
+            ])
+            instructions_df.to_excel(writer, index=False, sheet_name='字段说明', header=False)
         
-        return Response({'message': message, 'favorited': created})
+        return response
     
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def rate(self, request, pk=None):
-        """
-        评分视频
-        """
-        video = self.get_object()
-        rating = request.data.get('rating')
-        comment = request.data.get('comment', '')
-        
-        if not rating or not (1 <= int(rating) <= 5):
-            return Response({'error': '评分必须在1-5之间'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        rating_obj, created = VideoRating.objects.update_or_create(
-            user=request.user,
-            video=video,
-            defaults={'rating': rating, 'comment': comment}
-        )
-        
-        serializer = VideoRatingSerializer(rating_obj)
-        return Response(serializer.data)
-    
-    @action(detail=True, methods=['get'])
-    def comments(self, request, pk=None):
-        """
-        获取视频评论
-        """
-        video = self.get_object()
-        comments = VideoComment.objects.filter(video=video, parent=None, is_approved=True)
-        serializer = VideoCommentSerializer(comments, many=True)
-        return Response(serializer.data)
-
-
-class VideoFavoriteViewSet(viewsets.ModelViewSet):
-    """
-    视频收藏视图集
-    """
-    serializer_class = VideoFavoriteSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return VideoFavorite.objects.filter(user=self.request.user)
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class VideoCommentViewSet(viewsets.ModelViewSet):
-    """
-    视频评论视图集
-    """
-    serializer_class = VideoCommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return VideoComment.objects.filter(is_approved=True)
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user) 

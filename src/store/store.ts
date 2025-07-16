@@ -4,6 +4,7 @@ import groupsReducer from './slices/groupsSlice'
 import competitionsReducer from './slices/competitionsSlice'
 import tagsReducer from './slices/tagsSlice'
 import awardsReducer from './slices/awardsSlice'
+import dataImportReducer from './slices/dataImportSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     competitions: competitionsReducer,
     tags: tagsReducer,
     awards: awardsReducer,
+    dataImport: dataImportReducer,
   },
 })
 

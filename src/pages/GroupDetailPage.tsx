@@ -42,7 +42,7 @@ function GroupDetailPage() {
   
   // 获取该社团的所有视频
   const groupVideos = videos.filter(video => 
-    video.groups.some(g => g.id === id)
+    video.group === id
   )
 
   // 获取该社团获得的奖项

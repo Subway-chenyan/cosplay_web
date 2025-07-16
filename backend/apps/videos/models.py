@@ -42,9 +42,16 @@ class Video(models.Model):
     is_featured = models.BooleanField(default=False, verbose_name='是否推荐')
     is_original = models.BooleanField(default=True, verbose_name='是否原创')
     
-    # 上传者信息
+    # 关联信息
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
                                    related_name='uploaded_videos', verbose_name='上传者')
+    group = models.ForeignKey('groups.Group', on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name='videos', verbose_name='所属社团')
+    tags = models.ManyToManyField('tags.Tag', through='tags.VideoTag', 
+                                 related_name='videos', verbose_name='标签')
+    competition = models.ForeignKey('competitions.Competition', on_delete=models.SET_NULL, 
+                                   null=True, blank=True, related_name='videos', verbose_name='所属比赛')
+    competition_year = models.IntegerField(blank=True, null=True, verbose_name='比赛年份')
     
     # 时间戳
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
@@ -60,6 +67,9 @@ class Video(models.Model):
             models.Index(fields=['is_featured']),
             models.Index(fields=['performance_date']),
             models.Index(fields=['upload_date']),
+            models.Index(fields=['group']),
+            models.Index(fields=['competition']),
+            models.Index(fields=['competition_year']),
         ]
     
     def __str__(self):

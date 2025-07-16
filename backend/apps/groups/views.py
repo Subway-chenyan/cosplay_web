@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions
-from .models import Group, GroupMember, GroupFollower
-from .serializers import GroupSerializer, GroupMemberSerializer, GroupFollowerSerializer
+from .models import Group
+from .serializers import GroupSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):

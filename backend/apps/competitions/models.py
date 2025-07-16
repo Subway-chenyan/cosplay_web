@@ -8,8 +8,9 @@ class Competition(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, verbose_name='比赛名称')
-    year = models.IntegerField(verbose_name='年份')
     description = models.TextField(blank=True, verbose_name='比赛描述')
+    website = models.URLField(blank=True, verbose_name='官网链接')
+    year = models.IntegerField(default=2024, verbose_name='比赛年份')
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
@@ -17,11 +18,10 @@ class Competition(models.Model):
     class Meta:
         verbose_name = '比赛'
         verbose_name_plural = '比赛'
-        ordering = ['-year']
+        ordering = ['-created_at']
         indexes = [
             models.Index(fields=['name']),
-            models.Index(fields=['year']),
         ]
     
     def __str__(self):
-        return f"{self.name} ({self.year})" 
+        return self.name 

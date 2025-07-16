@@ -6,6 +6,7 @@ import GroupDetailPage from './pages/GroupDetailPage'
 import CompetitionsPage from './pages/CompetitionsPage'
 import CompetitionDetailPage from './pages/CompetitionDetailPage'
 import VideoDetailPage from './pages/VideoDetailPage'
+import DataImportPage from './pages/DataImportPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/group/:id" element={<GroupDetailPage />} />
           <Route path="/competitions" element={<CompetitionsPage />} />
           <Route path="/competition/:id" element={<CompetitionDetailPage />} />
+          <Route path="/data-import" element={<DataImportPage />} />
         </Route>
       </Routes>
     </div>

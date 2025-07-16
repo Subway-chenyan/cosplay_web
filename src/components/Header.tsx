@@ -10,6 +10,7 @@ function Header() {
     { name: '主页', href: '/' },
     { name: '社团', href: '/groups' },
     { name: '比赛', href: '/competitions' },
+    { name: '数据导入', href: '/data-import' },
   ]
 
   const isActive = (path: string) => location.pathname === path

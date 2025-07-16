@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '../store/store'
-import { fetchVideos } from '../store/slices/videosSlice'
-import { fetchGroups } from '../store/slices/groupsSlice'
+import { RootState, AppDispatch } from '../store/store'
+import { fetchVideoDetail, fetchRelatedVideos } from '../store/slices/videosSlice'
+import { videoService } from '../services/videoService'
+import { groupService } from '../services/groupService'
 import VideoCard from '../components/VideoCard'
+import { Video, Group } from '../types'
 import { 
   ArrowLeft, 
   Calendar, 
@@ -14,36 +16,52 @@ import {
   ExternalLink, 
   CheckCircle,
   Play,
-  Globe
+  Globe,
+  Loader
 } from 'lucide-react'
 
 function VideoDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { videos } = useSelector((state: RootState) => state.videos)
-  const { groups } = useSelector((state: RootState) => state.groups)
+  const { currentVideo, loading } = useSelector((state: RootState) => state.videos)
   const [isPlayerLoaded, setIsPlayerLoaded] = useState(false)
+  const [relatedVideos, setRelatedVideos] = useState<Video[]>([])
+  const [groupDetails, setGroupDetails] = useState<Group | null>(null)
+  const [loadingRelated, setLoadingRelated] = useState(false)
 
   useEffect(() => {
-    if (videos.length === 0) {
-      dispatch(fetchVideos() as any)
+    if (id) {
+      dispatch(fetchVideoDetail(id))
     }
-    if (groups.length === 0) {
-      dispatch(fetchGroups() as any)
+  }, [dispatch, id])
+
+  useEffect(() => {
+    const fetchRelatedData = async () => {
+      if (currentVideo && currentVideo.id === id) {
+        setLoadingRelated(true)
+        try {
+          // 获取社团详情
+          if (currentVideo.group) {
+            const group = await groupService.getGroupById(currentVideo.group)
+            setGroupDetails(group)
+            
+            // 获取相关视频
+            const related = await videoService.getRelatedVideos(currentVideo.id, 8)
+            setRelatedVideos(related.results)
+          }
+        } catch (error) {
+          console.error('Error fetching related data:', error)
+        } finally {
+          setLoadingRelated(false)
+        }
+      }
     }
-  }, [dispatch, videos.length, groups.length])
+    
+    fetchRelatedData()
+  }, [currentVideo, id])
 
-  const video = videos.find(v => v.id === id)
-  const videoGroup = video?.groups[0]
-  const groupDetails = groups.find(g => g.id === videoGroup?.id)
-
-  // 获取同社团的其他视频
-  const relatedVideos = videos.filter(v => 
-    v.id !== id && 
-    videoGroup && 
-    v.groups.some(g => g.id === videoGroup.id)
-  ).slice(0, 8)
+  const video = currentVideo && currentVideo.id === id ? currentVideo : null
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN')
@@ -58,6 +76,17 @@ function VideoDetailPage() {
   const handleVideoClick = (videoId: string) => {
     // 跳转到其他视频的详情页
     navigate(`/video/${videoId}`)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-primary-600" />
+          <p className="text-gray-600">正在加载视频详情...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!video) {
@@ -202,20 +231,7 @@ function VideoDetailPage() {
               </div>
             )}
 
-            {/* 比赛信息 */}
-            {video.competitions.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">参赛比赛</h3>
-                <div className="space-y-2">
-                  {video.competitions.map((competition) => (
-                    <div key={competition.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                      <div className="font-medium text-yellow-800">{competition.name}</div>
-                      <div className="text-sm text-yellow-600">{competition.year}年</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* 比赛信息 - 暂时隐藏，需要通过awards关联获取 */}
 
             {/* 描述 */}
             <div>
@@ -309,7 +325,7 @@ function VideoDetailPage() {
           {relatedVideos.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
-                更多来自 {videoGroup?.name} 的视频
+                更多来自 {video.group_name} 的视频
               </h2>
               
               <div className="space-y-4">

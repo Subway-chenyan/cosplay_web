@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store/store'
 import { fetchCompetitions } from '../store/slices/competitionsSlice'
-import { fetchVideos } from '../store/slices/videosSlice'
-import { fetchAwards } from '../store/slices/awardsSlice'
+import { fetchVideos, fetchCompetitionVideos } from '../store/slices/videosSlice'
+import { fetchCompetitionAwards, fetchCompetitionAwardRecords } from '../store/slices/awardsSlice'
 import { fetchGroups } from '../store/slices/groupsSlice'
 import VideoCard from '../components/VideoCard'
 import { 
@@ -15,7 +15,9 @@ import {
   Users,
   Play,
   Medal,
-  Star
+  Star,
+  Filter,
+  ChevronDown
 } from 'lucide-react'
 
 function CompetitionDetailPage() {
@@ -24,98 +26,152 @@ function CompetitionDetailPage() {
   const navigate = useNavigate()
   const { competitions } = useSelector((state: RootState) => state.competitions)
   const { videos } = useSelector((state: RootState) => state.videos)
-  const { awards } = useSelector((state: RootState) => state.awards)
+  const { competitionAwards, awardRecords } = useSelector((state: RootState) => state.awards)
   const { groups } = useSelector((state: RootState) => state.groups)
+
+  // 筛选状态
+  const [selectedAward, setSelectedAward] = useState<string>('all')
+  const [selectedYear, setSelectedYear] = useState<number | 'all'>('all')
+  const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
     if (competitions.length === 0) {
       dispatch(fetchCompetitions() as any)
     }
-    if (videos.length === 0) {
-      dispatch(fetchVideos() as any)
-    }
-    if (awards.length === 0) {
-      dispatch(fetchAwards() as any)
-    }
     if (groups.length === 0) {
       dispatch(fetchGroups() as any)
     }
-  }, [dispatch, competitions.length, videos.length, awards.length, groups.length])
+  }, [dispatch, competitions.length, groups.length])
+
+  // 获取比赛数据
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchCompetitionVideos({ competitionId: id }) as any)
+      dispatch(fetchCompetitionAwards(id) as any)
+      dispatch(fetchCompetitionAwardRecords({ competitionId: id }) as any)
+    }
+  }, [dispatch, id])
 
   const competition = competitions.find(c => c.id === id)
   
-  // 获取该比赛的所有奖项
-  const competitionAwards = awards.filter(award => 
-    award.competition === competition?.name
-  )
-
-  // 获取参与该比赛的所有视频
+  // 获取该比赛的所有视频（通过比赛ID筛选）
   const competitionVideos = videos.filter(video => 
-    video.competitions.some(comp => comp.id === id)
+    video.competition === competition?.id
   )
 
-  // 获取获奖视频
-  const awardedVideos = competitionVideos.filter(video => 
-    competitionAwards.some(award => award.video_id === video.id)
+  // 获取可用的年份列表
+  const availableYears = [...new Set(competitionVideos
+    .map(video => video.competition_year)
+    .filter(year => year !== undefined)
+  )].sort((a, b) => (b as number) - (a as number))
+
+  // 根据实际的奖项数据构建奖项类型列表
+  const createAwardTypeFromLevel = (level: string) => {
+    const lowerLevel = level.toLowerCase()
+    
+    // 根据level字符串判断奖项类型
+    if (lowerLevel.includes('金') || lowerLevel.includes('gold') || lowerLevel === '1') {
+      return {
+        value: level,
+        label: level.includes('金') ? level : '金奖',
+        color: 'bg-yellow-100',
+        textColor: 'text-yellow-800',
+        icon: <Trophy className="w-4 h-4 text-yellow-600" />
+      }
+    } else if (lowerLevel.includes('银') || lowerLevel.includes('silver') || lowerLevel === '2') {
+      return {
+        value: level,
+        label: level.includes('银') ? level : '银奖',
+        color: 'bg-gray-100',
+        textColor: 'text-gray-800',
+        icon: <Medal className="w-4 h-4 text-gray-600" />
+      }
+    } else if (lowerLevel.includes('铜') || lowerLevel.includes('bronze') || lowerLevel === '3') {
+      return {
+        value: level,
+        label: level.includes('铜') ? level : '铜奖',
+        color: 'bg-orange-100',
+        textColor: 'text-orange-800',
+        icon: <Award className="w-4 h-4 text-orange-600" />
+      }
+    } else if (lowerLevel.includes('特别') || lowerLevel.includes('special')) {
+      return {
+        value: level,
+        label: level.includes('特别') ? level : '特别奖',
+        color: 'bg-purple-100',
+        textColor: 'text-purple-800',
+        icon: <Star className="w-4 h-4 text-purple-600" />
+      }
+    } else {
+      return {
+        value: level,
+        label: level || '其他奖项',
+        color: 'bg-blue-100',
+        textColor: 'text-blue-800',
+        icon: <Users className="w-4 h-4 text-blue-600" />
+      }
+    }
+  }
+
+  // 从实际的奖项数据构建筛选选项
+  const awardTypes = [
+    { 
+      value: 'all', 
+      label: '全部奖项', 
+      color: 'bg-gray-100', 
+      textColor: 'text-gray-700', 
+      icon: <Filter className="w-4 h-4" /> 
+    },
+    ...competitionAwards.map(award => createAwardTypeFromLevel(award.level)),
+    { 
+      value: 'none', 
+      label: '参与作品', 
+      color: 'bg-blue-100', 
+      textColor: 'text-blue-800', 
+      icon: <Users className="w-4 h-4 text-blue-600" /> 
+    }
+  ]
+
+  // 去重
+  const uniqueAwardTypes = awardTypes.filter((type, index, self) => 
+    index === self.findIndex(t => t.value === type.value)
   )
 
-  // 获取未获奖但参与比赛的视频
-  const participatingVideos = competitionVideos.filter(video => 
-    !competitionAwards.some(award => award.video_id === video.id)
-  )
+  // 根据筛选条件过滤视频
+  const filteredVideos = competitionVideos.filter(video => {
+    // 年份筛选
+    if (selectedYear !== 'all' && video.competition_year !== selectedYear) {
+      return false
+    }
+
+    // 奖项筛选
+    if (selectedAward !== 'all') {
+      const videoAwardRecord = awardRecords.find(record => record.video === video.id)
+      if (selectedAward === 'none') {
+        return !videoAwardRecord // 没有获奖的视频
+      } else {
+        // 查找对应的奖项
+        const award = competitionAwards.find(a => a.id === videoAwardRecord?.award)
+        return award && award.level === selectedAward
+      }
+    }
+
+    return true
+  })
 
   const handleVideoClick = (videoId: string) => {
     navigate(`/video/${videoId}`)
   }
 
-  const getAwardLevelInfo = (level: string) => {
-    switch (level) {
-      case 'gold':
-        return { 
-          name: '金奖', 
-          color: 'bg-yellow-500', 
-          textColor: 'text-yellow-800',
-          bgColor: 'bg-yellow-50',
-          borderColor: 'border-yellow-200',
-          icon: <Trophy className="w-5 h-5 text-yellow-600" />
-        }
-      case 'silver':
-        return { 
-          name: '银奖', 
-          color: 'bg-gray-400', 
-          textColor: 'text-gray-800',
-          bgColor: 'bg-gray-50',
-          borderColor: 'border-gray-200',
-          icon: <Medal className="w-5 h-5 text-gray-600" />
-        }
-      case 'bronze':
-        return { 
-          name: '铜奖', 
-          color: 'bg-orange-600', 
-          textColor: 'text-orange-800',
-          bgColor: 'bg-orange-50',
-          borderColor: 'border-orange-200',
-          icon: <Award className="w-5 h-5 text-orange-600" />
-        }
-      case 'special':
-        return { 
-          name: '特别奖', 
-          color: 'bg-purple-500', 
-          textColor: 'text-purple-800',
-          bgColor: 'bg-purple-50',
-          borderColor: 'border-purple-200',
-          icon: <Star className="w-5 h-5 text-purple-600" />
-        }
-      default:
-        return { 
-          name: '参与奖', 
-          color: 'bg-blue-500', 
-          textColor: 'text-blue-800',
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
-          icon: <Users className="w-5 h-5 text-blue-600" />
-        }
-    }
+  const getAwardInfo = (videoId: string) => {
+    const awardRecord = awardRecords.find(record => record.video === videoId)
+    if (!awardRecord) return null
+
+    const award = competitionAwards.find(a => a.id === awardRecord.award)
+    if (!award) return null
+
+    const awardType = createAwardTypeFromLevel(award.level)
+    return { award, awardRecord, type: awardType }
   }
 
   if (!competition) {
@@ -134,7 +190,7 @@ function CompetitionDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* 返回按钮 */}
       <div className="flex items-center">
         <Link
@@ -147,147 +203,191 @@ function CompetitionDetailPage() {
       </div>
 
       {/* 比赛头部信息 */}
-      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg text-white p-8">
+      <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-2xl text-white p-8 shadow-xl">
         <div className="text-center">
-          <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Trophy className="w-10 h-10 text-white" />
+          <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+            <Trophy className="w-12 h-12 text-white" />
           </div>
           
-          <h1 className="text-4xl font-bold mb-2">{competition.name}</h1>
-          <div className="flex items-center justify-center space-x-2 text-yellow-100 mb-4">
-            <Calendar className="w-5 h-5" />
-            <span className="text-xl">{competition.year}年</span>
+          <h1 className="text-5xl font-bold mb-4">{competition.name}</h1>
+          <div className="flex items-center justify-center space-x-3 text-yellow-100 mb-6">
+            <Calendar className="w-6 h-6" />
+            <span className="text-2xl font-semibold">{competition.year}年</span>
           </div>
           
-          <p className="text-xl text-yellow-100 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-yellow-100 max-w-3xl mx-auto leading-relaxed mb-8">
             {competition.description}
           </p>
 
           {/* 比赛统计 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-white bg-opacity-10 rounded-lg p-4">
-              <div className="text-3xl font-bold mb-1">{competitionAwards.length}</div>
-              <div className="text-yellow-100">奖项设置</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
+              <div className="text-4xl font-bold mb-2">{competitionAwards.length}</div>
+              <div className="text-yellow-100 text-lg">设置奖项</div>
             </div>
-            <div className="bg-white bg-opacity-10 rounded-lg p-4">
-              <div className="text-3xl font-bold mb-1">{competitionVideos.length}</div>
-              <div className="text-yellow-100">参赛作品</div>
+            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
+              <div className="text-4xl font-bold mb-2">{competitionVideos.length}</div>
+              <div className="text-yellow-100 text-lg">参赛作品</div>
             </div>
-            {/* <div className="bg-white bg-opacity-10 rounded-lg p-4">
-              <div className="text-3xl font-bold mb-1">{awardedVideos.length}</div>
-              <div className="text-yellow-100">获奖作品</div>
-            </div> */}
+            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
+              <div className="text-4xl font-bold mb-2">{availableYears.length}</div>
+              <div className="text-yellow-100 text-lg">参与年份</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 获奖作品展示 */}
-      {competitionAwards.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center space-x-3 mb-6">
-            <Trophy className="w-6 h-6 text-yellow-500" />
-            <h2 className="text-2xl font-bold text-gray-900">获奖作品</h2>
+      {/* 筛选模块 */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        {/* 筛选头部 */}
+        <div 
+          className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                <Filter className="w-5 h-5 text-primary-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">奖项与年份筛选</h2>
+                <p className="text-gray-600">筛选您感兴趣的作品类型和年份</p>
+              </div>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </div>
+        </div>
 
-          <div className="space-y-6">
-            {competitionAwards.map((award) => {
-              const awardVideo = awardedVideos.find(v => v.id === award.video_id)
-              const awardGroup = groups.find(g => g.id === award.group_id)
-              const levelInfo = getAwardLevelInfo(award.level)
+        {/* 筛选内容 */}
+        <div className={`transition-all duration-300 overflow-hidden ${showFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="p-6 space-y-6">
+            {/* 奖项筛选 */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Trophy className="w-5 h-5 text-yellow-500 mr-2" />
+                奖项类型
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {uniqueAwardTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => setSelectedAward(type.value)}
+                    className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                      selectedAward === type.value
+                        ? 'border-primary-500 bg-primary-50 shadow-md scale-105'
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className={`w-12 h-12 ${type.color} rounded-lg flex items-center justify-center`}>
+                        {type.icon}
+                      </div>
+                      <span className={`text-sm font-medium ${selectedAward === type.value ? 'text-primary-700' : type.textColor}`}>
+                        {type.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-              if (!awardVideo) return null
-
-              return (
-                <div 
-                  key={award.id} 
-                  className={`border rounded-lg p-6 ${levelInfo.bgColor} ${levelInfo.borderColor}`}
+            {/* 年份筛选 */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Calendar className="w-5 h-5 text-blue-500 mr-2" />
+                参赛年份
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setSelectedYear('all')}
+                  className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 ${
+                    selectedYear === 'all'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-sm'
+                  }`}
                 >
-                  <div className="flex items-start space-x-6">
-                    {/* 奖项信息 */}
-                    <div className="flex-shrink-0">
-                      <div className={`w-16 h-16 ${levelInfo.color} rounded-lg flex items-center justify-center mb-3`}>
-                        {levelInfo.icon}
-                      </div>
-                      <div className="text-center">
-                        <div className={`text-sm font-bold ${levelInfo.textColor}`}>
-                          {levelInfo.name}
-                        </div>
-                      </div>
+                  全部年份
+                </button>
+                {availableYears.map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => setSelectedYear(year as number)}
+                    className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 ${
+                      selectedYear === year
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-sm'
+                    }`}
+                  >
+                    {year}年
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 筛选结果统计 */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">当前筛选结果:</span>
+                <span className="text-xl font-bold text-primary-600">{filteredVideos.length} 个作品</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 视频展示区域 */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <Play className="w-6 h-6 text-primary-600" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              舞台剧作品 ({filteredVideos.length})
+            </h2>
+          </div>
+          {selectedAward !== 'all' || selectedYear !== 'all' ? (
+            <button
+              onClick={() => {
+                setSelectedAward('all')
+                setSelectedYear('all')
+              }}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              清除筛选
+            </button>
+          ) : null}
+        </div>
+
+        {filteredVideos.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredVideos.map((video) => {
+              const awardInfo = getAwardInfo(video.id)
+              return (
+                <div key={video.id} className="relative">
+                  <VideoCard
+                    video={video}
+                    onClick={() => handleVideoClick(video.id)}
+                  />
+                  {/* 奖项标识 */}
+                  {awardInfo && (
+                    <div className={`absolute top-2 right-2 ${awardInfo.type?.color} rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm backdrop-blur-sm`}>
+                      {awardInfo.type?.icon}
+                      <span className={`text-xs font-medium ${awardInfo.type?.textColor}`}>
+                        {awardInfo.type?.label}
+                      </span>
                     </div>
-                    
-                    {/* 奖项详情和视频 */}
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-4">
-                        <h3 className={`text-xl font-bold ${levelInfo.textColor} mb-2`}>
-                          {award.name}
-                        </h3>
-                        
-                        {award.description && (
-                          <p className={`${levelInfo.textColor} mb-3`}>
-                            {award.description}
-                          </p>
-                        )}
-                        
-                        {awardGroup && (
-                          <div className={`text-sm ${levelInfo.textColor}`}>
-                            获奖社团: <span className="font-medium">{awardGroup.name}</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* 获奖视频卡片 */}
-                      <div className="bg-white rounded-lg p-4 border border-gray-200">
-                        <h4 className="font-medium text-gray-900 mb-3">获奖作品</h4>
-                        <div className="max-w-sm">
-                          <VideoCard
-                            video={awardVideo}
-                            onClick={() => handleVideoClick(awardVideo.id)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )
             })}
           </div>
-        </div>
-      )}
-
-      {/* 参赛作品展示 */}
-      {participatingVideos.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <Users className="w-6 h-6 text-blue-500" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                参赛作品 ({participatingVideos.length})
-              </h2>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {participatingVideos.map((video) => (
-              <VideoCard
-                key={video.id}
-                video={video}
-                onClick={() => handleVideoClick(video.id)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 空状态 */}
-      {competitionVideos.length === 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <div className="text-center">
+        ) : (
+          <div className="text-center py-12">
             <Play className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">暂无参赛作品</h3>
-            <p className="text-gray-600">该比赛还没有任何参赛视频</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">暂无匹配作品</h3>
+            <p className="text-gray-600">请尝试调整筛选条件</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

@@ -58,10 +58,6 @@ class AwardRecord(models.Model):
     year = models.IntegerField(verbose_name='获奖年份')
     description = models.TextField(blank=True, verbose_name='获奖描述')
     
-    # 证书和奖品
-    certificate_url = models.URLField(blank=True, verbose_name='证书链接')
-    prize_received = models.BooleanField(default=False, verbose_name='是否已领取奖品')
-    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     

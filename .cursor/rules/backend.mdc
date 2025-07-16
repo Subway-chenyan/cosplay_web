@@ -1,3 +1,5 @@
+---
+description:
 # Django 后端开发规范
 
 ## 项目技术栈
@@ -61,7 +63,7 @@ app_name/
 - **URL 命名**: 使用 kebab-case，如 `video-list`, `group-detail`
 
 ### 模型设计规范
-- 只保留核心模型：User（仅管理员/编辑）、Video、Group、Tag、Competition、Award、AwardRecord
+- 只保留核心模型：User（仅管理员/编辑）、Video、Group、Tag、Competition、Award、AwardRecord、VideoTag
 - 不包含剧目、收藏、评分、评论、观看记录等模型
 - 字段命名统一、主键为 `id`，外键为 `{model_name}_id`
 - 时间戳字段：`created_at`, `updated_at`
@@ -69,28 +71,178 @@ app_name/
 ### 序列化器规范
 - 只为核心模型编写序列化器
 - 字段只读属性合理设置
+- 支持嵌套序列化（如视频包含社团和标签信息）
 
 ### 视图类规范
 - 只为核心模型编写ViewSet
 - 遵循RESTful API设计
+- 支持过滤、搜索、排序功能
+
+## 数据库模型详细规范
+
+### 视频模型 (Video)
+```python
+class Video(models.Model):
+    # 基本信息
+    bv_number = models.CharField(max_length=20, unique=True)  # B站BV号
+    title = models.CharField(max_length=255)                   # 标题
+    description = models.TextField(blank=True)                 # 描述
+    url = models.URLField()                                    # 视频链接
+    thumbnail = models.URLField(blank=True)                    # 缩略图
+    
+    # 视频信息
+    duration = models.DurationField(blank=True, null=True)     # 时长
+    resolution = models.CharField(max_length=20, blank=True)   # 分辨率
+    file_size = models.BigIntegerField(blank=True, null=True) # 文件大小
+    
+    # 统计信息
+    view_count = models.IntegerField(default=0)               # 播放量
+    like_count = models.IntegerField(default=0)               # 点赞数
+    share_count = models.IntegerField(default=0)              # 分享数
+    
+    # 日期信息
+    upload_date = models.DateTimeField(blank=True, null=True) # 上传时间
+    performance_date = models.DateField(blank=True, null=True) # 表演时间
+    
+    # 状态和权限
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='published')
+    is_featured = models.BooleanField(default=False)          # 是否推荐
+    is_original = models.BooleanField(default=True)           # 是否原创
+    
+    # 关联信息
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    group = models.ForeignKey('groups.Group', on_delete=models.SET_NULL, null=True, blank=True)
+    tags = models.ManyToManyField('tags.Tag', through='tags.VideoTag')  # 标签关联
+```
+
+### 社团模型 (Group)
+```python
+class Group(models.Model):
+    # 基本信息
+    name = models.CharField(max_length=100, unique=True)      # 社团名称
+    description = models.TextField(blank=True)                 # 社团描述
+    logo = models.ImageField(upload_to='group_logos/', blank=True, null=True)
+    
+    # 基本信息
+    founded_date = models.DateField(blank=True, null=True)    # 成立时间
+    location = models.CharField(max_length=100, blank=True)   # 所在地
+    website = models.URLField(blank=True)                     # 官方网站
+    email = models.EmailField(blank=True)                     # 联系邮箱
+    phone = models.CharField(max_length=20, blank=True)       # 联系电话
+    
+    # 社交媒体
+    weibo = models.URLField(blank=True)                       # 微博链接
+    wechat = models.CharField(max_length=50, blank=True)      # 微信号
+    qq_group = models.CharField(max_length=20, blank=True)    # QQ群
+    bilibili = models.URLField(blank=True)                    # B站链接
+    
+    # 状态和设置
+    is_active = models.BooleanField(default=True)             # 是否活跃
+    is_verified = models.BooleanField(default=False)          # 是否认证
+    is_featured = models.BooleanField(default=False)          # 是否推荐
+    
+    # 统计信息
+    video_count = models.IntegerField(default=0)              # 视频数量
+    award_count = models.IntegerField(default=0)              # 获奖数量
+    
+    # 创建者
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+```
+
+### 标签模型 (Tag)
+```python
+class Tag(models.Model):
+    CATEGORY_CHOICES = [
+        ('游戏IP', '游戏IP'),
+        ('动漫IP', '动漫IP'),
+        ('年份', '年份'),
+        ('类型', '类型'),
+        ('风格', '风格'),
+        ('地区', '地区'),
+        ('其他', '其他'),
+    ]
+    
+    name = models.CharField(max_length=50)                    # 标签名称
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)  # 分类
+    description = models.TextField(blank=True)                 # 描述
+    color = models.CharField(max_length=7, default='#007bff') # 颜色
+    
+    # 统计信息
+    usage_count = models.IntegerField(default=0)              # 使用次数
+    
+    # 状态
+    is_active = models.BooleanField(default=True)             # 是否启用
+    is_featured = models.BooleanField(default=False)          # 是否推荐
+```
+
+### 比赛模型 (Competition)
+```python
+class Competition(models.Model):
+    name = models.CharField(max_length=100)                   # 比赛名称
+    description = models.TextField(blank=True)                 # 比赛描述
+    website = models.URLField(blank=True)                     # 官网链接
+```
+
+### 奖项模型 (Award)
+```python
+class Award(models.Model):
+    name = models.CharField(max_length=100)                   # 奖项名称
+    description = models.TextField(blank=True)                 # 奖项描述
+    competition = models.ForeignKey('competitions.Competition', on_delete=models.CASCADE)
+    level = models.CharField(max_length=20, blank=True)       # 级别
+    prize_money = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    prize_description = models.TextField(blank=True)           # 奖品描述
+    winner_count = models.IntegerField(default=0)             # 获奖者数量
+```
+
+### 获奖记录模型 (AwardRecord)
+```python
+class AwardRecord(models.Model):
+    award = models.ForeignKey(Award, on_delete=models.CASCADE, related_name='records')
+    video = models.ForeignKey('videos.Video', on_delete=models.SET_NULL, null=True, blank=True)
+    group = models.ForeignKey('groups.Group', on_delete=models.SET_NULL, null=True, blank=True)
+    year = models.IntegerField()                              # 获奖年份
+    description = models.TextField(blank=True)                 # 获奖描述
+```
+
+### 视频标签关联模型 (VideoTag)
+```python
+class VideoTag(models.Model):
+    video = models.ForeignKey('videos.Video', on_delete=models.CASCADE, related_name='video_tags')
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='video_tags')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['video', 'tag']
+```
 
 ## API 设计规范
 
 ### RESTful URL 设计
 ```
-# urls.py
-urlpatterns = [
-    path('videos/', VideoListCreateView.as_view(), name='video-list'),
-    path('videos/<int:pk>/', VideoRetrieveUpdateDestroyView.as_view(), name='video-detail'),
-    path('groups/', GroupListCreateView.as_view(), name='group-list'),
-    path('groups/<int:pk>/', GroupRetrieveUpdateDestroyView.as_view(), name='group-detail'),
-    path('competitions/', CompetitionListCreateView.as_view(), name='competition-list'),
-    path('competitions/<int:pk>/', CompetitionRetrieveUpdateDestroyView.as_view(), name='competition-detail'),
-    path('awards/', AwardListCreateView.as_view(), name='award-list'),
-    path('awards/<int:pk>/', AwardRetrieveUpdateDestroyView.as_view(), name='award-detail'),
-    path('tags/', TagListCreateView.as_view(), name='tag-list'),
-    path('tags/<int:pk>/', TagRetrieveUpdateDestroyView.as_view(), name='tag-detail'),
-]
+# 视频管理
+path('videos/', VideoViewSet.as_view({'get': 'list', 'post': 'create'}), name='video-list'),
+path('videos/<uuid:pk>/', VideoViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='video-detail'),
+
+# 社团管理
+path('groups/', GroupViewSet.as_view({'get': 'list', 'post': 'create'}), name='group-list'),
+path('groups/<uuid:pk>/', GroupViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='group-detail'),
+
+# 标签管理
+path('tags/', TagViewSet.as_view({'get': 'list', 'post': 'create'}), name='tag-list'),
+path('tags/<uuid:pk>/', TagViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='tag-detail'),
+
+# 比赛管理
+path('competitions/', CompetitionViewSet.as_view({'get': 'list', 'post': 'create'}), name='competition-list'),
+path('competitions/<uuid:pk>/', CompetitionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='competition-detail'),
+
+# 奖项管理
+path('awards/', AwardViewSet.as_view({'get': 'list', 'post': 'create'}), name='award-list'),
+path('awards/<uuid:pk>/', AwardViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='award-detail'),
+
+# 获奖记录管理
+path('award-records/', AwardRecordViewSet.as_view({'get': 'list', 'post': 'create'}), name='awardrecord-list'),
+path('award-records/<uuid:pk>/', AwardRecordViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='awardrecord-detail'),
 ```
 
 ### HTTP 状态码使用
@@ -106,19 +258,31 @@ urlpatterns = [
 ### 响应格式规范
 ```json
 {
-  "code": 200,
-  "message": "success",
-  "data": { ... }
+    "code": 200,
+    "message": "success",
+    "data": { ... }
 }
 ```
 
 ## 数据库设计规范
 - 只保留核心表结构
-- 表命名使用复数形式：`videos`, `groups`, `competitions`, `awards`, `tags`, `users`, `award_records`
-- 关联表使用下划线连接：`video_tags`, `video_groups`
+- 表命名使用复数形式：`videos`, `groups`, `competitions`, `awards`, `tags`, `users`, `award_records`, `video_tags`
+- 关联表使用下划线连接：`video_tags`
 - 字段命名、索引、外键等遵循一致性
+- 使用UUID作为主键，提高安全性
+
+## 权限控制规范
+- 视频、社团、标签的创建、更新、删除需要认证
+- 比赛、奖项、获奖记录的创建、更新、删除需要管理员权限
+- 查询操作允许匿名访问
+- 使用DRF的权限类进行权限控制
 
 ## 其它
 - 代码需有适当注释
 - 重要业务逻辑需有单元测试
 - 遵循本规范进行开发，确保代码质量和项目可维护性
+- 使用Django Admin进行数据管理
+- 支持批量导入功能
+globs:
+alwaysApply: false
+---

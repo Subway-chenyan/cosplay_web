@@ -6,6 +6,7 @@ export interface Video {
   url: string
   thumbnail: string
   duration?: string
+  duration_display?: string
   resolution?: string
   file_size?: number
   view_count: number
@@ -16,11 +17,15 @@ export interface Video {
   status: 'draft' | 'published' | 'private' | 'deleted'
   is_featured: boolean
   is_original: boolean
-  uploaded_by?: User
+  uploaded_by?: string
+  uploaded_by_username?: string
+  group?: string
+  group_name?: string
+  competition?: string
+  competition_name?: string
+  competition_year?: number
   created_at: string
   updated_at: string
-  groups: Group[]
-  competitions: Competition[]
   tags: Tag[]
 }
 
@@ -91,10 +96,26 @@ export interface Award {
   name: string
   description: string
   competition: string
+  level: string
+  prize_money?: number
+  prize_description: string
+  winner_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface AwardRecord {
+  id: string
+  award: string
+  video?: string
+  group?: string
   year: number
-  level: 'gold' | 'silver' | 'bronze' | 'special' | 'participation'
-  group_id: string
-  video_id: string
+  description: string
+  award_name?: string
+  award_level?: string
+  competition_name?: string
+  video_title?: string
+  group_name?: string
   created_at: string
   updated_at: string
 }

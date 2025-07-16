@@ -1,26 +1,33 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { RootState } from '../store/store'
-import { fetchGroups, setSearchQuery, clearSearch } from '../store/slices/groupsSlice'
+import { RootState, AppDispatch } from '../store/store'
+import { fetchGroups, searchGroups } from '../store/slices/groupsSlice'
 import SearchBar from '../components/SearchBar'
 import { Users, MapPin, Calendar, ExternalLink, CheckCircle } from 'lucide-react'
 
 function GroupsPage() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { groups, filteredGroups, loading, error, searchQuery } = useSelector((state: RootState) => state.groups)
+  const { groups, loading, error } = useSelector((state: RootState) => state.groups)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     dispatch(fetchGroups() as any)
   }, [dispatch])
 
   const handleSearchChange = (query: string) => {
-    dispatch(setSearchQuery(query) as any)
+    setSearchQuery(query)
+    if (query.trim()) {
+      dispatch(searchGroups(query))
+    } else {
+      dispatch(fetchGroups())
+    }
   }
 
   const handleClearSearch = () => {
-    dispatch(clearSearch() as any)
+    setSearchQuery('')
+    dispatch(fetchGroups())
   }
 
   const handleGroupClick = (groupId: string) => {
@@ -74,7 +81,7 @@ function GroupsPage() {
 
       {/* Groups Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredGroups.map((group) => (
+                  {groups.map((group: any) => (
           <div
             key={group.id}
             className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 card-hover cursor-pointer"
@@ -186,7 +193,7 @@ function GroupsPage() {
       </div>
 
       {/* Empty State */}
-      {filteredGroups.length === 0 && groups.length > 0 && (
+              {groups.length === 0 && searchQuery && (
         <div className="text-center py-12">
           <div className="bg-gray-50 rounded-lg p-8">
             <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
