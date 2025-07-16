@@ -7,11 +7,10 @@ class AwardAdmin(admin.ModelAdmin):
     """
     奖项管理后台
     """
-    list_display = ['name', 'competition', 'prize_money', 'winner_count', 'created_at']
+    list_display = ['name', 'competition', 'created_at']
     list_filter = ['competition', 'created_at']
-    search_fields = ['name', 'description', 'competition__name']
+    search_fields = ['name', 'competition__name']
     ordering = ['competition', 'name']
-    readonly_fields = ['winner_count']
 
 
 @admin.register(AwardRecord)

@@ -24,12 +24,12 @@ class VideoViewSet(viewsets.ModelViewSet):
     """
     视频视图集
     """
-    queryset = Video.objects.filter(status='published')
+    queryset = Video.objects.all()
     serializer_class = VideoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = VideoFilter
     search_fields = ['title', 'description', 'bv_number']
-    ordering_fields = ['created_at', 'view_count', 'like_count', 'performance_date']
+    ordering_fields = ['created_at']
     ordering = ['-created_at']
     
     def get_serializer_class(self):

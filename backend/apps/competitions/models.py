@@ -10,7 +10,6 @@ class Competition(models.Model):
     name = models.CharField(max_length=100, verbose_name='比赛名称')
     description = models.TextField(blank=True, verbose_name='比赛描述')
     website = models.URLField(blank=True, verbose_name='官网链接')
-    year = models.IntegerField(default=2024, verbose_name='比赛年份')
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')

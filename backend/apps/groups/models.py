@@ -29,8 +29,6 @@ class Group(models.Model):
     
     # 状态和设置
     is_active = models.BooleanField(default=True, verbose_name='是否活跃')
-    is_verified = models.BooleanField(default=False, verbose_name='是否认证')
-    is_featured = models.BooleanField(default=False, verbose_name='是否推荐')
     
     # 统计信息
     video_count = models.IntegerField(default=0, verbose_name='视频数量')
@@ -50,8 +48,6 @@ class Group(models.Model):
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['is_active']),
-            models.Index(fields=['is_verified']),
-            models.Index(fields=['is_featured']),
         ]
     
     def __str__(self):

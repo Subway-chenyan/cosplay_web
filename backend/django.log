@@ -4757,3 +4757,1606 @@ INFO 2025-07-16 23:32:07,160 basehttp 4644 23996 "GET /api/competitions/?page=1&
 INFO 2025-07-16 23:32:07,172 basehttp 4644 40588 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 2952
 INFO 2025-07-16 23:32:07,177 basehttp 4644 30412 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 7665
 INFO 2025-07-16 23:32:07,232 basehttp 4644 40588 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 7665
+INFO 2025-07-16 23:38:50,642 autoreload 4644 30492 C:\Users\Subway\cosplay_web\backend\apps\competitions\models.py changed, reloading.
+INFO 2025-07-16 23:38:51,114 autoreload 680 51052 Watching for file changes with StatReloader
+INFO 2025-07-16 23:39:02,030 autoreload 680 51052 C:\Users\Subway\cosplay_web\backend\apps\awards\models.py changed, reloading.
+INFO 2025-07-16 23:39:02,483 autoreload 51028 4128 Watching for file changes with StatReloader
+INFO 2025-07-16 23:39:10,317 autoreload 51028 4128 C:\Users\Subway\cosplay_web\backend\apps\videos\models.py changed, reloading.
+INFO 2025-07-16 23:39:10,765 autoreload 50632 39448 Watching for file changes with StatReloader
+INFO 2025-07-16 23:41:23,681 autoreload 50632 39448 C:\Users\Subway\cosplay_web\backend\apps\videos\serializers.py changed, reloading.
+INFO 2025-07-16 23:41:24,129 autoreload 50624 47704 Watching for file changes with StatReloader
+INFO 2025-07-16 23:44:49,111 autoreload 50624 47704 C:\Users\Subway\cosplay_web\backend\apps\awards\admin.py changed, reloading.
+INFO 2025-07-16 23:44:49,585 autoreload 40588 49728 Watching for file changes with StatReloader
+INFO 2025-07-16 23:45:03,584 autoreload 40588 49728 C:\Users\Subway\cosplay_web\backend\apps\competitions\admin.py changed, reloading.
+INFO 2025-07-16 23:45:04,053 autoreload 6896 51136 Watching for file changes with StatReloader
+ERROR 2025-07-16 23:49:06,408 log 6896 3080 Internal Server Error: /admin/awards/awardrecord/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 187, in _get_session
+    return self._session_cache
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "django_session" does not exist
+LINE 1: ...ession_data", "django_session"."expire_date" FROM "django_se...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 230, in inner
+    if not self.has_permission(request):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 203, in has_permission
+    return request.user.is_active and request.user.is_staff
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 266, in inner
+    self._setup()
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 419, in _setup
+    self._wrapped = self._setupfunc()
+                    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\auth\middleware.py", line 25, in <lambda>
+    request.user = SimpleLazyObject(lambda: get_user(request))
+                                            ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\auth\middleware.py", line 11, in get_user
+    request._cached_user = auth.get_user(request)
+                           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\auth\__init__.py", line 191, in get_user
+    user_id = _get_user_session_key(request)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\auth\__init__.py", line 60, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+                                               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 53, in __getitem__
+    return self._session[key]
+           ^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 192, in _get_session
+    self._session_cache = self.load()
+                          ^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 42, in load
+    s = self._get_session_from_db()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 32, in _get_session_from_db
+    return self.model.objects.get(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 633, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 380, in __len__
+    self._fetch_all()
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "django_session" does not exist
+LINE 1: ...ession_data", "django_session"."expire_date" FROM "django_se...
+                                                             ^
+
+ERROR 2025-07-16 23:49:06,412 basehttp 6896 3080 "GET /admin/awards/awardrecord/ HTTP/1.1" 500 202773
+ERROR 2025-07-16 23:49:12,069 log 6896 496 Internal Server Error: /api/competitions/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "competitions_competition" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "competitions_competition"
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "competitions_competition" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "competitions_competition"
+                                          ^
+
+ERROR 2025-07-16 23:49:12,074 log 6896 8308 Internal Server Error: /api/videos/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "videos_video" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "videos_video" WHERE "vide...
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "videos_video" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "videos_video" WHERE "vide...
+                                          ^
+
+ERROR 2025-07-16 23:49:12,085 log 6896 46624 Internal Server Error: /api/tags/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "tags_tag" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "tags_tag" WHERE "tags_tag...
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "tags_tag" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "tags_tag" WHERE "tags_tag...
+                                          ^
+
+ERROR 2025-07-16 23:49:12,093 log 6896 48920 Internal Server Error: /api/groups/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "groups_group" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "groups_group" WHERE "grou...
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "groups_group" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "groups_group" WHERE "grou...
+                                          ^
+
+ERROR 2025-07-16 23:49:12,097 basehttp 6896 496 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 500 193108
+ERROR 2025-07-16 23:49:12,100 basehttp 6896 8308 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 500 193387
+ERROR 2025-07-16 23:49:12,101 basehttp 6896 46624 "GET /api/tags/?page=1&page_size=50 HTTP/1.1" 500 192892
+ERROR 2025-07-16 23:49:12,102 basehttp 6896 48920 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 500 193205
+ERROR 2025-07-16 23:49:12,142 log 6896 496 Internal Server Error: /api/competitions/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "competitions_competition" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "competitions_competition"
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "competitions_competition" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "competitions_competition"
+                                          ^
+
+ERROR 2025-07-16 23:49:12,147 basehttp 6896 496 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 500 193108
+ERROR 2025-07-16 23:49:12,177 log 6896 46624 Internal Server Error: /api/tags/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "tags_tag" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "tags_tag" WHERE "tags_tag...
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "tags_tag" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "tags_tag" WHERE "tags_tag...
+                                          ^
+
+ERROR 2025-07-16 23:49:12,191 log 6896 48920 Internal Server Error: /api/groups/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "groups_group" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "groups_group" WHERE "grou...
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "groups_group" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "groups_group" WHERE "grou...
+                                          ^
+
+ERROR 2025-07-16 23:49:12,192 basehttp 6896 46624 "GET /api/tags/?page=1&page_size=50 HTTP/1.1" 500 192892
+ERROR 2025-07-16 23:49:12,204 log 6896 8308 Internal Server Error: /api/videos/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "videos_video" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "videos_video" WHERE "vide...
+                                          ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\mixins.py", line 40, in list
+    page = self.paginate_queryset(queryset)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\generics.py", line 171, in paginate_queryset
+    return self.paginator.paginate_queryset(queryset, self.request, view=self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\rest_framework\pagination.py", line 204, in paginate_queryset
+    self.page = paginator.page(page_number)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 72, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 53, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 99, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\functional.py", line 57, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\paginator.py", line 93, in count
+    return c()
+           ^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 608, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 568, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\query.py", line 554, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "videos_video" does not exist
+LINE 1: SELECT COUNT(*) AS "__count" FROM "videos_video" WHERE "vide...
+                                          ^
+
+ERROR 2025-07-16 23:49:12,205 basehttp 6896 48920 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 500 193205
+ERROR 2025-07-16 23:49:12,208 basehttp 6896 8308 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 500 193387
+INFO 2025-07-16 23:56:52,632 autoreload 6896 51136 C:\Users\Subway\cosplay_web\backend\apps\competitions\models.py changed, reloading.
+INFO 2025-07-16 23:56:53,154 autoreload 45656 22304 Watching for file changes with StatReloader
+INFO 2025-07-16 23:56:54,926 autoreload 45656 22304 C:\Users\Subway\cosplay_web\backend\apps\videos\models.py changed, reloading.
+INFO 2025-07-16 23:56:55,407 autoreload 48104 47632 Watching for file changes with StatReloader
+INFO 2025-07-16 23:56:57,157 autoreload 48104 47632 C:\Users\Subway\cosplay_web\backend\apps\awards\admin.py changed, reloading.
+INFO 2025-07-16 23:56:57,641 autoreload 45464 39124 Watching for file changes with StatReloader
+INFO 2025-07-16 23:58:01,733 autoreload 45464 39124 C:\Users\Subway\cosplay_web\backend\apps\competitions\models.py changed, reloading.
+INFO 2025-07-16 23:58:02,292 autoreload 22520 45836 Watching for file changes with StatReloader
+INFO 2025-07-16 23:58:11,206 autoreload 22520 45836 C:\Users\Subway\cosplay_web\backend\apps\videos\models.py changed, reloading.
+INFO 2025-07-16 23:58:11,685 autoreload 32916 49776 Watching for file changes with StatReloader
+INFO 2025-07-17 00:19:32,046 autoreload 32916 49776 C:\Users\Subway\cosplay_web\backend\apps\competitions\admin.py changed, reloading.
+INFO 2025-07-17 00:19:32,584 autoreload 47896 8424 Watching for file changes with StatReloader
+INFO 2025-07-17 00:19:43,598 autoreload 47896 8424 C:\Users\Subway\cosplay_web\backend\apps\videos\models.py changed, reloading.
+INFO 2025-07-17 00:19:44,063 autoreload 47820 51576 Watching for file changes with StatReloader
+INFO 2025-07-17 00:20:12,634 basehttp 47820 1000 "GET /admin/awards/awardrecord/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:20:12,659 basehttp 47820 1000 "GET /admin/login/?next=/admin/awards/awardrecord/ HTTP/1.1" 200 4254
+INFO 2025-07-17 00:20:12,678 basehttp 47820 1000 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:12,680 basehttp 47820 36788 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:12,680 basehttp 47820 25336 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:12,680 basehttp 47820 496 "GET /static/admin/css/login.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:12,681 basehttp 47820 48732 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:12,952 basehttp 47820 496 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:12,952 basehttp 47820 48732 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:22,152 basehttp 47820 48732 "POST /admin/login/?next=/admin/awards/awardrecord/ HTTP/1.1" 200 4386
+WARNING 2025-07-17 00:20:22,400 log 47820 48732 Not Found: /favicon.ico
+WARNING 2025-07-17 00:20:22,400 basehttp 47820 48732 "GET /favicon.ico HTTP/1.1" 404 3932
+WARNING 2025-07-17 00:20:22,438 log 47820 48732 Not Found: /favicon.ico
+WARNING 2025-07-17 00:20:22,438 basehttp 47820 48732 "GET /favicon.ico HTTP/1.1" 404 3932
+INFO 2025-07-17 00:20:32,744 basehttp 47820 48732 "POST /admin/login/?next=/admin/awards/awardrecord/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:20:32,793 basehttp 47820 48732 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 17665
+INFO 2025-07-17 00:20:32,833 basehttp 47820 48732 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,838 basehttp 47820 25336 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,838 basehttp 47820 496 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,838 basehttp 47820 1000 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,839 basehttp 47820 36788 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,840 basehttp 47820 26536 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,840 basehttp 47820 25336 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,840 basehttp 47820 496 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,840 basehttp 47820 1000 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,845 basehttp 47820 1000 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,853 basehttp 47820 48732 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:20:32,947 basehttp 47820 48732 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,973 basehttp 47820 1000 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,974 basehttp 47820 48732 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:32,974 basehttp 47820 496 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+WARNING 2025-07-17 00:20:33,071 log 47820 496 Not Found: /favicon.ico
+WARNING 2025-07-17 00:20:33,072 basehttp 47820 496 "GET /favicon.ico HTTP/1.1" 404 3932
+WARNING 2025-07-17 00:20:33,096 log 47820 496 Not Found: /favicon.ico
+WARNING 2025-07-17 00:20:33,097 basehttp 47820 496 "GET /favicon.ico HTTP/1.1" 404 3932
+INFO 2025-07-17 00:20:40,700 basehttp 47820 496 "GET /admin/competitions/competition/ HTTP/1.1" 200 15155
+INFO 2025-07-17 00:20:40,760 basehttp 47820 496 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:20:42,470 basehttp 47820 496 "GET /admin/competitions/competition/5dbaaa1c-0464-4705-9b3b-3dbbdffb677d/change/ HTTP/1.1" 200 13130
+INFO 2025-07-17 00:20:42,518 basehttp 47820 496 "GET /static/admin/css/forms.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:42,520 basehttp 47820 48732 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:42,529 basehttp 47820 496 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:20:42,655 basehttp 47820 496 "GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:42,663 basehttp 47820 496 "GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:46,173 basehttp 47820 496 "GET /admin/videos/video/ HTTP/1.1" 200 25743
+INFO 2025-07-17 00:20:46,236 basehttp 47820 496 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:20:48,852 basehttp 47820 496 "GET /admin/videos/video/83bb33b4-58bb-463b-858b-bda826af3f89/change/ HTTP/1.1" 200 52815
+INFO 2025-07-17 00:20:48,905 basehttp 47820 25336 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:48,905 basehttp 47820 1000 "GET /static/admin/js/collapse.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:48,905 basehttp 47820 48732 "GET /static/admin/js/calendar.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:48,905 basehttp 47820 26536 "GET /static/admin/js/inlines.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:48,907 basehttp 47820 26536 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:48,910 basehttp 47820 26536 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:48,913 basehttp 47820 496 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:20:49,045 basehttp 47820 496 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:49,110 basehttp 47820 496 "GET /static/admin/img/tooltag-arrowright.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:49,133 basehttp 47820 496 "GET /static/admin/img/inline-delete.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:49,211 basehttp 47820 496 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:20:49,211 basehttp 47820 26536 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:23:13,422 autoreload 47820 51576 C:\Users\Subway\cosplay_web\backend\apps\videos\models.py changed, reloading.
+INFO 2025-07-17 00:23:13,899 autoreload 50636 36420 Watching for file changes with StatReloader
+INFO 2025-07-17 00:23:29,662 autoreload 50636 36420 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:23:30,117 autoreload 50648 26480 Watching for file changes with StatReloader
+INFO 2025-07-17 00:24:10,382 autoreload 50648 26480 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:24:10,843 autoreload 48976 32900 Watching for file changes with StatReloader
+INFO 2025-07-17 00:24:12,943 basehttp 48976 50824 "GET /admin/awards/award/ HTTP/1.1" 200 24259
+INFO 2025-07-17 00:24:13,031 basehttp 48976 50824 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:26:04,665 basehttp 48976 50824 "GET /admin/videos/video/ HTTP/1.1" 200 23892
+INFO 2025-07-17 00:26:04,745 basehttp 48976 50824 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:26:07,190 basehttp 48976 50824 "GET /admin/videos/video/3e9e9d3e-6a86-4a0e-a8ee-dce9d2d30716/change/ HTTP/1.1" 200 54959
+INFO 2025-07-17 00:26:07,254 basehttp 48976 50824 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:26:07,363 basehttp 48976 44140 "GET /static/admin/css/autocomplete.css HTTP/1.1" 200 9114
+INFO 2025-07-17 00:26:07,363 basehttp 48976 35512 "GET /static/admin/css/vendor/select2/select2.css HTTP/1.1" 200 17358
+INFO 2025-07-17 00:26:07,365 basehttp 48976 28388 "GET /static/admin/js/vendor/select2/i18n/zh-CN.js HTTP/1.1" 200 768
+INFO 2025-07-17 00:26:07,366 basehttp 48976 49860 "GET /static/admin/js/autocomplete.js HTTP/1.1" 200 1060
+INFO 2025-07-17 00:26:07,368 basehttp 48976 53216 "GET /static/admin/js/vendor/select2/select2.full.js HTTP/1.1" 200 173566
+INFO 2025-07-17 00:26:14,138 basehttp 48976 53216 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2621
+INFO 2025-07-17 00:27:55,683 autoreload 48976 32900 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:27:56,162 autoreload 51372 52096 Watching for file changes with StatReloader
+INFO 2025-07-17 00:30:10,708 autoreload 51372 52096 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:30:11,187 autoreload 46636 51176 Watching for file changes with StatReloader
+INFO 2025-07-17 00:30:27,137 basehttp 46636 51152 "GET /admin/videos/video/3e9e9d3e-6a86-4a0e-a8ee-dce9d2d30716/change/ HTTP/1.1" 200 48578
+INFO 2025-07-17 00:30:27,233 basehttp 46636 51152 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:30:53,415 basehttp 46636 51152 "GET /admin/videos/video/3e9e9d3e-6a86-4a0e-a8ee-dce9d2d30716/change/ HTTP/1.1" 200 48578
+INFO 2025-07-17 00:30:53,470 basehttp 46636 51152 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:30:56,833 basehttp 46636 51152 "GET /admin/videos/video/ HTTP/1.1" 200 23892
+INFO 2025-07-17 00:30:56,895 basehttp 46636 51152 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:30:57,983 basehttp 46636 51152 "GET /admin/videos/video/add/ HTTP/1.1" 200 30227
+INFO 2025-07-17 00:30:58,041 basehttp 46636 51152 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:31:34,607 basehttp 46636 51152 "GET /admin/competitions/competition/5dbaaa1c-0464-4705-9b3b-3dbbdffb677d/delete/?_to_field=id&_popup=1 HTTP/1.1" 200 4510
+INFO 2025-07-17 00:31:34,759 basehttp 46636 51152 "GET /static/admin/js/cancel.js HTTP/1.1" 200 884
+INFO 2025-07-17 00:31:37,964 autoreload 46636 51176 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:31:38,455 autoreload 52660 53096 Watching for file changes with StatReloader
+INFO 2025-07-17 00:32:16,565 basehttp 52660 35060 "GET /admin/videos/video/add/ HTTP/1.1" 200 34563
+INFO 2025-07-17 00:32:16,622 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:32:27,055 basehttp 52660 35060 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2621
+INFO 2025-07-17 00:32:42,776 basehttp 52660 35060 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2621
+INFO 2025-07-17 00:33:11,206 basehttp 52660 35060 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2621
+INFO 2025-07-17 00:33:18,722 basehttp 52660 35060 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 17665
+INFO 2025-07-17 00:33:18,799 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:33:44,235 basehttp 52660 35060 "GET /admin/awards/award/ HTTP/1.1" 200 24259
+INFO 2025-07-17 00:33:44,303 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:33:46,012 basehttp 52660 35060 "GET /admin/awards/award/add/ HTTP/1.1" 200 15705
+INFO 2025-07-17 00:33:46,076 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:25,536 basehttp 52660 35060 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 17665
+INFO 2025-07-17 00:34:25,607 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:27,019 basehttp 52660 35060 "GET /admin/awards/award/ HTTP/1.1" 200 24259
+INFO 2025-07-17 00:34:27,085 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:31,320 basehttp 52660 35060 "GET /admin/tags/videotag/add/ HTTP/1.1" 200 17121
+INFO 2025-07-17 00:34:31,385 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:36,754 basehttp 52660 35060 "GET /admin/tags/tag/add/ HTTP/1.1" 200 15065
+INFO 2025-07-17 00:34:36,820 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:44,683 basehttp 52660 35060 "GET /admin/competitions/competition/ HTTP/1.1" 200 15155
+INFO 2025-07-17 00:34:44,749 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:49,175 basehttp 52660 35060 "GET /admin/competitions/competition/add/ HTTP/1.1" 200 12549
+INFO 2025-07-17 00:34:49,242 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:34:53,097 basehttp 52660 35060 "GET /admin/groups/group/add/ HTTP/1.1" 200 22805
+INFO 2025-07-17 00:34:53,156 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:36:01,400 basehttp 52660 35060 "GET /admin/auth/group/add/ HTTP/1.1" 200 15936
+INFO 2025-07-17 00:36:01,475 basehttp 52660 35060 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:36:01,520 basehttp 52660 41876 "GET /static/admin/js/SelectBox.js HTTP/1.1" 200 4530
+INFO 2025-07-17 00:36:01,520 basehttp 52660 47800 "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 200 15292
+INFO 2025-07-17 00:36:01,686 basehttp 52660 47800 "GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+INFO 2025-07-17 00:36:01,686 basehttp 52660 35060 "GET /static/admin/img/icon-unknown-alt.svg HTTP/1.1" 200 655
+INFO 2025-07-17 00:36:01,686 basehttp 52660 41876 "GET /static/admin/img/selector-icons.svg HTTP/1.1" 200 3291
+INFO 2025-07-17 00:36:03,643 basehttp 52660 41876 "GET /admin/users/user/add/ HTTP/1.1" 200 13579
+INFO 2025-07-17 00:36:03,712 basehttp 52660 41876 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:36:10,898 basehttp 52660 41876 "GET /admin/tags/videotag/add/ HTTP/1.1" 200 17121
+INFO 2025-07-17 00:36:10,964 basehttp 52660 41876 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:36:41,010 autoreload 52660 53096 C:\Users\Subway\cosplay_web\backend\apps\awards\models.py changed, reloading.
+INFO 2025-07-17 00:36:41,509 autoreload 15484 49228 Watching for file changes with StatReloader
+INFO 2025-07-17 00:36:54,471 autoreload 15484 49228 C:\Users\Subway\cosplay_web\backend\apps\groups\models.py changed, reloading.
+INFO 2025-07-17 00:36:54,942 autoreload 51076 2504 Watching for file changes with StatReloader
+INFO 2025-07-17 00:37:37,505 autoreload 51076 2504 C:\Users\Subway\cosplay_web\backend\apps\awards\admin.py changed, reloading.
+INFO 2025-07-17 00:37:37,985 autoreload 20604 42276 Watching for file changes with StatReloader
+INFO 2025-07-17 00:37:46,856 autoreload 20604 42276 C:\Users\Subway\cosplay_web\backend\apps\groups\admin.py changed, reloading.
+INFO 2025-07-17 00:37:47,321 autoreload 30192 49808 Watching for file changes with StatReloader
+INFO 2025-07-17 00:38:37,960 basehttp 30192 39576 "GET /admin/tags/videotag/add/ HTTP/1.1" 200 17121
+INFO 2025-07-17 00:38:38,014 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:38:50,066 basehttp 30192 39576 "GET /admin/videos/video/ HTTP/1.1" 200 24428
+INFO 2025-07-17 00:38:50,129 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:38:51,606 basehttp 30192 39576 "GET /admin/videos/video/55c908c3-f1d4-436e-a0b0-1c7a236ce4fc/change/ HTTP/1.1" 200 53025
+INFO 2025-07-17 00:38:51,671 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:38:57,087 basehttp 30192 39576 "GET /admin/groups/group/ HTTP/1.1" 200 15514
+INFO 2025-07-17 00:38:57,138 basehttp 30192 38768 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:38:57,155 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:38:59,272 basehttp 30192 39576 "GET /admin/groups/group/f69ecf0b-a900-41fb-b869-1618a7d2e30b/change/ HTTP/1.1" 200 22925
+INFO 2025-07-17 00:38:59,337 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:39:08,793 basehttp 30192 39576 "GET /admin/awards/award/ HTTP/1.1" 200 22370
+INFO 2025-07-17 00:39:08,856 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:39:10,145 basehttp 30192 39576 "GET /admin/awards/award/9f415f72-b162-4d4a-8694-93cd9220bb75/change/ HTTP/1.1" 200 13634
+INFO 2025-07-17 00:39:10,212 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:39:15,207 basehttp 30192 39576 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 17656
+INFO 2025-07-17 00:39:15,265 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:39:26,908 basehttp 30192 39576 "GET /admin/awards/awardrecord/28efbfad-d67f-4829-94a9-b68878b35c16/change/ HTTP/1.1" 200 21087
+INFO 2025-07-17 00:39:26,972 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:39:44,392 basehttp 30192 39576 "GET /admin/videos/video/add/ HTTP/1.1" 200 34563
+INFO 2025-07-17 00:39:44,455 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:39:48,812 basehttp 30192 39576 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2621
+INFO 2025-07-17 00:40:12,248 basehttp 30192 39576 "GET /admin/groups/group/add/?_to_field=id&_popup=1 HTTP/1.1" 200 14907
+INFO 2025-07-17 00:40:12,276 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:40:34,888 basehttp 30192 39576 "POST /admin/groups/group/add/?_to_field=id&_popup=1 HTTP/1.1" 200 381
+INFO 2025-07-17 00:40:34,944 basehttp 30192 39576 "GET /static/admin/js/popup_response.js HTTP/1.1" 200 551
+INFO 2025-07-17 00:40:40,225 basehttp 30192 39576 "GET /admin/competitions/competition/add/?_to_field=id&_popup=1 HTTP/1.1" 200 5691
+INFO 2025-07-17 00:40:40,256 basehttp 30192 39576 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:40:49,322 basehttp 30192 39576 "POST /admin/competitions/competition/add/?_to_field=id&_popup=1 HTTP/1.1" 200 365
+INFO 2025-07-17 00:40:58,606 basehttp 30192 39576 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2621
+INFO 2025-07-17 00:41:00,868 basehttp 30192 39576 "GET /admin/awards/award/add/?_to_field=id&_popup=1 HTTP/1.1" 200 6487
+INFO 2025-07-17 00:41:00,883 basehttp 30192 39576 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:00,883 basehttp 30192 38768 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:00,885 basehttp 30192 45544 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:00,904 basehttp 30192 52524 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:41:00,990 basehttp 30192 52524 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:08,499 basehttp 30192 52524 "POST /admin/awards/award/add/?_to_field=id&_popup=1 HTTP/1.1" 200 380
+INFO 2025-07-17 00:41:14,821 basehttp 30192 52524 "POST /admin/videos/video/add/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:41:14,898 basehttp 30192 52524 "GET /admin/videos/video/ HTTP/1.1" 200 25450
+INFO 2025-07-17 00:41:14,937 basehttp 30192 52524 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:14,938 basehttp 30192 45544 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:14,949 basehttp 30192 52524 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:41:18,521 basehttp 30192 52524 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 18287
+INFO 2025-07-17 00:41:18,577 basehttp 30192 52524 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:41:25,619 basehttp 30192 52524 "GET /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/change/ HTTP/1.1" 200 21170
+INFO 2025-07-17 00:41:25,677 basehttp 30192 38768 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,677 basehttp 30192 39576 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,677 basehttp 30192 45544 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,678 basehttp 30192 51460 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,679 basehttp 30192 21828 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,681 basehttp 30192 38768 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,682 basehttp 30192 39576 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,682 basehttp 30192 45544 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,682 basehttp 30192 21828 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:25,690 basehttp 30192 52524 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:41:34,321 basehttp 30192 52524 "GET /admin/videos/video/add/ HTTP/1.1" 200 34715
+INFO 2025-07-17 00:41:34,370 basehttp 30192 52524 "GET /static/admin/css/forms.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:34,373 basehttp 30192 45544 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:34,384 basehttp 30192 21828 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:41:34,438 basehttp 30192 21828 "GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:41:34,439 basehttp 30192 21828 "GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:42:56,152 autoreload 30192 49808 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:42:56,650 autoreload 51684 18132 Watching for file changes with StatReloader
+ERROR 2025-07-17 00:43:55,578 log 51684 49760 Internal Server Error: /admin/videos/video/add/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1886, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1815, in _changeform_view
+    formsets, inline_instances = self._create_formsets(
+                                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 2258, in _create_formsets
+    prefix = FormSet.get_default_prefix()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'get_default_prefix'
+ERROR 2025-07-17 00:43:55,580 basehttp 51684 49760 "GET /admin/videos/video/add/ HTTP/1.1" 500 125578
+ERROR 2025-07-17 00:44:23,208 log 51684 49760 Internal Server Error: /admin/videos/video/add/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1886, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1815, in _changeform_view
+    formsets, inline_instances = self._create_formsets(
+                                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 2258, in _create_formsets
+    prefix = FormSet.get_default_prefix()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'get_default_prefix'
+ERROR 2025-07-17 00:44:23,209 basehttp 51684 49760 "GET /admin/videos/video/add/ HTTP/1.1" 500 125578
+INFO 2025-07-17 00:44:30,235 basehttp 51684 49760 "GET /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/change/ HTTP/1.1" 200 21170
+INFO 2025-07-17 00:44:34,187 basehttp 51684 49760 "GET /admin/videos/video/ HTTP/1.1" 200 25231
+INFO 2025-07-17 00:44:34,232 basehttp 51684 49760 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:44:34,235 basehttp 51684 34040 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:44:34,244 basehttp 51684 49760 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:44:34,384 basehttp 51684 49760 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:44:34,459 basehttp 51684 49760 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:44:34,459 basehttp 51684 34040 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+ERROR 2025-07-17 00:44:37,252 log 51684 49760 Internal Server Error: /admin/videos/video/add/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1886, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1815, in _changeform_view
+    formsets, inline_instances = self._create_formsets(
+                                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 2258, in _create_formsets
+    prefix = FormSet.get_default_prefix()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'get_default_prefix'
+ERROR 2025-07-17 00:44:37,253 basehttp 51684 49760 "GET /admin/videos/video/add/ HTTP/1.1" 500 125391
+INFO 2025-07-17 00:44:40,292 basehttp 51684 49760 "GET /admin/videos/video/ HTTP/1.1" 200 25231
+ERROR 2025-07-17 00:44:41,760 log 51684 49760 Internal Server Error: /admin/videos/video/55c908c3-f1d4-436e-a0b0-1c7a236ce4fc/change/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1889, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1820, in _changeform_view
+    formsets, inline_instances = self._create_formsets(
+                                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 2258, in _create_formsets
+    prefix = FormSet.get_default_prefix()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'get_default_prefix'
+ERROR 2025-07-17 00:44:41,763 basehttp 51684 49760 "GET /admin/videos/video/55c908c3-f1d4-436e-a0b0-1c7a236ce4fc/change/ HTTP/1.1" 500 127138
+INFO 2025-07-17 00:44:45,004 basehttp 51684 49760 "GET /admin/videos/video/ HTTP/1.1" 200 25231
+ERROR 2025-07-17 00:44:46,857 log 51684 49760 Internal Server Error: /admin/videos/video/add/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1886, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1815, in _changeform_view
+    formsets, inline_instances = self._create_formsets(
+                                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 2258, in _create_formsets
+    prefix = FormSet.get_default_prefix()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'get_default_prefix'
+ERROR 2025-07-17 00:44:46,858 basehttp 51684 49760 "GET /admin/videos/video/add/ HTTP/1.1" 500 125391
+INFO 2025-07-17 00:45:10,573 autoreload 51684 18132 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:45:11,093 autoreload 52808 6500 Watching for file changes with StatReloader
+INFO 2025-07-17 00:45:27,152 basehttp 52808 28500 "GET /admin/videos/video/add/ HTTP/1.1" 200 36715
+INFO 2025-07-17 00:45:27,210 basehttp 52808 48368 "GET /static/admin/js/inlines.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:45:27,228 basehttp 52808 48368 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:45:27,230 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:45:27,328 basehttp 52808 48368 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:45:27,328 basehttp 52808 28500 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:45:27,393 basehttp 52808 28500 "GET /static/admin/img/inline-delete.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:45:46,635 basehttp 52808 28500 "GET /admin/videos/video/ HTTP/1.1" 200 25231
+INFO 2025-07-17 00:45:46,694 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:45:48,578 basehttp 52808 28500 "GET /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 200 46689
+INFO 2025-07-17 00:45:48,651 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:45:48,815 basehttp 52808 28500 "GET /static/admin/img/tooltag-arrowright.svg HTTP/1.1" 304 0
+INFO 2025-07-17 00:45:52,426 basehttp 52808 28500 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=group HTTP/1.1" 200 471
+INFO 2025-07-17 00:45:54,800 basehttp 52808 28500 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=group HTTP/1.1" 200 471
+INFO 2025-07-17 00:45:59,186 basehttp 52808 28500 "POST /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 200 46719
+INFO 2025-07-17 00:45:59,233 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:46:22,571 basehttp 52808 28500 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=group HTTP/1.1" 200 471
+INFO 2025-07-17 00:46:26,097 basehttp 52808 28500 "POST /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:46:26,174 basehttp 52808 28500 "GET /admin/videos/video/ HTTP/1.1" 200 25450
+INFO 2025-07-17 00:46:26,235 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:46:43,382 basehttp 52808 28500 "GET /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 200 46689
+INFO 2025-07-17 00:46:43,441 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:46:57,680 basehttp 52808 28500 "POST /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:46:57,750 basehttp 52808 28500 "GET /admin/videos/video/ HTTP/1.1" 200 25450
+INFO 2025-07-17 00:46:57,817 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:47:00,777 basehttp 52808 28500 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 18298
+INFO 2025-07-17 00:47:00,838 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:47:02,876 basehttp 52808 28500 "GET /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/change/ HTTP/1.1" 200 21170
+INFO 2025-07-17 00:47:02,942 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:47:06,496 basehttp 52808 28500 "POST /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:47:06,541 basehttp 52808 28500 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 18488
+INFO 2025-07-17 00:47:06,605 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:47:10,396 basehttp 52808 28500 "GET /admin/videos/video/ HTTP/1.1" 200 25231
+INFO 2025-07-17 00:47:10,455 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:47:12,094 basehttp 52808 28500 "GET /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 200 46689
+INFO 2025-07-17 00:47:12,151 basehttp 52808 28500 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:48:39,614 autoreload 52808 6500 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:48:40,134 autoreload 37548 45132 Watching for file changes with StatReloader
+INFO 2025-07-17 00:49:00,680 basehttp 37548 25656 "GET /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 200 41991
+INFO 2025-07-17 00:49:00,720 basehttp 37548 18304 "GET /static/admin/css/vendor/select2/select2.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:49:00,722 basehttp 37548 22272 "GET /static/admin/css/autocomplete.css HTTP/1.1" 304 0
+INFO 2025-07-17 00:49:00,723 basehttp 37548 45776 "GET /static/admin/js/vendor/select2/select2.full.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:49:00,723 basehttp 37548 34040 "GET /static/admin/js/vendor/select2/i18n/zh-CN.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:49:00,724 basehttp 37548 53008 "GET /static/admin/js/autocomplete.js HTTP/1.1" 304 0
+INFO 2025-07-17 00:49:00,730 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:13,589 basehttp 37548 25656 "POST /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:49:13,670 basehttp 37548 25656 "GET /admin/videos/video/ HTTP/1.1" 200 25497
+INFO 2025-07-17 00:49:13,750 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:15,464 basehttp 37548 25656 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 18247
+INFO 2025-07-17 00:49:15,520 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:17,929 basehttp 37548 25656 "GET /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/change/ HTTP/1.1" 200 21170
+INFO 2025-07-17 00:49:17,997 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:21,660 basehttp 37548 25656 "GET /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/delete/ HTTP/1.1" 200 10540
+INFO 2025-07-17 00:49:22,959 basehttp 37548 25656 "POST /admin/awards/awardrecord/d5f406cc-e318-4ba4-b994-c951b5d3420e/delete/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:49:22,993 basehttp 37548 25656 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 17924
+INFO 2025-07-17 00:49:23,056 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:25,635 basehttp 37548 25656 "GET /admin/videos/video/ HTTP/1.1" 200 25269
+INFO 2025-07-17 00:49:25,699 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:27,255 basehttp 37548 25656 "GET /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 200 39383
+INFO 2025-07-17 00:49:27,317 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:35,384 basehttp 37548 25656 "GET /admin/autocomplete/?app_label=awards&model_name=awardrecord&field_name=award HTTP/1.1" 200 2564
+INFO 2025-07-17 00:49:39,810 basehttp 37548 25656 "POST /admin/videos/video/ab4d8243-5acf-4737-881c-d9d175bf6bac/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:49:39,891 basehttp 37548 25656 "GET /admin/videos/video/ HTTP/1.1" 200 25450
+INFO 2025-07-17 00:49:39,947 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:42,946 basehttp 37548 25656 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 18247
+INFO 2025-07-17 00:49:43,000 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:45,298 basehttp 37548 25656 "GET /admin/awards/awardrecord/796c1707-0ce2-41c1-b934-5d8024355117/change/ HTTP/1.1" 200 21170
+INFO 2025-07-17 00:49:45,359 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:54,924 basehttp 37548 25656 "GET /admin/videos/video/ HTTP/1.1" 200 25231
+INFO 2025-07-17 00:49:54,983 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:49:57,954 basehttp 37548 25656 "GET /admin/videos/video/add/ HTTP/1.1" 200 34354
+INFO 2025-07-17 00:49:58,027 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:50:17,482 basehttp 37548 25656 "GET /admin/competitions/competition/add/?_to_field=id&_popup=1 HTTP/1.1" 200 5691
+INFO 2025-07-17 00:50:17,519 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:50:23,577 basehttp 37548 25656 "POST /admin/competitions/competition/add/?_to_field=id&_popup=1 HTTP/1.1" 200 399
+INFO 2025-07-17 00:50:40,330 basehttp 37548 25656 "GET /admin/awards/award/add/?_to_field=id&_popup=1 HTTP/1.1" 200 6574
+INFO 2025-07-17 00:50:40,354 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:50:48,596 basehttp 37548 25656 "POST /admin/awards/award/add/?_to_field=id&_popup=1 HTTP/1.1" 200 414
+INFO 2025-07-17 00:50:52,167 basehttp 37548 25656 "POST /admin/videos/video/add/ HTTP/1.1" 200 37255
+INFO 2025-07-17 00:50:52,217 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+ERROR 2025-07-17 00:50:56,025 log 37548 25656 Internal Server Error: /admin/videos/video/add/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.NotNullViolation: null value in column "year" of relation "awards_awardrecord" violates not-null constraint
+DETAIL:  Failing row contains (b8b99d8c-8d27-41b5-b324-998e95a87908, null, , 2025-07-16 16:50:55.99076+00, 2025-07-16 16:50:55.99076+00, 55393816-7bf7-41cc-94e8-30e180af286b, null, fd0d23b9-50db-46a0-8145-4898ebbe2590).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1886, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1799, in _changeform_view
+    self.save_related(request, form, formsets, not add)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1255, in save_related
+    self.save_formset(request, form, formset, change=change)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1243, in save_formset
+    formset.save()
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\forms\models.py", line 784, in save
+    return self.save_existing_objects(commit) + self.save_new_objects(commit)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\forms\models.py", line 944, in save_new_objects
+    self.new_objects.append(self.save_new(form, commit=commit))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py", line 20, in save_new
+    instance.save()
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 814, in save
+    self.save_base(
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 877, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 1020, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 1061, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 1805, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1822, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: null value in column "year" of relation "awards_awardrecord" violates not-null constraint
+DETAIL:  Failing row contains (b8b99d8c-8d27-41b5-b324-998e95a87908, null, , 2025-07-16 16:50:55.99076+00, 2025-07-16 16:50:55.99076+00, 55393816-7bf7-41cc-94e8-30e180af286b, null, fd0d23b9-50db-46a0-8145-4898ebbe2590).
+
+ERROR 2025-07-17 00:50:56,028 basehttp 37548 25656 "POST /admin/videos/video/add/ HTTP/1.1" 500 222422
+ERROR 2025-07-17 00:51:06,990 log 37548 25656 Internal Server Error: /admin/videos/video/add/
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.NotNullViolation: null value in column "year" of relation "awards_awardrecord" violates not-null constraint
+DETAIL:  Failing row contains (d94bbe4a-b461-4902-968a-0808862bc5c9, null, , 2025-07-16 16:51:06.961346+00, 2025-07-16 16:51:06.961346+00, 55393816-7bf7-41cc-94e8-30e180af286b, null, 62efb418-3c08-455c-8f74-2531071bfc2e).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\views\decorators\cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1886, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\utils\decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1747, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1799, in _changeform_view
+    self.save_related(request, form, formsets, not add)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1255, in save_related
+    self.save_formset(request, form, formset, change=change)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\contrib\admin\options.py", line 1243, in save_formset
+    formset.save()
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\forms\models.py", line 784, in save
+    return self.save_existing_objects(commit) + self.save_new_objects(commit)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\forms\models.py", line 944, in save_new_objects
+    self.new_objects.append(self.save_new(form, commit=commit))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py", line 20, in save_new
+    instance.save()
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 814, in save
+    self.save_base(
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 877, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 1020, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\base.py", line 1061, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\query.py", line 1805, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1822, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Subway\cosplay_web\backend\.venv\Lib\site-packages\django\db\backends\utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: null value in column "year" of relation "awards_awardrecord" violates not-null constraint
+DETAIL:  Failing row contains (d94bbe4a-b461-4902-968a-0808862bc5c9, null, , 2025-07-16 16:51:06.961346+00, 2025-07-16 16:51:06.961346+00, 55393816-7bf7-41cc-94e8-30e180af286b, null, 62efb418-3c08-455c-8f74-2531071bfc2e).
+
+ERROR 2025-07-17 00:51:06,993 basehttp 37548 25656 "POST /admin/videos/video/add/ HTTP/1.1" 500 222424
+INFO 2025-07-17 00:51:34,307 basehttp 37548 25656 "GET /admin/videos/video/add/ HTTP/1.1" 200 34441
+INFO 2025-07-17 00:51:42,288 basehttp 37548 25656 "POST /admin/videos/video/add/ HTTP/1.1" 200 34911
+INFO 2025-07-17 00:51:42,339 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:51:46,237 basehttp 37548 25656 "POST /admin/videos/video/add/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:51:46,330 basehttp 37548 25656 "GET /admin/videos/video/ HTTP/1.1" 200 26233
+INFO 2025-07-17 00:51:46,396 basehttp 37548 25656 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:51:47,335 autoreload 37548 45132 C:\Users\Subway\cosplay_web\backend\apps\videos\admin.py changed, reloading.
+INFO 2025-07-17 00:51:47,877 autoreload 5152 10436 Watching for file changes with StatReloader
+INFO 2025-07-17 00:52:16,297 basehttp 5152 36972 "GET /admin/videos/video/ HTTP/1.1" 200 26014
+INFO 2025-07-17 00:52:16,352 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:52:20,057 basehttp 5152 36972 "GET /admin/videos/video/ HTTP/1.1" 200 26014
+INFO 2025-07-17 00:52:20,120 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:52:24,847 basehttp 5152 36972 "GET /admin/videos/video/fc55eac7-8c5c-4055-9dcc-5ea2511b7805/change/ HTTP/1.1" 200 55434
+INFO 2025-07-17 00:52:24,910 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:52:31,420 basehttp 5152 36972 "POST /admin/videos/video/fc55eac7-8c5c-4055-9dcc-5ea2511b7805/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:52:31,503 basehttp 5152 36972 "GET /admin/videos/video/ HTTP/1.1" 200 26185
+INFO 2025-07-17 00:52:31,564 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:52:39,339 basehttp 5152 36972 "GET /admin/videos/video/90ea8eb9-53e7-4fb4-843e-83e26a30b5b6/change/ HTTP/1.1" 200 39473
+INFO 2025-07-17 00:52:39,404 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:52:42,572 basehttp 5152 36972 "GET /admin/awards/award/add/?_to_field=id&_popup=1 HTTP/1.1" 200 6574
+INFO 2025-07-17 00:52:42,607 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-17 00:52:46,158 basehttp 5152 36972 "POST /admin/awards/award/add/?_to_field=id&_popup=1 HTTP/1.1" 200 414
+INFO 2025-07-17 00:52:48,698 basehttp 5152 36972 "POST /admin/videos/video/90ea8eb9-53e7-4fb4-843e-83e26a30b5b6/change/ HTTP/1.1" 302 0
+INFO 2025-07-17 00:52:48,788 basehttp 5152 36972 "GET /admin/videos/video/ HTTP/1.1" 200 26194
+INFO 2025-07-17 00:52:48,871 basehttp 5152 36972 "GET /admin/jsi18n/ HTTP/1.1" 200 8560

@@ -11,19 +11,10 @@ class Award(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, verbose_name='奖项名称')
-    description = models.TextField(blank=True, verbose_name='奖项描述')
     
     # 关联比赛
     competition = models.ForeignKey('competitions.Competition', on_delete=models.CASCADE,
                                    related_name='awards', verbose_name='所属比赛')
-    
-    # 奖品信息
-    prize_money = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, 
-                                     verbose_name='奖金')
-    prize_description = models.TextField(blank=True, verbose_name='奖品描述')
-    
-    # 统计信息
-    winner_count = models.IntegerField(default=0, verbose_name='获奖者数量')
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')

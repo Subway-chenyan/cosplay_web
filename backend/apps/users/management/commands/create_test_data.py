@@ -196,8 +196,6 @@ class Command(BaseCommand):
                 'qq_group': '123456789',
                 'bilibili': 'https://space.bilibili.com/xinghecosplay',
                 'is_active': True,
-                'is_verified': True,
-                'is_featured': True,
             },
             {
                 'name': '梦境工作室',
@@ -212,8 +210,6 @@ class Command(BaseCommand):
                 'qq_group': '987654321',
                 'bilibili': 'https://space.bilibili.com/dreamstudio',
                 'is_active': True,
-                'is_verified': False,
-                'is_featured': False,
             },
             {
                 'name': '次元空间',
@@ -228,8 +224,6 @@ class Command(BaseCommand):
                 'qq_group': '456789123',
                 'bilibili': 'https://space.bilibili.com/ciyuanspace',
                 'is_active': True,
-                'is_verified': True,
-                'is_featured': False,
             },
             {
                 'name': '星辰剧团',
@@ -244,8 +238,6 @@ class Command(BaseCommand):
                 'qq_group': '789123456',
                 'bilibili': 'https://space.bilibili.com/xingchentroupe',
                 'is_active': True,
-                'is_verified': False,
-                'is_featured': True,
             },
         ]
 
@@ -263,69 +255,80 @@ class Command(BaseCommand):
         """创建比赛"""
         competitions_data = [
             {
-                'name': '全国cosplay大赛',
-                'description': '全国性的cosplay比赛，汇聚各地优秀社团。每年举办一次，是cosplay界的重要赛事。',
-                'website': 'https://cosplay-competition.com',
-                'year': 2024,
+                'name': 'ChinaJoy Cosplay嘉年华',
+                'description': 'ChinaJoy展会期间举办的cosplay比赛，是全国最大的游戏展会cosplay赛事之一。',
+                'website': 'https://chinajoy.cosplay.com',
+            },
+            {
+                'name': '国漫cosplay大赛',
+                'description': '以国产动漫为主题的cosplay比赛，推广国产动漫文化。',
+                'website': 'https://guoman.cosplay.com',
             },
             {
                 'name': '次元文化节',
                 'description': '以二次元文化为主题的大型文化活动，包含cosplay比赛、动漫展览等多个环节。',
                 'website': 'https://acg-festival.com',
-                'year': 2023,
-            },
-            {
-                'name': '漫展cosplay比赛',
-                'description': '漫展期间举办的cosplay竞赛活动，为coser提供展示平台。',
-                'website': 'https://comic-con-cosplay.com',
-                'year': 2024,
             },
             {
                 'name': '高校cosplay联赛',
                 'description': '面向高校学生的cosplay比赛，鼓励大学生参与cosplay文化。',
                 'website': 'https://university-cosplay.com',
-                'year': 2023,
             },
         ]
 
         competitions = []
         for comp_data in competitions_data:
-            competition = Competition.objects.create(**comp_data)
+            competition, created = Competition.objects.get_or_create(
+                name=comp_data['name'],
+                defaults=comp_data
+            )
             competitions.append(competition)
 
         return competitions
 
     def create_awards(self, competitions):
         """创建奖项"""
-        award_types = [
-            ('最佳舞台剧表演奖', '金奖', 10000),
-            ('最佳服装制作奖', '金奖', 8000),
-            ('最佳化妆奖', '银奖', 5000),
-            ('最佳道具制作奖', '银奖', 5000),
-            ('最佳创意奖', '铜奖', 3000),
-            ('最佳人气奖', '特别奖', 2000),
-            ('优秀表演奖', '优秀奖', 1000),
-            ('优秀团队奖', '优秀奖', 1000),
-            ('最具潜力奖', '潜力奖', 500),
-            ('最佳舞蹈奖', '银奖', 4000),
-            ('最佳剧情奖', '铜奖', 3000),
-        ]
+        # 为每个比赛定义固定的奖项
+        awards_config = {
+            'ChinaJoy Cosplay嘉年华': [
+                '最佳舞台剧表演奖',
+                '最佳服装制作奖',
+                '最佳化妆奖',
+                '最佳道具制作奖',
+                '最佳创意奖',
+                '最佳人气奖',
+            ],
+            '国漫cosplay大赛': [
+                '最佳国漫还原奖',
+                '最佳剧情演绎奖',
+                '最佳舞蹈奖',
+                '最佳团队奖',
+                '最具潜力奖',
+            ],
+            '次元文化节': [
+                '最佳动漫还原奖',
+                '最佳特效奖',
+                '最佳音乐奖',
+                '最佳摄影奖',
+                '优秀表演奖',
+            ],
+            '高校cosplay联赛': [
+                '最佳大学生奖',
+                '最佳新人奖',
+                '最佳创意奖',
+                '优秀团队奖',
+            ],
+        }
 
         awards = []
         for competition in competitions:
-            # 为每个比赛随机选择5-8个奖项
-            selected_awards = random.sample(award_types, random.randint(5, 8))
-            for award_name, level, prize_money in selected_awards:
-                award = Award.objects.create(
-                    competition=competition,
-                    name=award_name,
-                    level=level,
-                    description=f'{competition.name} {award_name}，奖励优秀cosplay作品',
-                    prize_money=prize_money,
-                    prize_description=f'{level}奖杯 + {prize_money}元奖金',
-                    winner_count=random.randint(1, 3)
-                )
-                awards.append(award)
+            if competition.name in awards_config:
+                for award_name in awards_config[competition.name]:
+                    award, created = Award.objects.get_or_create(
+                        competition=competition,
+                        name=award_name
+                    )
+                    awards.append(award)
 
         return awards
 
@@ -338,12 +341,8 @@ class Command(BaseCommand):
                 'description': '历时3个月制作的原神璃月篇大型舞台剧，还原度极高的服装道具，精彩的剧情演绎。包含钟离、甘雨、胡桃等角色的精彩表演。',
                 'url': 'https://www.bilibili.com/video/BV1Uy3vzbEEo/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail.jpg',
-                'upload_date': timezone.now() - timedelta(days=30),
-                'performance_date': datetime(2023, 6, 15).date(),
-                'status': 'published',
-                'is_featured': True,
-                'is_original': True,
                 'competition_year': 2023,
+                'competition_name': 'ChinaJoy Cosplay嘉年华',
             },
             {
                 'bv_number': 'BV2Xy4wzaFFp',
@@ -351,12 +350,8 @@ class Command(BaseCommand):
                 'description': '次元工作室出品，特效制作精良，服装华丽，表演震撼。琪亚娜、芽衣、布洛妮娅等角色的精彩演绎。',
                 'url': 'https://www.bilibili.com/video/BV2Xy4wzaFFp/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail2.jpg',
-                'upload_date': timezone.now() - timedelta(days=25),
-                'performance_date': datetime(2023, 8, 20).date(),
-                'status': 'published',
-                'is_featured': True,
-                'is_original': True,
                 'competition_year': 2023,
+                'competition_name': 'ChinaJoy Cosplay嘉年华',
             },
             {
                 'bv_number': 'BV3Zx5yaGGq',
@@ -364,12 +359,8 @@ class Command(BaseCommand):
                 'description': '梦境剧团倾力打造，大学生cosplay社团的用心之作。阿米娅、陈、德克萨斯等角色的精彩表演。',
                 'url': 'https://www.bilibili.com/video/BV3Zx5yaGGq/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail3.jpg',
-                'upload_date': timezone.now() - timedelta(days=20),
-                'performance_date': datetime(2024, 1, 10).date(),
-                'status': 'published',
-                'is_featured': False,
-                'is_original': True,
                 'competition_year': 2024,
+                'competition_name': '国漫cosplay大赛',
             },
             {
                 'bv_number': 'BV4Ay6zaHHr',
@@ -377,12 +368,8 @@ class Command(BaseCommand):
                 'description': '致敬炎柱煉獄杏寿郎的个人cosplay作品，燃烧的意志永不熄灭。服装制作精良，表演感人至深。',
                 'url': 'https://www.bilibili.com/video/BV4Ay6zaHHr/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail4.jpg',
-                'upload_date': timezone.now() - timedelta(days=15),
-                'performance_date': datetime(2023, 12, 5).date(),
-                'status': 'published',
-                'is_featured': True,
-                'is_original': True,
                 'competition_year': 2023,
+                'competition_name': '次元文化节',
             },
             {
                 'bv_number': 'BV5Bz7zaIIs',
@@ -390,12 +377,8 @@ class Command(BaseCommand):
                 'description': '唯美的貂蝉cosplay，梦幻的舞蹈表演。服装华丽，舞蹈优美，完美还原游戏中的角色。',
                 'url': 'https://www.bilibili.com/video/BV5Bz7zaIIs/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail5.jpg',
-                'upload_date': timezone.now() - timedelta(days=10),
-                'performance_date': datetime(2024, 2, 14).date(),
-                'status': 'published',
-                'is_featured': False,
-                'is_original': True,
                 'competition_year': 2024,
+                'competition_name': '高校cosplay联赛',
             },
             {
                 'bv_number': 'BV6Ca8zaJJt',
@@ -403,12 +386,8 @@ class Command(BaseCommand):
                 'description': 'LOL阿狸皮肤cosplay，精美的服装制作和化妆技术。完美还原游戏中的角色形象。',
                 'url': 'https://www.bilibili.com/video/BV6Ca8zaJJt/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail6.jpg',
-                'upload_date': timezone.now() - timedelta(days=5),
-                'performance_date': datetime(2024, 3, 1).date(),
-                'status': 'published',
-                'is_featured': True,
-                'is_original': True,
                 'competition_year': 2024,
+                'competition_name': 'ChinaJoy Cosplay嘉年华',
             },
             {
                 'bv_number': 'BV7Dd9zaKKu',
@@ -416,12 +395,8 @@ class Command(BaseCommand):
                 'description': '火影忍者经典对决场景的舞台剧演绎，特效制作精良，表演震撼。',
                 'url': 'https://www.bilibili.com/video/BV7Dd9zaKKu/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail7.jpg',
-                'upload_date': timezone.now() - timedelta(days=3),
-                'performance_date': datetime(2024, 3, 15).date(),
-                'status': 'published',
-                'is_featured': False,
-                'is_original': True,
                 'competition_year': 2024,
+                'competition_name': '次元文化节',
             },
             {
                 'bv_number': 'BV8Ee0zaLLv',
@@ -429,31 +404,24 @@ class Command(BaseCommand):
                 'description': '海贼王空岛篇经典战斗场景的舞台剧演绎，服装道具制作精良。',
                 'url': 'https://www.bilibili.com/video/BV8Ee0zaLLv/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail8.jpg',
-                'upload_date': timezone.now() - timedelta(days=1),
-                'performance_date': datetime(2024, 3, 20).date(),
-                'status': 'published',
-                'is_featured': True,
-                'is_original': True,
                 'competition_year': 2024,
+                'competition_name': '国漫cosplay大赛',
             },
         ]
 
         videos = []
         for i, video_data in enumerate(videos_data):
-            # 随机分配社团和比赛
+            # 根据比赛名称找到对应的比赛
+            competition_name = video_data.pop('competition_name')
+            competition = next((comp for comp in competitions if comp.name == competition_name), None)
+            
+            # 随机分配社团
             group = groups[i % len(groups)]
-            competition = competitions[i % len(competitions)] if i < len(competitions) else None
             
             video = Video.objects.create(
                 uploaded_by=users[i % len(users)],
                 group=group,
                 competition=competition,
-                view_count=random.randint(10000, 500000),
-                like_count=random.randint(500, 20000),
-                share_count=random.randint(100, 5000),
-                duration=timedelta(minutes=random.randint(3, 30)),
-                resolution=random.choice(['720p', '1080p', '4K']),
-                file_size=random.randint(50000000, 500000000),  # 50MB - 500MB
                 **video_data
             )
             videos.append(video)
@@ -496,18 +464,26 @@ class Command(BaseCommand):
                 tag.usage_count += 1
                 tag.save()
 
-        # 获奖记录
-        awarded_videos = random.sample(videos, min(4, len(videos)))
-        selected_awards = random.sample(awards, min(4, len(awards)))
-
-        for i, (video, award) in enumerate(zip(awarded_videos, selected_awards)):
-            AwardRecord.objects.create(
-                award=award,
-                video=video,
-                group=video.group,
-                year=video.competition_year or 2024,
-                description=f'{video.title} 获得 {award.name}'
-            )
+        # 创建获奖记录
+        # 为部分视频创建获奖记录
+        awarded_videos = random.sample(videos, min(5, len(videos)))
+        
+        for video in awarded_videos:
+            if video.competition:
+                # 获取该比赛的所有奖项
+                competition_awards = [award for award in awards if award.competition == video.competition]
+                if competition_awards:
+                    # 随机选择一个奖项
+                    award = random.choice(competition_awards)
+                    
+                    # 创建获奖记录
+                    AwardRecord.objects.create(
+                        award=award,
+                        video=video,
+                        group=video.group,
+                        year=video.competition_year or 2024,
+                        description=f'{video.title} 获得 {award.name}'
+                    )
 
     def update_statistics(self, groups, videos, tags):
         """更新统计信息"""
