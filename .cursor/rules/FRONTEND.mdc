@@ -1,0 +1,492 @@
+# 前端开发规则
+
+## 项目概述
+
+这是一个基于React、TypeScript和Tailwind CSS的Cosplay舞台剧视频数据库前端项目，提供视频播放、社团管理、比赛展示等功能。
+
+## 技术栈
+
+- **框架**: React 18 + TypeScript
+- **路由**: React Router DOM v6
+- **状态管理**: Redux Toolkit
+- **样式**: Tailwind CSS
+- **构建工具**: Vite
+- **图标**: Lucide React
+- **HTTP客户端**: Axios
+- **工具库**: clsx, tailwind-merge
+
+## 项目结构规范
+
+```
+src/
+├── components/          # 可复用组件
+│   ├── Header.tsx      # 导航栏组件
+│   ├── Layout.tsx      # 布局组件
+│   ├── VideoCard.tsx   # 视频卡片组件
+│   ├── SearchBar.tsx   # 搜索栏组件
+│   └── VideoFilters.tsx # 筛选组件
+├── pages/              # 页面组件
+│   ├── HomePage.tsx    # 主页
+│   ├── VideoDetailPage.tsx # 视频详情页
+│   ├── GroupsPage.tsx  # 社团列表页
+│   ├── GroupDetailPage.tsx # 社团详情页
+│   ├── CompetitionsPage.tsx # 比赛列表页
+│   └── CompetitionDetailPage.tsx # 比赛详情页
+├── store/              # Redux状态管理
+│   ├── store.ts        # Redux store配置
+│   └── slices/         # Redux切片
+│       ├── videosSlice.ts
+│       ├── groupsSlice.ts
+│       ├── competitionsSlice.ts
+│       ├── tagsSlice.ts
+│       └── awardsSlice.ts
+├── types/              # TypeScript类型定义
+│   └── index.ts
+├── App.tsx             # 应用入口
+└── main.tsx           # 应用启动
+```
+
+## 代码规范
+
+### 1. 文件命名规范
+
+- **组件文件**: 使用PascalCase，如 `VideoCard.tsx`
+- **页面文件**: 使用PascalCase + Page后缀，如 `HomePage.tsx`
+- **类型文件**: 使用camelCase，如 `index.ts`
+- **工具文件**: 使用camelCase，如 `utils.ts`
+
+### 2. 组件规范
+
+#### 组件结构
+```typescript
+// 1. 导入语句
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+
+// 2. 类型定义
+interface ComponentProps {
+  // 属性定义
+}
+
+// 3. 组件定义
+const ComponentName: React.FC<ComponentProps> = ({ prop1, prop2 }) => {
+  // 4. Hooks
+  const dispatch = useDispatch()
+  const data = useSelector((state: RootState) => state.data)
+
+  // 5. 事件处理函数
+  const handleClick = () => {
+    // 处理逻辑
+  }
+
+  // 6. 渲染函数
+  return (
+    <div className="component-container">
+      {/* JSX内容 */}
+    </div>
+  )
+}
+
+// 7. 导出
+export default ComponentName
+```
+
+#### 组件设计原则
+- **单一职责**: 每个组件只负责一个功能
+- **可复用性**: 组件应该可以在不同场景下复用
+- **可测试性**: 组件应该易于测试
+- **可维护性**: 代码结构清晰，易于理解和修改
+
+### 3. TypeScript规范
+
+#### 类型定义
+```typescript
+// 接口定义
+export interface Video {
+  id: string
+  title: string
+  description: string
+  // ... 其他属性
+}
+
+// 联合类型
+export type VideoStatus = 'draft' | 'published' | 'private' | 'deleted'
+
+// 泛型类型
+export interface PaginatedResponse<T> {
+  count: number
+  next?: string
+  previous?: string
+  results: T[]
+}
+```
+
+#### 类型使用规范
+- 优先使用接口(interface)定义对象类型
+- 使用联合类型(union types)定义有限的值集合
+- 使用泛型提高代码复用性
+- 避免使用any类型，优先使用unknown
+
+### 4. Redux状态管理规范
+
+#### Slice结构
+```typescript
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+
+// 1. 异步thunk
+export const fetchVideos = createAsyncThunk(
+  'videos/fetchVideos',
+  async (params: VideoFilters) => {
+    const response = await api.getVideos(params)
+    return response.data
+  }
+)
+
+// 2. 状态接口
+interface VideosState {
+  items: Video[]
+  loading: boolean
+  error: string | null
+  filters: VideoFilters
+}
+
+// 3. 初始状态
+const initialState: VideosState = {
+  items: [],
+  loading: false,
+  error: null,
+  filters: {
+    groups: [],
+    competitions: [],
+    tags: [],
+  }
+}
+
+// 4. Slice定义
+const videosSlice = createSlice({
+  name: 'videos',
+  initialState,
+  reducers: {
+    // 同步reducer
+    setFilters: (state, action: PayloadAction<VideoFilters>) => {
+      state.filters = action.payload
+    },
+  },
+  extraReducers: (builder) => {
+    // 异步reducer
+    builder
+      .addCase(fetchVideos.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchVideos.fulfilled, (state, action) => {
+        state.loading = false
+        state.items = action.payload.results
+      })
+      .addCase(fetchVideos.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || '加载失败'
+      })
+  }
+})
+
+// 5. 导出
+export const { setFilters } = videosSlice.actions
+export default videosSlice.reducer
+```
+
+#### 状态管理原则
+- **单一数据源**: 所有状态存储在Redux store中
+- **状态不可变**: 使用Redux Toolkit的immer确保状态不可变
+- **异步操作**: 使用createAsyncThunk处理异步操作
+- **状态分离**: 按功能模块分离状态
+
+### 5. 样式规范
+
+#### Tailwind CSS使用规范
+```typescript
+// 1. 基础样式类
+const baseClasses = "px-4 py-2 rounded-md text-sm font-medium"
+
+// 2. 条件样式
+const buttonClasses = clsx(
+  baseClasses,
+  isActive 
+    ? "bg-primary-600 text-white" 
+    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+)
+
+// 3. 响应式设计
+const responsiveClasses = "w-full md:w-1/2 lg:w-1/3"
+
+// 4. 自定义颜色
+const customClasses = "bg-primary-500 hover:bg-primary-600"
+```
+
+#### 样式设计原则
+- **移动优先**: 使用Tailwind的响应式前缀
+- **一致性**: 使用设计系统中的颜色和间距
+- **可维护性**: 避免内联样式，使用Tailwind类
+- **性能**: 避免过度嵌套和复杂选择器
+
+### 6. 路由规范
+
+#### 路由结构
+```typescript
+// 路由配置
+<Routes>
+  <Route path="/" element={<Layout />}>
+    <Route index element={<HomePage />} />
+    <Route path="/video/:id" element={<VideoDetailPage />} />
+    <Route path="/groups" element={<GroupsPage />} />
+    <Route path="/group/:id" element={<GroupDetailPage />} />
+    <Route path="/competitions" element={<CompetitionsPage />} />
+    <Route path="/competition/:id" element={<CompetitionDetailPage />} />
+  </Route>
+</Routes>
+```
+
+#### 路由规范
+- 使用嵌套路由结构
+- 路由路径使用kebab-case
+- 动态路由使用:param格式
+- 页面组件使用Page后缀
+
+### 7. 组件设计规范
+
+#### 页面组件
+```typescript
+// 页面组件结构
+const PageName: React.FC = () => {
+  // 1. 状态管理
+  const dispatch = useDispatch()
+  const { data, loading, error } = useSelector((state: RootState) => state.module)
+
+  // 2. 副作用
+  useEffect(() => {
+    dispatch(fetchData())
+  }, [dispatch])
+
+  // 3. 事件处理
+  const handleAction = () => {
+    // 处理逻辑
+  }
+
+  // 4. 渲染逻辑
+  if (loading) return <LoadingSpinner />
+  if (error) return <ErrorMessage message={error} />
+
+  return (
+    <div className="page-container">
+      {/* 页面内容 */}
+    </div>
+  )
+}
+```
+
+#### 可复用组件
+```typescript
+// 可复用组件结构
+interface ComponentProps {
+  title: string
+  data: DataType[]
+  onAction?: (id: string) => void
+  className?: string
+}
+
+const ComponentName: React.FC<ComponentProps> = ({
+  title,
+  data,
+  onAction,
+  className
+}) => {
+  return (
+    <div className={clsx("component-base", className)}>
+      <h2 className="component-title">{title}</h2>
+      <div className="component-content">
+        {data.map(item => (
+          <div key={item.id} onClick={() => onAction?.(item.id)}>
+            {/* 内容 */}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+### 8. 错误处理规范
+
+#### 错误边界
+```typescript
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback />
+    }
+
+    return this.props.children
+  }
+}
+```
+
+#### 异步错误处理
+```typescript
+// Redux异步错误处理
+builder.addCase(fetchData.rejected, (state, action) => {
+  state.loading = false
+  state.error = action.error.message || '操作失败'
+})
+```
+
+### 9. 性能优化规范
+
+#### 组件优化
+```typescript
+// 1. React.memo优化
+const OptimizedComponent = React.memo<ComponentProps>(({ data }) => {
+  return <div>{/* 组件内容 */}</div>
+})
+
+// 2. useMemo优化计算
+const expensiveValue = useMemo(() => {
+  return data.filter(item => item.active).length
+}, [data])
+
+// 3. useCallback优化函数
+const handleClick = useCallback((id: string) => {
+  dispatch(updateItem(id))
+}, [dispatch])
+```
+
+#### 列表优化
+```typescript
+// 虚拟滚动或分页加载
+const VirtualList = () => {
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+
+  const loadMore = useCallback(() => {
+    if (hasMore && !loading) {
+      dispatch(fetchMoreData(page + 1))
+      setPage(prev => prev + 1)
+    }
+  }, [hasMore, loading, page, dispatch])
+
+  return (
+    <div>
+      {items.map(item => (
+        <ItemCard key={item.id} item={item} />
+      ))}
+      {hasMore && (
+        <button onClick={loadMore}>加载更多</button>
+      )}
+    </div>
+  )
+}
+```
+
+### 10. 测试规范
+
+#### 组件测试
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Provider } from 'react-redux'
+import { store } from '../store/store'
+
+describe('ComponentName', () => {
+  it('should render correctly', () => {
+    render(
+      <Provider store={store}>
+        <ComponentName />
+      </Provider>
+    )
+    
+    expect(screen.getByText('Expected Text')).toBeInTheDocument()
+  })
+
+  it('should handle user interaction', () => {
+    render(
+      <Provider store={store}>
+        <ComponentName />
+      </Provider>
+    )
+    
+    fireEvent.click(screen.getByRole('button'))
+    expect(screen.getByText('Updated Text')).toBeInTheDocument()
+  })
+})
+```
+
+### 11. 代码质量规范
+
+#### ESLint规则
+- 使用TypeScript严格模式
+- 禁止使用any类型
+- 要求函数返回类型注解
+- 要求组件props类型定义
+
+#### 代码审查清单
+- [ ] 组件是否有适当的类型定义
+- [ ] 是否使用了正确的Redux模式
+- [ ] 样式是否遵循设计系统
+- [ ] 是否有适当的错误处理
+- [ ] 是否有性能优化考虑
+- [ ] 代码是否易于测试
+
+### 12. 部署规范
+
+#### 构建配置
+```typescript
+// vite.config.ts
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
+  },
+})
+```
+
+#### 环境配置
+```typescript
+// 环境变量
+VITE_API_BASE_URL=http://localhost:8000/api
+VITE_APP_TITLE=Cosplay舞台剧数据库
+```
+
+## 总结
+
+本规则文档涵盖了前端开发的各个方面，包括：
+- 项目结构和文件组织
+- 代码规范和最佳实践
+- 状态管理和数据流
+- 组件设计和复用
+- 样式和UI设计
+- 错误处理和性能优化
+- 测试和质量保证
+
+遵循这些规则可以确保代码质量、可维护性和团队协作效率。 
