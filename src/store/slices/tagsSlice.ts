@@ -27,19 +27,21 @@ const initialState: TagsState = {
 // 异步thunk - 获取标签列表
 export const fetchTags = createAsyncThunk(
   'tags/fetchTags',
-  async (params?: { 
-    page?: number
-    search?: string
+  async (params?: {
     category?: string
-    is_featured?: boolean
+    is_active?: boolean
+    ordering?: string
+    page?: number
+    page_size?: number
   }) => {
-    const response = await tagService.getTags({
+    const queryParams: any = {
       page: params?.page || 1,
-      page_size: 50,
-      search: params?.search,
+      page_size: params?.page_size || 100,
       category: params?.category,
-      is_featured: params?.is_featured,
-    })
+      is_active: params?.is_active,
+      ordering: params?.ordering,
+    }
+    const response = await tagService.getTags(queryParams)
     return response
   }
 )
@@ -49,15 +51,6 @@ export const fetchTagsByCategory = createAsyncThunk(
   'tags/fetchTagsByCategory',
   async (category: string) => {
     const response = await tagService.getTagsByCategory(category)
-    return response
-  }
-)
-
-// 获取精选标签
-export const fetchFeaturedTags = createAsyncThunk(
-  'tags/fetchFeaturedTags',
-  async () => {
-    const response = await tagService.getFeaturedTags()
     return response
   }
 )
@@ -115,14 +108,6 @@ const tagsSlice = createSlice({
       })
       // 处理其他异步操作
       .addCase(fetchTagsByCategory.fulfilled, (state, action) => {
-        state.tags = action.payload.results
-        state.pagination = {
-          count: action.payload.count,
-          next: action.payload.next,
-          previous: action.payload.previous,
-        }
-      })
-      .addCase(fetchFeaturedTags.fulfilled, (state, action) => {
         state.tags = action.payload.results
         state.pagination = {
           count: action.payload.count,

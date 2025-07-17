@@ -82,9 +82,6 @@ function VideoFilters() {
                 }`}
               >
                 {group.name}
-                {group.is_verified && (
-                  <span className="ml-1 text-blue-500">✓</span>
-                )}
               </button>
             ))}
           </div>
@@ -103,9 +100,6 @@ function VideoFilters() {
                 }`}
               >
                 {competition.name}
-                <span className="ml-1 text-gray-500 text-xs">
-                  ({competition.year})
-                </span>
               </button>
             ))}
           </div>
@@ -138,9 +132,6 @@ function VideoFilters() {
                       }}
                     >
                       {tag.name}
-                      {tag.is_featured && (
-                        <span className="ml-1">⭐</span>
-                      )}
                     </button>
                   ))}
                 </div>

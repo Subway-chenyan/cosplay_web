@@ -17,7 +17,6 @@ class VideoSerializer(serializers.ModelSerializer):
     视频序列化器
     """
     uploaded_by_username = serializers.CharField(source='uploaded_by.username', read_only=True)
-    duration_display = serializers.CharField(source='get_duration_display', read_only=True)
     group_name = serializers.CharField(source='group.name', read_only=True)
     competition_name = serializers.CharField(source='competition.name', read_only=True)
     tags = TagSerializer(many=True, read_only=True)
@@ -34,14 +33,11 @@ class VideoSerializer(serializers.ModelSerializer):
         model = Video
         fields = [
             'id', 'bv_number', 'title', 'description', 'url', 'thumbnail',
-            'duration', 'duration_display', 'resolution', 'file_size',
-            'view_count', 'like_count', 'share_count',
-            'upload_date', 'performance_date', 'status', 'is_featured', 'is_original',
             'uploaded_by', 'uploaded_by_username', 'group', 'group_name', 
             'competition', 'competition_name', 'competition_year',
             'tags', 'tag_ids', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'view_count', 'like_count', 'share_count']
+        read_only_fields = ['id']
 
 
 class VideoListSerializer(serializers.ModelSerializer):
@@ -56,8 +52,7 @@ class VideoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
         fields = [
-            'id', 'bv_number', 'title', 'thumbnail', 'duration', 'view_count',
-            'like_count', 'performance_date', 'uploaded_by_username', 'group', 'group_name', 
+            'id', 'bv_number', 'title', 'thumbnail', 'uploaded_by_username', 'group', 'group_name', 
             'competition', 'competition_name', 'competition_year', 'tags', 'created_at'
         ]
 

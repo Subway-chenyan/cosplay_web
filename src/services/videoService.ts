@@ -9,16 +9,7 @@ interface VideoQueryParams {
   competitions?: string[]
   competition_year?: number
   tags?: string[]
-  status?: string
-  is_featured?: boolean
-  is_original?: boolean
   ordering?: string
-  upload_date_from?: string
-  upload_date_to?: string
-  performance_date_from?: string
-  performance_date_to?: string
-  view_count_min?: number
-  view_count_max?: number
 }
 
 class VideoService {
@@ -77,11 +68,6 @@ class VideoService {
     return this.getVideos(params)
   }
 
-  // 获取精选视频
-  async getFeaturedVideos(): Promise<PaginatedResponse<Video>> {
-    return this.getVideos({ is_featured: true, page_size: 6 })
-  }
-
   // 获取最新视频
   async getLatestVideos(limit: number = 12): Promise<PaginatedResponse<Video>> {
     return this.getVideos({ 
@@ -90,10 +76,10 @@ class VideoService {
     })
   }
 
-  // 获取热门视频（按播放量排序）
+  // 获取热门视频（按创建时间排序）
   async getPopularVideos(limit: number = 12): Promise<PaginatedResponse<Video>> {
     return this.getVideos({ 
-      ordering: '-view_count', 
+      ordering: '-created_at', 
       page_size: limit 
     })
   }
@@ -103,7 +89,7 @@ class VideoService {
     const params: VideoQueryParams = {
       competitions: [competitionId],
       page_size: 100, // 获取更多视频
-      ordering: '-performance_date'
+      ordering: '-created_at'
     }
     
     if (year) {

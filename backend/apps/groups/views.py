@@ -13,7 +13,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'location', 'description']
-    filterset_fields = ['is_verified', 'is_featured']
+    filterset_fields = []
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:

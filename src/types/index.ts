@@ -5,18 +5,6 @@ export interface Video {
   description: string
   url: string
   thumbnail: string
-  duration?: string
-  duration_display?: string
-  resolution?: string
-  file_size?: number
-  view_count: number
-  like_count: number
-  share_count: number
-  upload_date?: string
-  performance_date?: string
-  status: 'draft' | 'published' | 'private' | 'deleted'
-  is_featured: boolean
-  is_original: boolean
   uploaded_by?: string
   uploaded_by_username?: string
   group?: string
@@ -44,9 +32,8 @@ export interface Group {
   qq_group?: string
   bilibili?: string
   is_active: boolean
-  is_verified: boolean
-  member_count: number
   video_count: number
+  award_count: number
   created_at: string
   updated_at: string
 }
@@ -54,8 +41,8 @@ export interface Group {
 export interface Competition {
   id: string
   name: string
-  year: number
   description: string
+  website?: string
   created_at: string
   updated_at: string
 }
@@ -94,11 +81,7 @@ export interface VideoFilters {
 export interface Award {
   id: string
   name: string
-  description: string
   competition: string
-  prize_money?: number
-  prize_description: string
-  winner_count: number
   created_at: string
   updated_at: string
 }

@@ -7,7 +7,6 @@ interface TagQueryParams {
   search?: string
   category?: string
   is_active?: boolean
-  is_featured?: boolean
   ordering?: string
 }
 
@@ -52,11 +51,6 @@ class TagService {
   // 获取某个分类的标签
   async getTagsByCategory(category: string): Promise<PaginatedResponse<Tag>> {
     return this.getTags({ category })
-  }
-
-  // 获取精选标签
-  async getFeaturedTags(): Promise<PaginatedResponse<Tag>> {
-    return this.getTags({ is_featured: true })
   }
 
   // 获取热门标签（按使用次数排序）

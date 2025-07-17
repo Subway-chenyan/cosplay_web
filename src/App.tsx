@@ -18,7 +18,7 @@ function App() {
           <Route path="/groups" element={<GroupsPage />} />
           <Route path="/group/:id" element={<GroupDetailPage />} />
           <Route path="/competitions" element={<CompetitionsPage />} />
-          <Route path="/competition/:id" element={<CompetitionDetailPage />} />
+          <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
           <Route path="/data-import" element={<DataImportPage />} />
         </Route>
       </Routes>

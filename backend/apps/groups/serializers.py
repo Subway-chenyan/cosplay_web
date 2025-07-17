@@ -13,7 +13,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'description', 'logo', 'founded_date', 'location',
             'website', 'email', 'phone', 'weibo', 'wechat', 'qq_group', 'bilibili',
-            'is_active', 'is_verified', 'is_featured', 'video_count',
+            'is_active', 'video_count',
             'award_count', 'created_by', 'created_by_username',
             'created_at', 'updated_at'
         ]

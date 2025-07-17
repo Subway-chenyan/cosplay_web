@@ -122,15 +122,15 @@ function GroupDetailPage() {
             )}
           </div>
 
+          {/* 社团名称 */}
+          <div className="text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              {group.name}
+            </h1>
+          </div>
+
           {/* 社团基本信息 */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-3 mb-2">
-              <h1 className="text-3xl font-bold text-gray-900">{group.name}</h1>
-              {group.is_verified && (
-                <CheckCircle className="w-8 h-8 text-green-500 flex-shrink-0" />
-              )}
-            </div>
-
             {group.location && (
               <div className="flex items-center text-gray-600 mb-3">
                 <MapPin className="w-5 h-5 mr-2" />

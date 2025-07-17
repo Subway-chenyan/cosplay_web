@@ -152,9 +152,6 @@ class VideoViewSet(viewsets.ModelViewSet):
                 ['description', '视频描述', '否', '详细的视频描述信息'],
                 ['url', '视频链接', '是', 'https://www.bilibili.com/video/BV1234567890'],
                 ['thumbnail', '缩略图链接', '否', 'https://example.com/thumb.jpg'],
-                ['view_count', '播放量', '否', '1000'],
-                ['like_count', '点赞数', '否', '100'],
-                ['performance_date', '表演日期', '否', '2024-01-01']
             ])
             instructions_df.to_excel(writer, index=False, sheet_name='字段说明', header=False)
         

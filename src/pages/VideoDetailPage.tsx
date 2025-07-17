@@ -194,18 +194,9 @@ function VideoDetailPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">{video.title}</h1>
             
             <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
-              <div className="flex items-center space-x-1">
-                {video.performance_date ? (
-                  <>
-                    <Calendar className="w-4 h-4" />
-                    <span>: {formatDate(video.performance_date)}</span>
-                  </>
-                ) : (
-                  <>
-                    <Clock className="w-4 h-4" />
-                    <span>创建时间: {formatDate(video.created_at)}</span>
-                  </>
-                )}
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-gray-500" />
+                <span>: {formatDate(video.created_at)}</span>
               </div>
               
               <div className="flex items-center space-x-1">
@@ -271,9 +262,6 @@ function VideoDetailPage() {
                     <h3 className="text-lg font-semibold text-gray-900 truncate">
                       {groupDetails.name}
                     </h3>
-                    {groupDetails.is_verified && (
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    )}
                   </div>
                   
                   {groupDetails.location && (
