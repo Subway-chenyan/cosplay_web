@@ -114,3 +114,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/ 
+
+# Excel临时文件
+~$*.xlsx
+~$*.xls 

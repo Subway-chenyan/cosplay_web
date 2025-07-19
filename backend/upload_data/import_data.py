@@ -1,0 +1,312 @@
+#!/usr/bin/env python
+"""
+数据导入脚本
+从Excel文件导入视频数据到数据库
+"""
+import os
+import sys
+import pandas as pd
+from datetime import datetime
+
+# 添加Django项目路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# 配置Django环境
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cosplay_api.settings')
+
+try:
+    import django
+    from django.db import transaction
+    django.setup()
+    
+    from apps.videos.models import Video
+    from apps.groups.models import Group
+    from apps.competitions.models import Competition
+    from apps.awards.models import Award, AwardRecord
+    from apps.tags.models import Tag, VideoTag
+except ImportError:
+    # 如果在非Django环境下运行，这些导入会在实际运行时解决
+    pass
+
+
+class DataImporter:
+    """数据导入器"""
+    
+    def __init__(self):
+        self.success_count = 0
+        self.error_count = 0
+        self.errors = []
+    
+    def log_error(self, row_num, error_msg):
+        """记录错误"""
+        self.error_count += 1
+        self.errors.append(f"第{row_num}行: {error_msg}")
+        print(f"❌ 第{row_num}行错误: {error_msg}")
+    
+    def get_or_create_group(self, row, group_name):
+        """获取或创建社团"""
+        if not group_name:
+            return None
+            
+        try:
+            group, created = Group.objects.get_or_create(
+                name=group_name,
+                defaults={
+                    'description': row.get('group_description', ''),
+                    'founded_date': self.parse_date(row.get('group_founded_date')),
+                    'location': row.get('group_location', ''),
+                    'website': row.get('group_website', ''),
+                    'email': row.get('group_email', ''),
+                    'phone': row.get('group_phone', ''),
+                    'weibo': row.get('group_weibo', ''),
+                    'wechat': row.get('group_wechat', ''),
+                    'qq_group': row.get('group_qq_group', ''),
+                    'bilibili': row.get('group_bilibili', ''),
+                }
+            )
+            
+            if created:
+                print(f"✅ 创建新社团: {group_name}")
+            
+            return group
+            
+        except Exception as e:
+            print(f"❌ 创建社团失败: {e}")
+            return None
+    
+    def get_or_create_competition(self, row, competition_name):
+        """获取或创建比赛"""
+        if not competition_name:
+            return None
+            
+        try:
+            competition, created = Competition.objects.get_or_create(
+                name=competition_name,
+                defaults={
+                    'description': row.get('competition_description', ''),
+                    'website': row.get('competition_website', ''),
+                }
+            )
+            
+            if created:
+                print(f"✅ 创建新比赛: {competition_name}")
+            
+            return competition
+            
+        except Exception as e:
+            print(f"❌ 创建比赛失败: {e}")
+            return None
+    
+    def get_or_create_award(self, competition, award_name):
+        """获取或创建奖项"""
+        if not award_name or not competition:
+            return None
+            
+        try:
+            award, created = Award.objects.get_or_create(
+                name=award_name,
+                competition=competition
+            )
+            
+            if created:
+                print(f"✅ 创建新奖项: {competition.name} - {award_name}")
+            
+            return award
+            
+        except Exception as e:
+            print(f"❌ 创建奖项失败: {e}")
+            return None
+    
+    def create_tags(self, video, tags_str):
+        """创建标签关联"""
+        if not tags_str:
+            return
+            
+        try:
+            # 解析标签字符串: "标签名:分类,标签名:分类"
+            tag_items = [item.strip() for item in str(tags_str).split(',') if item.strip()]
+            
+            for tag_item in tag_items:
+                if ':' in tag_item:
+                    tag_name, tag_category = tag_item.split(':', 1)
+                    tag_name = tag_name.strip()
+                    tag_category = tag_category.strip()
+                else:
+                    tag_name = tag_item.strip()
+                    tag_category = '其他'
+                
+                if tag_name:
+                    # 获取或创建标签
+                    tag, created = Tag.objects.get_or_create(
+                        name=tag_name,
+                        category=tag_category,
+                        defaults={'description': f'自动创建的{tag_category}标签'}
+                    )
+                    
+                    if created:
+                        print(f"✅ 创建新标签: {tag_name} ({tag_category})")
+                    
+                    # 创建视频标签关联
+                    VideoTag.objects.get_or_create(video=video, tag=tag)
+                    
+        except Exception as e:
+            print(f"❌ 创建标签失败: {e}")
+    
+    def create_award_record(self, video, award, award_year, award_description):
+        """创建获奖记录"""
+        if not award or not award_year:
+            return
+            
+        try:
+            award_record, created = AwardRecord.objects.get_or_create(
+                award=award,
+                video=video,
+                year=int(award_year),
+                defaults={
+                    'description': award_description or '',
+                    'group': video.group
+                }
+            )
+            
+            if created:
+                print(f"✅ 创建获奖记录: {video.title} - {award.name} ({award_year})")
+                
+        except Exception as e:
+            print(f"❌ 创建获奖记录失败: {e}")
+    
+    def parse_date(self, date_str):
+        """解析日期字符串"""
+        if not date_str or pd.isna(date_str):
+            return None
+            
+        try:
+            if isinstance(date_str, str):
+                return datetime.strptime(date_str, '%Y-%m-%d').date()
+            return date_str
+        except:
+            return None
+    
+    def clean_value(self, value):
+        """清理数据值"""
+        if pd.isna(value):
+            return ''
+        return str(value).strip()
+    
+    @transaction.atomic
+    def import_row(self, row_num, row):
+        """导入单行数据"""
+        try:
+            # 清理数据
+            row = {k: self.clean_value(v) for k, v in row.items()}
+            
+            # 检查必需字段
+            bv_number = row.get('bv_number')
+            title = row.get('title')
+            url = row.get('url')
+            
+            if not bv_number or not title or not url:
+                self.log_error(row_num, "缺少必需字段 (bv_number, title, url)")
+                return False
+            
+            # 检查BV号是否已存在
+            if Video.objects.filter(bv_number=bv_number).exists():
+                self.log_error(row_num, f"BV号已存在: {bv_number}")
+                return False
+            
+            # 创建关联实体
+            group = self.get_or_create_group(row, row.get('group_name'))
+            competition = self.get_or_create_competition(row, row.get('competition_name'))
+            
+            # 创建视频
+            video = Video.objects.create(
+                bv_number=bv_number,
+                title=title,
+                description=row.get('description', ''),
+                url=url,
+                thumbnail=row.get('thumbnail', ''),
+                group=group,
+                competition=competition,
+                competition_year=int(row['competition_year']) if row.get('competition_year') else None
+            )
+            
+            print(f"✅ 创建视频: {title} ({bv_number})")
+            
+            # 创建标签关联
+            self.create_tags(video, row.get('tags'))
+            
+            # 创建奖项和获奖记录
+            award_name = row.get('award_name')
+            if award_name and competition:
+                award = self.get_or_create_award(competition, award_name)
+                self.create_award_record(
+                    video, award, 
+                    row.get('award_year'), 
+                    row.get('award_description')
+                )
+            
+            self.success_count += 1
+            return True
+            
+        except Exception as e:
+            self.log_error(row_num, f"处理数据时发生错误: {str(e)}")
+            return False
+    
+    def import_from_excel(self, file_path, sheet_name=None):
+        """从Excel文件导入数据"""
+        try:
+            print(f"📖 开始读取Excel文件: {file_path}")
+            
+            # 读取Excel文件
+            if sheet_name:
+                df = pd.read_excel(file_path, sheet_name=sheet_name)
+            else:
+                # 自动选择第一个数据工作表
+                xl = pd.ExcelFile(file_path)
+                sheet_name = xl.sheet_names[0]
+                df = pd.read_excel(file_path, sheet_name=sheet_name)
+            
+            print(f"📋 使用工作表: {sheet_name}")
+            print(f"📊 共找到 {len(df)} 行数据")
+            
+            # 导入数据
+            for index, row in df.iterrows():
+                row_num = index + 2  # Excel行号 (从第2行开始)
+                print(f"\n🔄 处理第{row_num}行...")
+                self.import_row(row_num, row)
+            
+            # 输出结果
+            print(f"\n{'='*50}")
+            print(f"📈 导入完成!")
+            print(f"✅ 成功: {self.success_count} 条")
+            print(f"❌ 失败: {self.error_count} 条")
+            
+            if self.errors:
+                print(f"\n💥 错误详情:")
+                for error in self.errors:
+                    print(f"  {error}")
+            
+        except Exception as e:
+            print(f"❌ 读取Excel文件失败: {e}")
+
+
+def main():
+    """主函数"""
+    if len(sys.argv) < 2:
+        print("使用方法: python import_data.py <excel_file_path> [sheet_name]")
+        print("示例: python import_data.py data.xlsx")
+        print("示例: python import_data.py data.xlsx 导入模板")
+        return
+    
+    file_path = sys.argv[1]
+    sheet_name = sys.argv[2] if len(sys.argv) > 2 else None
+    
+    if not os.path.exists(file_path):
+        print(f"❌ 文件不存在: {file_path}")
+        return
+    
+    importer = DataImporter()
+    importer.import_from_excel(file_path, sheet_name)
+
+
+if __name__ == '__main__':
+    main() 

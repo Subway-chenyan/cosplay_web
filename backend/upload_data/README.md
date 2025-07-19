@@ -1,0 +1,195 @@
+# 数据快速导入工具
+
+## 简介
+
+这是一个用于快速导入Cosplay视频数据的工具，支持从Excel文件批量导入视频、社团、比赛、奖项等相关数据。
+
+## 功能特性
+
+✨ **生成Excel模板**: 自动生成包含所有必要字段的Excel导入模板  
+🚀 **批量数据导入**: 从Excel文件批量导入视频数据到数据库  
+🔄 **自动创建关联**: 自动创建不存在的社团、比赛、奖项等关联数据  
+📊 **详细反馈**: 提供详细的导入进度和错误信息  
+🛡️ **事务安全**: 使用数据库事务确保数据一致性  
+
+## 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+## 使用方法
+
+### 1. 生成Excel模板
+
+```bash
+cd backend/upload_data
+python generate_template.py
+```
+
+生成的模板文件位置: `templates/video_import_template.xlsx`
+
+模板包含三个工作表:
+- **示例数据**: 包含填写示例的完整数据
+- **导入模板**: 用于填写实际数据的空白模板  
+- **字段说明**: 详细的字段说明和要求
+
+### 2. 填写Excel数据
+
+打开生成的模板文件，在"导入模板"工作表中填写数据。
+
+#### 必填字段
+- `bv_number`: B站视频BV号 (必须唯一)
+- `title`: 视频标题
+- `url`: 视频链接
+
+#### 可选字段
+- `description`: 视频描述
+- `thumbnail`: 缩略图链接
+- `competition_year`: 比赛年份
+- `group_name`: 所属社团名称
+- `competition_name`: 所属比赛名称
+- `tags`: 标签 (格式: `标签名:分类,标签名:分类`)
+
+#### 扩展字段
+当指定的社团、比赛不存在时，可填写相应的扩展字段来创建新的实体:
+
+**社团扩展字段**:
+- `group_description`: 社团描述
+- `group_founded_date`: 成立时间 (格式: YYYY-MM-DD)
+- `group_location`: 所在地
+- `group_website`: 官方网站
+- `group_email`: 联系邮箱
+- `group_phone`: 联系电话
+- 等等...
+
+**比赛扩展字段**:
+- `competition_description`: 比赛描述
+- `competition_website`: 比赛官网
+
+**奖项字段**:
+- `award_name`: 奖项名称
+- `award_year`: 获奖年份
+- `award_description`: 获奖描述
+
+### 3. 执行数据导入
+
+```bash
+cd backend/upload_data
+python import_data.py <excel_file_path> [sheet_name]
+```
+
+**示例**:
+```bash
+# 使用默认工作表
+python import_data.py templates/video_import_template.xlsx
+
+# 指定工作表
+python import_data.py data.xlsx 导入模板
+```
+
+## 数据导入规则
+
+### 🔄 自动创建逻辑
+
+1. **社团**: 如果`group_name`指定的社团不存在，将使用提供的`group_*`字段自动创建
+2. **比赛**: 如果`competition_name`指定的比赛不存在，将使用提供的`competition_*`字段自动创建  
+3. **奖项**: 如果`award_name`指定的奖项不存在，将在对应比赛下自动创建
+4. **标签**: 如果标签不存在，将根据指定分类自动创建
+
+### 📋 标签格式说明
+
+标签字段支持多个标签，格式为: `标签名:分类,标签名:分类`
+
+**支持的分类**:
+- 游戏IP
+- 动漫IP  
+- 年份
+- 类型
+- 风格
+- 地区
+- 其他
+
+**示例**:
+```
+初音未来:游戏IP,2024:年份,日系:风格
+```
+
+### ⚠️ 注意事项
+
+1. **BV号唯一性**: 每个BV号必须唯一，重复的BV号会导致导入失败
+2. **日期格式**: 日期字段请使用 YYYY-MM-DD 格式 (如: 2024-01-01)
+3. **URL格式**: 网址字段需要包含完整的协议 (如: https://)
+4. **事务回滚**: 如果某行数据导入失败，只有该行会被跳过，其他数据不受影响
+
+## 输出信息
+
+导入过程中会显示详细的进度信息:
+
+```
+🔄 处理第2行...
+✅ 创建新社团: 示例社团A
+✅ 创建新比赛: 全国Cosplay大赛  
+✅ 创建新标签: 初音未来 (游戏IP)
+✅ 创建视频: 示例视频1 (BV1234567890)
+✅ 创建新奖项: 全国Cosplay大赛 - 最佳团体奖
+✅ 创建获奖记录: 示例视频1 - 最佳团体奖 (2024)
+
+==================================================
+📈 导入完成!
+✅ 成功: 2 条
+❌ 失败: 0 条
+```
+
+## 错误处理
+
+如果导入过程中出现错误，会显示具体的错误信息:
+
+```
+❌ 第3行错误: 缺少必需字段 (bv_number, title, url)
+❌ 第4行错误: BV号已存在: BV1234567890
+```
+
+## 目录结构
+
+```
+upload_data/
+├── generate_template.py    # 生成Excel模板脚本
+├── import_data.py         # 数据导入脚本  
+├── requirements.txt       # 依赖包列表
+├── README.md             # 使用说明
+└── templates/            # 生成的模板文件目录
+    └── video_import_template.xlsx
+```
+
+## 技术说明
+
+- **Django集成**: 脚本直接使用Django ORM，确保与后端数据模型一致
+- **事务安全**: 每行数据使用独立事务，避免批量回滚
+- **错误容错**: 单行错误不会影响其他数据的导入
+- **关联创建**: 智能识别并创建缺失的关联实体
+
+## 数据模型关系
+
+```
+Video (视频)
+├── Group (社团) - ForeignKey
+├── Competition (比赛) - ForeignKey  
+├── Tags (标签) - ManyToMany
+└── AwardRecord (获奖记录)
+    └── Award (奖项) - ForeignKey to Competition
+```
+
+## 常见问题
+
+**Q: 如何处理大量数据？**  
+A: 建议分批导入，每批不超过1000条记录
+
+**Q: 导入失败如何处理？**  
+A: 检查错误信息，修正Excel数据后重新导入
+
+**Q: 如何更新已存在的数据？**  
+A: 目前不支持更新，需要先删除再重新导入
+
+**Q: 支持哪些Excel格式？**  
+A: 支持 .xlsx 和 .xls 格式 
