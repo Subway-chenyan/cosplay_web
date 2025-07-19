@@ -137,10 +137,6 @@ function GroupsPage() {
               {/* Stats */}
               <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                 <div className="flex items-center space-x-1">
-                  <Users className="w-4 h-4" />
-                  <span>{group.member_count} 成员</span>
-                </div>
-                <div className="flex items-center space-x-1">
                   <div className="w-4 h-4 bg-primary-500 rounded flex items-center justify-center">
                     <span className="text-white text-xs font-bold">视</span>
                   </div>

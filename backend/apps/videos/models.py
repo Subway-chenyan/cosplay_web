@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 import uuid
 
 User = get_user_model()
@@ -46,4 +48,57 @@ class Video(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return self.url 
+        return self.url
+
+
+def update_group_video_count(group):
+    """更新社团的视频数量"""
+    if group:
+        from apps.groups.models import Group
+        try:
+            group_obj = Group.objects.get(id=group.id)
+            group_obj.video_count = group_obj.videos.count()
+            group_obj.save(update_fields=['video_count'])
+        except Group.DoesNotExist:
+            pass
+
+
+@receiver(post_save, sender=Video)
+def video_saved(sender, instance, created, **kwargs):
+    """视频保存时的信号处理"""
+    # 如果是新创建的视频
+    if created:
+        # 更新当前社团的视频数量
+        if instance.group:
+            update_group_video_count(instance.group)
+    else:
+        # 如果是更新视频，需要检查社团是否发生变化
+        if instance.pk:
+            try:
+                old_instance = Video.objects.get(pk=instance.pk)
+                old_group = old_instance.group
+                new_group = instance.group
+                
+                # 如果社团发生了变化
+                if old_group != new_group:
+                    # 更新旧社团的视频数量
+                    if old_group:
+                        update_group_video_count(old_group)
+                    # 更新新社团的视频数量
+                    if new_group:
+                        update_group_video_count(new_group)
+                # 如果社团没有变化，但视频确实属于某个社团
+                elif new_group:
+                    update_group_video_count(new_group)
+            except Video.DoesNotExist:
+                # 如果找不到旧实例，直接更新新社团
+                if instance.group:
+                    update_group_video_count(instance.group)
+
+
+@receiver(post_delete, sender=Video)
+def video_deleted(sender, instance, **kwargs):
+    """视频删除时的信号处理"""
+    # 更新社团的视频数量
+    if instance.group:
+        update_group_video_count(instance.group) 
