@@ -176,6 +176,11 @@ class DataImporter:
             award_years = [year.strip() for year in str(award_years_str).split(',') if year.strip()] if award_years_str else []
             award_descriptions = [desc.strip() for desc in str(award_descriptions_str).split(',') if desc.strip()] if award_descriptions_str else []
             
+            print(f"🏆 处理奖项: {len(award_names)}个奖项")
+            print(f"   奖项名称: {award_names}")
+            print(f"   年份数量: {len(award_years)}, 内容: {award_years}")
+            print(f"   描述数量: {len(award_descriptions)}")
+            
             # 确保年份和描述数量与奖项数量匹配
             while len(award_years) < len(award_names):
                 award_years.append('')
@@ -185,25 +190,48 @@ class DataImporter:
             # 为每个奖项创建记录
             for i, award_name in enumerate(award_names):
                 if award_name:
+                    print(f"   正在处理奖项 {i+1}: {award_name}")
                     award = self.get_or_create_award(competition, award_name)
-                    award_year = award_years[i] if i < len(award_years) else ''
-                    award_description = award_descriptions[i] if i < len(award_descriptions) else ''
-                    
-                    self.create_award_record(video, award, award_year, award_description)
+                    if award:
+                        award_year = award_years[i] if i < len(award_years) else ''
+                        award_description = award_descriptions[i] if i < len(award_descriptions) else ''
+                        
+                        self.create_award_record(video, award, award_year, award_description)
+                    else:
+                        print(f"❌ 无法创建奖项: {award_name}")
                     
         except Exception as e:
             print(f"❌ 创建多个奖项失败: {e}")
+            import traceback
+            print(f"详细错误: {traceback.format_exc()}")
 
     def create_award_record(self, video, award, award_year, award_description):
         """创建获奖记录"""
-        if not award or not award_year:
+        if not award:
             return
             
         try:
+            # 处理年份：如果没有提供年份，使用视频的比赛年份或当前年份
+            year = None
+            if award_year and str(award_year).strip():
+                try:
+                    year = int(str(award_year).strip())
+                except ValueError:
+                    print(f"⚠️ 无效的年份格式: {award_year}，使用默认年份")
+            
+            # 如果还是没有有效年份，使用默认年份
+            if year is None:
+                if video.competition_year:
+                    year = video.competition_year
+                else:
+                    from datetime import datetime
+                    year = datetime.now().year
+                print(f"💡 使用默认年份: {year}")
+            
             award_record, created = AwardRecord.objects.get_or_create(
                 award=award,
                 video=video,
-                year=int(award_year),
+                year=year,
                 defaults={
                     'description': award_description or '',
                     'group': video.group
@@ -211,10 +239,14 @@ class DataImporter:
             )
             
             if created:
-                print(f"✅ 创建获奖记录: {video.title} - {award.name} ({award_year})")
+                print(f"✅ 创建获奖记录: {video.title} - {award.name} ({year})")
+            else:
+                print(f"ℹ️ 获奖记录已存在: {video.title} - {award.name} ({year})")
                 
         except Exception as e:
             print(f"❌ 创建获奖记录失败: {e}")
+            import traceback
+            print(f"详细错误: {traceback.format_exc()}")
     
     def parse_date(self, date_str):
         """解析日期字符串"""
