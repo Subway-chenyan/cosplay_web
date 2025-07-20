@@ -196,7 +196,7 @@ function VideoDetailPage() {
             <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-5 h-5 text-gray-500" />
-                <span>: {formatDate(video.created_at)}</span>
+                <span>{formatDate(video.created_at)}</span>
               </div>
               
               <div className="flex items-center space-x-1">

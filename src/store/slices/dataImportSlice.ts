@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { api } from '../../services/api'
 
 export interface ImportTask {
   task_id: string
+  import_type: string
   status: 'pending' | 'processing' | 'success' | 'failed'
   total_records: number
   success_count: number
@@ -9,12 +11,15 @@ export interface ImportTask {
   errors: Array<{ row?: number; field?: string; message: string }>
   warnings: Array<{ row?: number; message: string }>
   created_at: string
-  completed_at?: string
+  updated_at: string
 }
 
 interface DataImportState {
   currentTask: ImportTask | null
   isUploading: boolean
+  isVerifyingKey: boolean
+  isKeyValid: boolean
+  uploadKey: string
   history: ImportTask[]
   error: string | null
 }
@@ -22,9 +27,21 @@ interface DataImportState {
 const initialState: DataImportState = {
   currentTask: null,
   isUploading: false,
+  isVerifyingKey: false,
+  isKeyValid: false,
+  uploadKey: '',
   history: [],
   error: null
 }
+
+// 异步thunk：验证上传密钥
+export const verifyUploadKey = createAsyncThunk(
+  'dataImport/verifyUploadKey',
+  async (uploadKey: string) => {
+    const result = await api.verifyUploadKey(uploadKey)
+    return { ...result, uploadKey }
+  }
+)
 
 // 异步thunk：开始导入
 export const startImport = createAsyncThunk(
@@ -33,66 +50,31 @@ export const startImport = createAsyncThunk(
     file: File
     import_type: string
     validate_only: boolean
+    upload_key: string
   }) => {
-    const formData = new FormData()
-    formData.append('file', params.file)
-    formData.append('import_type', params.import_type)
-    formData.append('validate_only', params.validate_only.toString())
-
-    const response = await fetch('/api/videos/bulk-import/', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: formData
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || '导入失败')
-    }
-
-    return await response.json()
+    const result = await api.startImport(params)
+    return { ...result, import_type: params.import_type }
   }
 )
 
 // 异步thunk：查询任务状态
 export const fetchTaskStatus = createAsyncThunk(
   'dataImport/fetchTaskStatus',
-  async (taskId: string) => {
-    const response = await fetch(`/api/videos/import-status/${taskId}/`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error('查询任务状态失败')
-    }
-
-    return await response.json()
+  async (params: { taskId: string; uploadKey: string }) => {
+    return await api.getImportStatus(params.taskId, params.uploadKey)
   }
 )
 
 // 异步thunk：下载模板
 export const downloadTemplate = createAsyncThunk(
   'dataImport/downloadTemplate',
-  async (importType: string) => {
-    const response = await fetch(`/api/videos/import-template/?type=${importType}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
+  async (params: { importType: string; uploadKey: string }) => {
+    const blob = await api.downloadTemplate(params.importType, params.uploadKey)
     
-    if (!response.ok) {
-      throw new Error('模板下载失败')
-    }
-
-    const blob = await response.blob()
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${importType}_import_template.xlsx`
+    a.download = `${params.importType}_import_template.xlsx`
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
@@ -115,10 +97,34 @@ const dataImportSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null
+    },
+    setUploadKey: (state, action: PayloadAction<string>) => {
+      state.uploadKey = action.payload
+    },
+    resetKeyValidation: (state) => {
+      state.isKeyValid = false
+      state.uploadKey = ''
     }
   },
   extraReducers: (builder) => {
     builder
+      // 验证密钥
+      .addCase(verifyUploadKey.pending, (state) => {
+        state.isVerifyingKey = true
+        state.error = null
+      })
+      .addCase(verifyUploadKey.fulfilled, (state, action) => {
+        state.isVerifyingKey = false
+        state.isKeyValid = action.payload.valid
+        if (action.payload.valid) {
+          state.uploadKey = action.payload.uploadKey
+        }
+      })
+      .addCase(verifyUploadKey.rejected, (state, action) => {
+        state.isVerifyingKey = false
+        state.isKeyValid = false
+        state.error = action.error.message || '密钥验证失败'
+      })
       // 开始导入
       .addCase(startImport.pending, (state) => {
         state.isUploading = true
@@ -128,13 +134,15 @@ const dataImportSlice = createSlice({
         state.isUploading = false
         state.currentTask = {
           task_id: action.payload.task_id,
-          status: 'pending',
+          import_type: action.payload.import_type,
+          status: 'pending' as const,
           total_records: 0,
           success_count: 0,
           error_count: 0,
           errors: [],
           warnings: [],
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }
       })
       .addCase(startImport.rejected, (state, action) => {
@@ -143,9 +151,15 @@ const dataImportSlice = createSlice({
       })
       // 查询任务状态
       .addCase(fetchTaskStatus.fulfilled, (state, action) => {
-        state.currentTask = action.payload
-        if (action.payload.status === 'success' || action.payload.status === 'failed') {
-          state.history.unshift(action.payload)
+        const task = action.payload as ImportTask
+        state.currentTask = task
+        if (task.status === 'success' || task.status === 'failed') {
+          const existingIndex = state.history.findIndex(h => h.task_id === task.task_id)
+          if (existingIndex >= 0) {
+            state.history[existingIndex] = task
+          } else {
+            state.history.unshift(task)
+          }
         }
       })
       .addCase(fetchTaskStatus.rejected, (state, action) => {
@@ -161,5 +175,11 @@ const dataImportSlice = createSlice({
   }
 })
 
-export const { clearCurrentTask, updateTaskStatus, clearError } = dataImportSlice.actions
+export const { 
+  clearCurrentTask, 
+  updateTaskStatus, 
+  clearError, 
+  setUploadKey, 
+  resetKeyValidation 
+} = dataImportSlice.actions
 export default dataImportSlice.reducer 

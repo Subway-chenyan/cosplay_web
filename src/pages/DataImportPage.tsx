@@ -1,23 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Upload, Download, AlertCircle, CheckCircle, Loader2, FileText, Database } from 'lucide-react'
+import { Upload, Download, AlertCircle, CheckCircle, Loader2, FileText, Database, Key, Lock } from 'lucide-react'
 import { RootState, AppDispatch } from '../store/store'
 import { 
+  verifyUploadKey,
   startImport, 
   fetchTaskStatus, 
   downloadTemplate, 
   clearCurrentTask, 
   clearError,
+  setUploadKey,
+  resetKeyValidation,
   ImportTask 
 } from '../store/slices/dataImportSlice'
 
 const DataImportPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
-  const { currentTask, isUploading, error } = useSelector((state: RootState) => state.dataImport)
+  const { 
+    currentTask, 
+    isUploading, 
+    isVerifyingKey, 
+    isKeyValid, 
+    uploadKey, 
+    error 
+  } = useSelector((state: RootState) => state.dataImport)
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [importType, setImportType] = useState('video')
   const [validateOnly, setValidateOnly] = useState(false)
+  const importType = 'video' // 固定为视频数据导入
+  const [inputKey, setInputKey] = useState('')
+  const [step, setStep] = useState<'key' | 'upload'>('key')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -40,17 +52,27 @@ const DataImportPage: React.FC = () => {
     }
   }
 
+  const handleVerifyKey = () => {
+    if (!inputKey.trim()) return
+    dispatch(verifyUploadKey(inputKey.trim()))
+  }
+
   const handleDownloadTemplate = () => {
-    dispatch(downloadTemplate(importType))
+    if (!uploadKey) return
+    dispatch(downloadTemplate({
+      importType,
+      uploadKey
+    }))
   }
 
   const handleStartImport = () => {
-    if (!selectedFile) return
+    if (!selectedFile || !uploadKey) return
     
     dispatch(startImport({
       file: selectedFile,
       import_type: importType,
-      validate_only: validateOnly
+      validate_only: validateOnly,
+      upload_key: uploadKey
     }))
   }
 
@@ -60,9 +82,19 @@ const DataImportPage: React.FC = () => {
     }
     
     pollIntervalRef.current = setInterval(() => {
-      dispatch(fetchTaskStatus(taskId))
+      dispatch(fetchTaskStatus({
+        taskId,
+        uploadKey
+      }))
     }, 2000)
   }
+
+  // 监听密钥验证状态
+  useEffect(() => {
+    if (isKeyValid) {
+      setStep('upload')
+    }
+  }, [isKeyValid])
 
   // 监听currentTask变化，开始轮询
   useEffect(() => {
@@ -78,7 +110,7 @@ const DataImportPage: React.FC = () => {
         clearInterval(pollIntervalRef.current)
       }
     }
-  }, [currentTask])
+  }, [currentTask, uploadKey])
 
   // 清理错误信息
   useEffect(() => {
@@ -89,6 +121,14 @@ const DataImportPage: React.FC = () => {
       return () => clearTimeout(timer)
     }
   }, [error, dispatch])
+
+  const handleResetKey = () => {
+    dispatch(resetKeyValidation())
+    setInputKey('')
+    setStep('key')
+    setSelectedFile(null)
+    dispatch(clearCurrentTask())
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,10 +153,24 @@ const DataImportPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">数据批量导入</h1>
-        <p className="text-gray-600">
-          支持CSV、Excel格式文件的批量数据导入，包括视频、社团、标签等数据类型
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">视频数据批量导入</h1>
+            <p className="text-gray-600">
+              支持CSV、Excel格式文件的批量视频数据导入
+            </p>
+          </div>
+          
+          {isKeyValid && (
+            <button
+              onClick={handleResetKey}
+              className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <Lock className="h-4 w-4 mr-1" />
+              更换密钥
+            </button>
+          )}
+        </div>
         
         {/* 错误信息显示 */}
         {error && (
@@ -129,55 +183,88 @@ const DataImportPage: React.FC = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 导入配置 */}
-        <div className="space-y-6">
+      {step === 'key' ? (
+        /* 密钥验证界面 */
+        <div className="max-w-md mx-auto">
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <Database className="mr-2 h-5 w-5" />
-              导入配置
-            </h2>
+            <div className="text-center mb-6">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                <Key className="h-6 w-6 text-blue-600" />
+              </div>
+                              <h2 className="text-lg font-semibold text-gray-900">安全验证</h2>
+                <p className="text-sm text-gray-600">请输入视频数据导入密钥以继续</p>
+            </div>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  数据类型
+                  视频数据导入密钥
                 </label>
-                <select
-                  value={importType}
-                  onChange={(e) => setImportType(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="video">视频数据</option>
-                  <option value="group">社团数据</option>
-                  <option value="tag">标签数据</option>
-                  <option value="competition">比赛数据</option>
-                </select>
+                <input
+                  type="password"
+                  value={inputKey}
+                  onChange={(e) => setInputKey(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleVerifyKey()}
+                  placeholder="请输入密钥"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
-
-              <div>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={validateOnly}
-                    onChange={(e) => setValidateOnly(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">仅验证数据（不实际导入）</span>
-                </label>
-              </div>
-
-              <div>
-                <button
-                  onClick={handleDownloadTemplate}
-                  className="w-full flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  下载导入模板
-                </button>
-              </div>
+              
+              <button
+                onClick={handleVerifyKey}
+                disabled={!inputKey.trim() || isVerifyingKey}
+                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              >
+                {isVerifyingKey ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    验证中...
+                  </>
+                ) : (
+                  <>
+                    <Key className="mr-2 h-4 w-4" />
+                    验证密钥
+                  </>
+                )}
+              </button>
             </div>
           </div>
+        </div>
+      ) : (
+        /* 数据导入界面 */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 导入配置 */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center">
+                <Database className="mr-2 h-5 w-5" />
+                导入设置
+              </h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={validateOnly}
+                      onChange={(e) => setValidateOnly(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">仅验证数据（不实际导入）</span>
+                  </label>
+                </div>
+
+                <div>
+                  <button
+                    onClick={handleDownloadTemplate}
+                    className="w-full flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    下载视频数据模板
+                  </button>
+                </div>
+              </div>
+            </div>
 
           {/* 文件上传 */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -325,16 +412,17 @@ const DataImportPage: React.FC = () => {
           <div className="bg-blue-50 rounded-lg p-6">
             <h3 className="text-sm font-medium text-blue-900 mb-2">使用说明</h3>
             <ul className="text-xs text-blue-800 space-y-1">
-              <li>• 请先下载对应的导入模板</li>
-              <li>• 按照模板格式填写数据</li>
-              <li>• 必填字段不能为空</li>
-              <li>• 重复数据将被跳过</li>
+              <li>• 请先下载视频数据导入模板</li>
+              <li>• 按照模板格式填写视频信息</li>
+              <li>• BV号、标题、URL为必填字段</li>
+              <li>• 重复的BV号将被跳过</li>
               <li>• 建议先选择"仅验证数据"测试</li>
               <li>• 单个文件最大支持50MB</li>
             </ul>
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

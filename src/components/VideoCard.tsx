@@ -61,7 +61,7 @@ function VideoCard({ video, onClick }: VideoCardProps) {
         {/* 创建时间 */}
         <div className="flex items-center space-x-2 text-gray-600">
           <Calendar className="w-4 h-4" />
-          <span className="text-sm">: {formatDate(video.created_at)}</span>
+          <span className="text-sm">{formatDate(video.created_at)}</span>
         </div>
       </div>
     </div>

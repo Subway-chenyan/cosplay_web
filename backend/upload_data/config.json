@@ -1,0 +1,14 @@
+{
+  "upload_key": "cosplay_upload_key_2024",
+  "max_file_size": 52428800,
+  "allowed_extensions": [".xlsx", ".xls", ".csv"],
+  "rate_limit": {
+    "requests_per_minute": 10,
+    "requests_per_hour": 60
+  },
+  "settings": {
+    "auto_create_missing": true,
+    "validate_required_fields": true,
+    "log_level": "INFO"
+  }
+} 

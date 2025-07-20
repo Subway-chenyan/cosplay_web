@@ -91,6 +91,64 @@ class ApiService {
     const queryString = searchParams.toString()
     return queryString ? `?${queryString}` : ''
   }
+
+  // 数据导入相关API
+  async verifyUploadKey(uploadKey: string): Promise<{valid: boolean, message: string}> {
+    const response = await axiosInstance.post('/videos/import/verify-key/', {
+      upload_key: uploadKey
+    })
+    return response.data
+  }
+
+  async downloadTemplate(importType: string, uploadKey: string): Promise<Blob> {
+    const response = await axiosInstance.get(`/videos/import/template/?type=${importType}`, {
+      headers: {
+        'X-Upload-Key': uploadKey
+      },
+      responseType: 'blob'
+    })
+    return response.data
+  }
+
+  async startImport(params: {
+    file: File
+    import_type: string
+    validate_only?: boolean
+    upload_key: string
+  }): Promise<{task_id: string, message: string}> {
+    const formData = new FormData()
+    formData.append('file', params.file)
+    formData.append('import_type', params.import_type)
+    formData.append('validate_only', params.validate_only ? 'true' : 'false')
+    
+    const response = await axiosInstance.post('/videos/import/start/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'X-Upload-Key': params.upload_key
+      }
+    })
+    return response.data
+  }
+
+  async getImportStatus(taskId: string, uploadKey: string): Promise<{
+    task_id: string
+    import_type: string
+    status: string
+    total_records: number
+    success_count: number
+    error_count: number
+    errors: Array<{row?: number, field?: string, message: string}>
+    warnings: Array<{row?: number, message: string}>
+    created_at: string
+    updated_at: string
+  }> {
+    const response = await axiosInstance.get(`/videos/import/status/${taskId}/`, {
+      headers: {
+        'X-Upload-Key': uploadKey
+      }
+    })
+    return response.data
+  }
 }
 
 export const api = new ApiService()
