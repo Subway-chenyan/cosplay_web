@@ -6230,3 +6230,80 @@ INFO 2025-07-20 11:20:19,352 basehttp 255416 247780 "GET /static/admin/img/toolt
 INFO 2025-07-20 11:20:19,431 basehttp 255416 247780 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
 INFO 2025-07-20 11:20:26,125 basehttp 255416 247780 "GET /admin/videos/video/ HTTP/1.1" 200 25868
 INFO 2025-07-20 11:20:26,197 basehttp 255416 247780 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-07-20 11:41:59,383 autoreload 255416 43740 C:\Users\Subway\cosplay_web\backend\upload_data\generate_template.py changed, reloading.
+INFO 2025-07-20 11:41:59,990 autoreload 265600 89432 Watching for file changes with StatReloader
+INFO 2025-07-20 11:42:09,992 autoreload 265600 89432 C:\Users\Subway\cosplay_web\backend\upload_data\generate_template.py changed, reloading.
+INFO 2025-07-20 11:42:10,513 autoreload 155368 18804 Watching for file changes with StatReloader
+INFO 2025-07-20 11:42:18,458 autoreload 155368 18804 C:\Users\Subway\cosplay_web\backend\upload_data\generate_template.py changed, reloading.
+INFO 2025-07-20 11:42:19,012 autoreload 178400 157760 Watching for file changes with StatReloader
+INFO 2025-07-20 11:42:26,992 autoreload 178400 157760 C:\Users\Subway\cosplay_web\backend\upload_data\generate_template.py changed, reloading.
+INFO 2025-07-20 11:42:27,517 autoreload 66080 24716 Watching for file changes with StatReloader
+INFO 2025-07-20 11:42:35,521 autoreload 66080 24716 C:\Users\Subway\cosplay_web\backend\upload_data\generate_template.py changed, reloading.
+INFO 2025-07-20 11:42:36,067 autoreload 442144 201640 Watching for file changes with StatReloader
+INFO 2025-07-20 11:42:47,082 autoreload 442144 201640 C:\Users\Subway\cosplay_web\backend\upload_data\generate_template.py changed, reloading.
+INFO 2025-07-20 11:42:47,691 autoreload 192324 192316 Watching for file changes with StatReloader
+INFO 2025-07-20 11:43:06,955 autoreload 192324 192316 C:\Users\Subway\cosplay_web\backend\upload_data\import_data.py changed, reloading.
+INFO 2025-07-20 11:43:07,508 autoreload 215160 296872 Watching for file changes with StatReloader
+INFO 2025-07-20 11:43:23,715 autoreload 215160 296872 C:\Users\Subway\cosplay_web\backend\upload_data\import_data.py changed, reloading.
+INFO 2025-07-20 11:43:24,300 autoreload 48632 310308 Watching for file changes with StatReloader
+INFO 2025-07-20 11:49:39,263 basehttp 48632 78940 "GET /api/videos/import/template/?type=video HTTP/1.1" 200 7352
+INFO 2025-07-20 12:03:19,052 basehttp 48632 68988 "POST /api/videos/import/start/ HTTP/1.1" 200 84
+INFO 2025-07-20 12:03:21,072 basehttp 48632 68988 "OPTIONS /api/videos/import/status/046dda9b-b37e-4a66-bb55-06b05c994fe3/ HTTP/1.1" 200 0
+INFO 2025-07-20 12:03:21,075 basehttp 48632 68988 "GET /api/videos/import/status/046dda9b-b37e-4a66-bb55-06b05c994fe3/ HTTP/1.1" 200 253
+INFO 2025-07-20 12:03:26,150 basehttp 48632 68988 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:03:26,185 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:03:27,685 basehttp 48632 68988 "GET /api/awards/records/?page=1&page_size=50 HTTP/1.1" 200 3852
+INFO 2025-07-20 12:03:27,714 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:03:27,740 basehttp 48632 68988 "GET /api/awards/records/?page=1&page_size=50 HTTP/1.1" 200 3852
+INFO 2025-07-20 12:03:27,762 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:03:27,811 basehttp 48632 68988 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:03:57,386 basehttp 48632 68988 "GET /api/videos/c34cf10f-9642-4127-b6dc-957cbdbd6f3b/ HTTP/1.1" 200 860
+INFO 2025-07-20 12:03:57,418 basehttp 48632 212408 "GET /api/videos/c34cf10f-9642-4127-b6dc-957cbdbd6f3b/ HTTP/1.1" 200 860
+INFO 2025-07-20 12:03:57,428 basehttp 48632 68988 "GET /api/groups/ea9effe5-7943-4734-9074-431b1b3cfe9d/ HTTP/1.1" 200 697
+INFO 2025-07-20 12:03:57,475 basehttp 48632 212408 "GET /api/groups/ea9effe5-7943-4734-9074-431b1b3cfe9d/ HTTP/1.1" 200 697
+INFO 2025-07-20 12:03:57,478 basehttp 48632 68988 "GET /api/videos/c34cf10f-9642-4127-b6dc-957cbdbd6f3b/ HTTP/1.1" 200 860
+INFO 2025-07-20 12:03:57,507 basehttp 48632 212408 "GET /api/videos/c34cf10f-9642-4127-b6dc-957cbdbd6f3b/ HTTP/1.1" 200 860
+INFO 2025-07-20 12:03:57,513 basehttp 48632 68988 "GET /api/videos/?page=1&page_size=9&tags=900539ba-9f42-4886-b1a5-07dbfed70d1a HTTP/1.1" 200 1510
+INFO 2025-07-20 12:03:57,546 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=9&tags=900539ba-9f42-4886-b1a5-07dbfed70d1a HTTP/1.1" 200 1510
+INFO 2025-07-20 12:04:13,807 basehttp 48632 212408 "GET /api/videos/942542f5-5829-4ca6-bf08-490754b0c2c6/ HTTP/1.1" 200 1050
+INFO 2025-07-20 12:04:13,848 basehttp 48632 212408 "GET /api/groups/9da2ec22-29ae-464c-97d7-e425d88474c1/ HTTP/1.1" 200 673
+INFO 2025-07-20 12:04:13,881 basehttp 48632 212408 "GET /api/videos/942542f5-5829-4ca6-bf08-490754b0c2c6/ HTTP/1.1" 200 1050
+INFO 2025-07-20 12:04:13,918 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=9&tags=981f5ee1-fdc0-42d7-adfd-6e6d7e4181cd&tags=33a7ab7e-a88d-499c-ad88-68c932940d21&tags=900539ba-9f42-4886-b1a5-07dbfed70d1a HTTP/1.1" 200 1510
+INFO 2025-07-20 12:04:16,996 basehttp 48632 212408 "GET /api/videos/c34cf10f-9642-4127-b6dc-957cbdbd6f3b/ HTTP/1.1" 200 860
+INFO 2025-07-20 12:04:17,036 basehttp 48632 212408 "GET /api/groups/ea9effe5-7943-4734-9074-431b1b3cfe9d/ HTTP/1.1" 200 697
+INFO 2025-07-20 12:04:17,086 basehttp 48632 212408 "GET /api/videos/c34cf10f-9642-4127-b6dc-957cbdbd6f3b/ HTTP/1.1" 200 860
+INFO 2025-07-20 12:04:17,124 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=9&tags=900539ba-9f42-4886-b1a5-07dbfed70d1a HTTP/1.1" 200 1510
+INFO 2025-07-20 12:04:29,919 basehttp 48632 68988 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:04:29,926 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:04:29,951 basehttp 48632 68988 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:04:29,979 basehttp 48632 68988 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:04:29,989 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:04:30,012 basehttp 48632 212408 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:04:30,016 basehttp 48632 68988 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:04:30,058 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:04:36,841 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:04:36,870 basehttp 48632 68988 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:05:41,099 basehttp 48632 68988 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:05:41,133 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:05:43,196 basehttp 48632 68988 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:05:43,200 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:05:43,228 basehttp 48632 68988 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:05:43,238 basehttp 48632 68988 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:05:43,261 basehttp 48632 68988 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:05:43,271 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:05:43,287 basehttp 48632 68988 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:05:43,343 basehttp 48632 212408 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:08:20,831 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:08:20,846 basehttp 48632 68988 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:08:20,862 basehttp 48632 212408 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:08:20,899 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:08:20,924 basehttp 48632 212408 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:08:20,924 basehttp 48632 68988 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:08:20,959 basehttp 48632 212408 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:08:20,993 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:08:21,005 basehttp 48632 68988 "GET /api/videos/?page=1&page_size=12 HTTP/1.1" 200 8765
+INFO 2025-07-20 12:08:21,018 basehttp 48632 212408 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:08:21,034 basehttp 48632 68988 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914
+INFO 2025-07-20 12:08:21,054 basehttp 48632 212408 "GET /api/groups/?page=1&page_size=12 HTTP/1.1" 200 4430
+INFO 2025-07-20 12:08:21,064 basehttp 48632 68988 "GET /api/competitions/?page=1&page_size=12 HTTP/1.1" 200 2245
+INFO 2025-07-20 12:08:21,081 basehttp 48632 212408 "GET /api/tags/?page=1&page_size=100 HTTP/1.1" 200 5914

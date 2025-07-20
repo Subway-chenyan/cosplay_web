@@ -29,10 +29,11 @@ python generate_template.py
 
 生成的模板文件位置: `templates/video_import_template.xlsx`
 
-模板包含三个工作表:
-- **示例数据**: 包含填写示例的完整数据
-- **导入模板**: 用于填写实际数据的空白模板  
+模板包含两个工作表:
+- **示例数据**: 包含多奖项示例数据，可直接修改使用
 - **字段说明**: 详细的字段说明和要求
+
+💡 **导入说明**: 系统会自动使用第一个工作表进行导入，现在支持一个视频设置多个奖项。
 
 ### 2. 填写Excel数据
 
@@ -67,10 +68,10 @@ python generate_template.py
 - `competition_description`: 比赛描述
 - `competition_website`: 比赛官网
 
-**奖项字段**:
-- `award_name`: 奖项名称
-- `award_year`: 获奖年份
-- `award_description`: 获奖描述
+**奖项字段**（支持多个奖项）:
+- `award_names`: 奖项名称（多个用逗号分隔）
+- `award_years`: 获奖年份（多个用逗号分隔，需与奖项数量对应）
+- `award_descriptions`: 获奖描述（多个用逗号分隔，需与奖项数量对应）
 
 ### 3. 执行数据导入
 
@@ -114,6 +115,15 @@ python import_data.py data.xlsx test
 ```
 初音未来:游戏IP,2024:年份,日系:风格
 ```
+
+### 🏆 多奖项格式说明
+
+一个视频可以获得同一比赛下的多个奖项，使用逗号分隔：
+
+**示例**:
+- `award_names`: `最佳团体奖,最佳创意奖,观众选择奖`
+- `award_years`: `2024,2024,2024`
+- `award_descriptions`: `获得团体组第一名,创意设计优秀,观众投票最高`
 
 ### ⚠️ 注意事项
 

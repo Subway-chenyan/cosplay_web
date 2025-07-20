@@ -152,6 +152,48 @@ class DataImporter:
         except Exception as e:
             print(f"❌ 创建标签失败: {e}")
     
+    def create_multiple_awards(self, video, competition, row):
+        """创建多个奖项和获奖记录"""
+        if not competition:
+            return
+            
+        award_names_str = row.get('award_names', '')
+        award_years_str = row.get('award_years', '')
+        award_descriptions_str = row.get('award_descriptions', '')
+        
+        # 如果没有奖项信息，尝试旧格式
+        if not award_names_str:
+            award_names_str = row.get('award_name', '')
+            award_years_str = row.get('award_year', '')
+            award_descriptions_str = row.get('award_description', '')
+        
+        if not award_names_str:
+            return
+            
+        try:
+            # 解析多个奖项（用逗号分隔）
+            award_names = [name.strip() for name in str(award_names_str).split(',') if name.strip()]
+            award_years = [year.strip() for year in str(award_years_str).split(',') if year.strip()] if award_years_str else []
+            award_descriptions = [desc.strip() for desc in str(award_descriptions_str).split(',') if desc.strip()] if award_descriptions_str else []
+            
+            # 确保年份和描述数量与奖项数量匹配
+            while len(award_years) < len(award_names):
+                award_years.append('')
+            while len(award_descriptions) < len(award_names):
+                award_descriptions.append('')
+            
+            # 为每个奖项创建记录
+            for i, award_name in enumerate(award_names):
+                if award_name:
+                    award = self.get_or_create_award(competition, award_name)
+                    award_year = award_years[i] if i < len(award_years) else ''
+                    award_description = award_descriptions[i] if i < len(award_descriptions) else ''
+                    
+                    self.create_award_record(video, award, award_year, award_description)
+                    
+        except Exception as e:
+            print(f"❌ 创建多个奖项失败: {e}")
+
     def create_award_record(self, video, award, award_year, award_description):
         """创建获奖记录"""
         if not award or not award_year:
@@ -234,15 +276,8 @@ class DataImporter:
             # 创建标签关联
             self.create_tags(video, row.get('tags'))
             
-            # 创建奖项和获奖记录
-            award_name = row.get('award_name')
-            if award_name and competition:
-                award = self.get_or_create_award(competition, award_name)
-                self.create_award_record(
-                    video, award, 
-                    row.get('award_year'), 
-                    row.get('award_description')
-                )
+            # 创建奖项和获奖记录（支持多个奖项）
+            self.create_multiple_awards(video, competition, row)
             
             self.success_count += 1
             return True
