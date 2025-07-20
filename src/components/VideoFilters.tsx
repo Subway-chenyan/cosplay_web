@@ -110,7 +110,7 @@ function VideoFilters() {
           <h3 className="text-sm font-medium text-gray-700 mb-3">标签</h3>
           
           {/* 按分类分组显示标签 */}
-          {['游戏IP', '风格', '年份', '类型', '地区', '动漫IP'].map((category) => {
+          {['IP', '风格', '年份', '地区'].map((category) => {
             const categoryTags = tags.filter(tag => tag.category === category)
             if (categoryTags.length === 0) return null
             

@@ -85,7 +85,7 @@ python import_data.py <excel_file_path> [sheet_name]
 python import_data.py templates/video_import_template.xlsx
 
 # 指定工作表
-python import_data.py data.xlsx 导入模板
+python import_data.py data.xlsx test
 ```
 
 ## 数据导入规则

@@ -107,6 +107,9 @@ class APITester:
         # 获取标签列表
         response = self.session.get(f"{self.base_url}/api/tags/")
         self.print_result("GET /api/tags/", response)
+
+        response = self.session.get(f"{self.base_url}/api/tags/?category=IP")
+        self.print_result("GET /api/tags/?category=IP", response)
     
     def test_performances_api(self):
         """测试演出API"""
@@ -157,8 +160,8 @@ class APITester:
         self.print_result("GET /api/videos/?status=published", response)
         
         # 按标签分类过滤
-        response = self.session.get(f"{self.base_url}/api/tags/?category=游戏IP")
-        self.print_result("GET /api/tags/?category=游戏IP", response)
+        response = self.session.get(f"{self.base_url}/api/tags/?category=IP")
+        self.print_result("GET /api/tags/?category=IP", response)
     
     def test_api_docs(self):
         """测试API文档"""

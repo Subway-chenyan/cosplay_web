@@ -128,31 +128,22 @@ class Command(BaseCommand):
     def create_tags(self):
         """创建标签"""
         tags_data = [
-            # 游戏IP
-            {'name': '原神', 'category': '游戏IP', 'color': '#FF6B35', 'description': '米哈游开发的开放世界冒险RPG游戏'},
-            {'name': '崩坏3', 'category': '游戏IP', 'color': '#FF69B4', 'description': '米哈游开发的3D动作手游'},
-            {'name': '明日方舟', 'category': '游戏IP', 'color': '#4169E1', 'description': '鹰角网络开发的塔防策略游戏'},
-            {'name': '王者荣耀', 'category': '游戏IP', 'color': '#FFD700', 'description': '腾讯开发的MOBA手游'},
-            {'name': '英雄联盟', 'category': '游戏IP', 'color': '#FF4500', 'description': '拳头游戏开发的MOBA游戏'},
-            
-            # 动漫IP
-            {'name': '鬼灭之刃', 'category': '动漫IP', 'color': '#DC143C', 'description': '吾峠呼世晴创作的日本漫画'},
-            {'name': '火影忍者', 'category': '动漫IP', 'color': '#FF8C00', 'description': '岸本齐史创作的日本漫画'},
-            {'name': '海贼王', 'category': '动漫IP', 'color': '#FF6347', 'description': '尾田荣一郎创作的日本漫画'},
-            {'name': '进击的巨人', 'category': '动漫IP', 'color': '#2F4F4F', 'description': '谏山创创作的日本漫画'},
-            {'name': '刀剑神域', 'category': '动漫IP', 'color': '#4B0082', 'description': '川原砾创作的轻小说系列'},
+            # IP
+            {'name': '原神', 'category': 'IP', 'color': '#FF6B35', 'description': '米哈游开发的开放世界冒险RPG游戏'},
+            {'name': '崩坏3', 'category': 'IP', 'color': '#FF69B4', 'description': '米哈游开发的3D动作手游'},
+            {'name': '明日方舟', 'category': 'IP', 'color': '#4169E1', 'description': '鹰角网络开发的塔防策略游戏'},
+            {'name': '王者荣耀', 'category': 'IP', 'color': '#FFD700', 'description': '腾讯开发的MOBA手游'},
+            {'name': '英雄联盟', 'category': 'IP', 'color': '#FF4500', 'description': '拳头游戏开发的MOBA游戏'},
+            {'name': '鬼灭之刃', 'category': 'IP', 'color': '#DC143C', 'description': '吾峠呼世晴创作的日本漫画'},
+            {'name': '火影忍者', 'category': 'IP', 'color': '#FF8C00', 'description': '岸本齐史创作的日本漫画'},
+            {'name': '海贼王', 'category': 'IP', 'color': '#FF6347', 'description': '尾田荣一郎创作的日本漫画'},
+            {'name': '进击的巨人', 'category': 'IP', 'color': '#2F4F4F', 'description': '谏山创创作的日本漫画'},
+            {'name': '刀剑神域', 'category': 'IP', 'color': '#4B0082', 'description': '川原砾创作的轻小说系列'},
             
             # 年份
             {'name': '2023年', 'category': '年份', 'color': '#32CD32', 'description': '2023年作品'},
             {'name': '2024年', 'category': '年份', 'color': '#00CED1', 'description': '2024年作品'},
             {'name': '2022年', 'category': '年份', 'color': '#FF69B4', 'description': '2022年作品'},
-            
-            # 类型
-            {'name': '舞台剧', 'category': '类型', 'color': '#8A2BE2', 'description': '舞台表演类型'},
-            {'name': '个人solo', 'category': '类型', 'color': '#FF1493', 'description': '个人表演'},
-            {'name': '群体表演', 'category': '类型', 'color': '#00BFFF', 'description': '多人群体表演'},
-            {'name': '舞蹈', 'category': '类型', 'color': '#FF69B4', 'description': '舞蹈表演'},
-            {'name': '剧情', 'category': '类型', 'color': '#FF4500', 'description': '剧情表演'},
             
             # 风格
             {'name': '古风', 'category': '风格', 'color': '#8B4513', 'description': '古代风格'},
@@ -185,7 +176,7 @@ class Command(BaseCommand):
         groups_data = [
             {
                 'name': '星河cosplay社',
-                'description': '北京知名cosplay社团，专注于舞台剧表演，成立于2018年。擅长原神、崩坏3等游戏IP的cosplay制作。',
+                'description': '北京知名cosplay社团，专注于舞台剧表演，成立于2018年。擅长原神、崩坏3等IP的cosplay制作。',
                 'founded_date': datetime(2018, 3, 15).date(),
                 'location': '北京',
                 'website': 'http://xinghe-cosplay.com',
@@ -199,7 +190,7 @@ class Command(BaseCommand):
             },
             {
                 'name': '梦境工作室',
-                'description': '上海专业cosplay制作团队，擅长特效和服装制作。专注于动漫IP的cosplay，如鬼灭之刃、进击的巨人等。',
+                'description': '上海专业cosplay制作团队，擅长特效和服装制作。专注于IP的cosplay，如鬼灭之刃、进击的巨人等。',
                 'founded_date': datetime(2019, 7, 20).date(),
                 'location': '上海',
                 'website': '',
@@ -213,7 +204,7 @@ class Command(BaseCommand):
             },
             {
                 'name': '次元空间',
-                'description': '广州大学cosplay社团，大学生为主，创意丰富。擅长王者荣耀、英雄联盟等游戏IP的cosplay。',
+                'description': '广州大学cosplay社团，大学生为主，创意丰富。擅长王者荣耀、英雄联盟等IP的cosplay。',
                 'founded_date': datetime(2020, 1, 10).date(),
                 'location': '广州',
                 'website': 'http://ciyuan-space.cn',
@@ -227,7 +218,7 @@ class Command(BaseCommand):
             },
             {
                 'name': '星辰剧团',
-                'description': '深圳新兴cosplay社团，专注于舞蹈和剧情表演。擅长刀剑神域、海贼王等动漫IP。',
+                'description': '深圳新兴cosplay社团，专注于舞蹈和剧情表演。擅长刀剑神域、海贼王等IP。',
                 'founded_date': datetime(2021, 5, 8).date(),
                 'location': '深圳',
                 'website': 'http://xingchen-troupe.com',
@@ -434,21 +425,21 @@ class Command(BaseCommand):
         for video in videos:
             # 根据视频内容选择合适的标签
             if '原神' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['原神', '游戏IP', '舞台剧', '2023年', '古风']]
+                selected_tags = [tag for tag in tags if tag.name in ['原神', 'IP', '2023年', '古风']]
             elif '崩坏3' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['崩坏3', '游戏IP', '舞台剧', '2023年', '科幻']]
+                selected_tags = [tag for tag in tags if tag.name in ['崩坏3', 'IP', '2023年', '科幻']]
             elif '明日方舟' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['明日方舟', '游戏IP', '舞台剧', '2024年', '现代']]
+                selected_tags = [tag for tag in tags if tag.name in ['明日方舟', 'IP', '2024年', '现代']]
             elif '鬼灭之刃' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['鬼灭之刃', '动漫IP', '个人solo', '2023年', '古风']]
+                selected_tags = [tag for tag in tags if tag.name in ['鬼灭之刃', 'IP', '2023年', '古风']]
             elif '王者荣耀' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['王者荣耀', '游戏IP', '个人solo', '2024年', '古风']]
+                selected_tags = [tag for tag in tags if tag.name in ['王者荣耀', 'IP', '2024年', '古风']]
             elif '英雄联盟' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['英雄联盟', '游戏IP', '个人solo', '2024年', '现代']]
+                selected_tags = [tag for tag in tags if tag.name in ['英雄联盟', 'IP', '2024年', '现代']]
             elif '火影忍者' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['火影忍者', '动漫IP', '舞台剧', '2024年', '现代']]
+                selected_tags = [tag for tag in tags if tag.name in ['火影忍者', 'IP', '2024年', '现代']]
             elif '海贼王' in video.title:
-                selected_tags = [tag for tag in tags if tag.name in ['海贼王', '动漫IP', '舞台剧', '2024年', '奇幻']]
+                selected_tags = [tag for tag in tags if tag.name in ['海贼王', 'IP', '2024年', '奇幻']]
             else:
                 # 随机选择标签
                 selected_tags = random.sample(tags, random.randint(2, 5))

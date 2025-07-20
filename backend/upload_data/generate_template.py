@@ -61,7 +61,7 @@ def generate_template():
         'competition_year': [2024, 2023],
         'group_name': ['示例社团A', '示例社团B'],
         'competition_name': ['全国Cosplay大赛', 'Anime Expo'],
-        'tags': ['初音未来:游戏IP,2024:年份', '东方Project:游戏IP'],
+        'tags': ['初音未来:IP,2024:年份', '东方Project:IP'],
         'group_description': ['这是一个专业的Cosplay社团', ''],
         'group_founded_date': ['2020-01-01', ''],
         'group_location': ['北京', '上海'],
