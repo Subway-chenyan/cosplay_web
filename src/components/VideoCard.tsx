@@ -148,7 +148,7 @@ function VideoCard({ video, onClick }: VideoCardProps) {
               <Trophy className="w-4 h-4 flex-shrink-0" />
               <span className="text-sm truncate">
                 {video.competition_name}
-                {video.competition_year && ` (${video.competition_year})`}
+                {/* {video.competition_year && ` (${video.competition_year})`} */}
               </span>
             </div>
           )}
@@ -156,7 +156,7 @@ function VideoCard({ video, onClick }: VideoCardProps) {
           {/* 创建时间 */}
           <div className="flex items-center space-x-2 text-gray-600">
             <Calendar className="w-4 h-4 flex-shrink-0" />
-            <span className="text-sm">{formatDate(video.created_at)}</span>
+            <span className="text-sm">{(video.competition_year)}</span>
           </div>
         </div>
       </div>

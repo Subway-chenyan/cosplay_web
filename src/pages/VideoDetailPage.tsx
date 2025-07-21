@@ -78,6 +78,12 @@ function VideoDetailPage() {
     navigate(`/video/${videoId}`)
   }
 
+  const handleGroupClick = () => {
+    if (groupDetails) {
+      navigate(`/group/${groupDetails.id}`)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -196,7 +202,7 @@ function VideoDetailPage() {
             <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-5 h-5 text-gray-500" />
-                <span>{formatDate(video.created_at)}</span>
+                <span>{video.competition_year}</span>
               </div>
               
               <div className="flex items-center space-x-1">
@@ -241,7 +247,11 @@ function VideoDetailPage() {
               
               {/* 社团头部 */}
               <div className="flex items-center space-x-4 mb-4">
-                <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                <button
+                  onClick={handleGroupClick}
+                  className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 hover:ring-2 hover:ring-primary-300 transition-all duration-200 hover:scale-105 cursor-pointer"
+                  title="点击查看社团详情"
+                >
                   {groupDetails.logo ? (
                     <img
                       src={groupDetails.logo}
@@ -255,13 +265,17 @@ function VideoDetailPage() {
                       </span>
                     </div>
                   )}
-                </div>
+                </button>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <button
+                      onClick={handleGroupClick}
+                      className="text-lg font-semibold text-gray-900 truncate hover:text-primary-600 transition-colors cursor-pointer"
+                      title="点击查看社团详情"
+                    >
                       {groupDetails.name}
-                    </h3>
+                    </button>
                   </div>
                   
                   {groupDetails.location && (
