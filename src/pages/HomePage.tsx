@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
@@ -13,14 +13,103 @@ function HomePage() {
   const navigate = useNavigate()
   const { videos, loading, error, pagination, searchQuery, filters, currentPage } = useSelector((state: RootState) => state.videos)
   const [inputValue, setInputValue] = useState(searchQuery)
+  const [isFilterLoading, setIsFilterLoading] = useState(false)
+  const scrollPositionRef = useRef<number>(0)
+  const filtersRef = useRef(filters)
+  const searchQueryRef = useRef(searchQuery)
 
+  // 防抖函数
+  const debounce = useCallback((func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout
+    return (...args: any[]) => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => func(...args), delay)
+    }
+  }, [])
+
+  // 保存滚动位置
+  const saveScrollPosition = useCallback(() => {
+    scrollPositionRef.current = window.scrollY
+  }, [])
+
+  // 恢复滚动位置
+  const restoreScrollPosition = useCallback(() => {
+    if (scrollPositionRef.current > 0) {
+      window.scrollTo(0, scrollPositionRef.current)
+    }
+  }, [])
+
+  // 获取视频数据
+  const fetchVideosData = useCallback(async (params?: { 
+    page?: number
+    filters?: any
+    searchQuery?: string
+  }) => {
+    const isFilterChange = JSON.stringify(params?.filters) !== JSON.stringify(filtersRef.current) ||
+                          params?.searchQuery !== searchQueryRef.current
+    
+    if (isFilterChange) {
+      setIsFilterLoading(true)
+      saveScrollPosition()
+    }
+
+    try {
+      await dispatch(fetchVideos(params) as any)
+    } finally {
+      if (isFilterChange) {
+        setIsFilterLoading(false)
+        // 延迟恢复滚动位置，确保DOM已更新
+        setTimeout(restoreScrollPosition, 100)
+      }
+    }
+  }, [dispatch, saveScrollPosition, restoreScrollPosition])
+
+  // 防抖的筛选处理
+  const debouncedFetchVideos = useCallback(
+    debounce(fetchVideosData, 300),
+    [fetchVideosData, debounce]
+  )
+
+  // 监听筛选和搜索变化
   useEffect(() => {
-    dispatch(fetchVideos({
-      page: currentPage,
-      searchQuery,
-      filters
-    }))
-  }, [dispatch, currentPage, searchQuery, filters])
+    const hasFiltersChanged = JSON.stringify(filters) !== JSON.stringify(filtersRef.current)
+    const hasSearchChanged = searchQuery !== searchQueryRef.current
+
+    if (hasFiltersChanged || hasSearchChanged) {
+      filtersRef.current = filters
+      searchQueryRef.current = searchQuery
+      debouncedFetchVideos({
+        page: 1, // 筛选时重置到第一页
+        searchQuery,
+        filters
+      })
+    }
+  }, [filters, searchQuery, debouncedFetchVideos])
+
+  // 监听页码变化（非筛选导致的）
+  useEffect(() => {
+    const hasFiltersChanged = JSON.stringify(filters) !== JSON.stringify(filtersRef.current)
+    const hasSearchChanged = searchQuery !== searchQueryRef.current
+    
+    if (!hasFiltersChanged && !hasSearchChanged) {
+      fetchVideosData({
+        page: currentPage,
+        searchQuery,
+        filters
+      })
+    }
+  }, [currentPage, fetchVideosData])
+
+  // 组件挂载时的初始加载
+  useEffect(() => {
+    if (videos.length === 0) {
+      fetchVideosData({
+        page: currentPage,
+        searchQuery,
+        filters
+      })
+    }
+  }, []) // 只在组件挂载时执行一次
 
   const handleVideoClick = (videoId: string) => {
     navigate(`/video/${videoId}`)
@@ -40,6 +129,7 @@ function HomePage() {
     dispatch(setCurrentPage(1) as any)
   }
 
+  // 首次加载状态
   if (loading && videos.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -96,8 +186,6 @@ function HomePage() {
         </div>
       </div>
 
-
-
       {/* Search Bar */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">搜索视频</h2>
@@ -114,6 +202,16 @@ function HomePage() {
       {/* Filters */}
       <VideoFilters />
 
+      {/* 筛选加载指示器 */}
+      {isFilterLoading && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-center space-x-2">
+            <Loader className="w-4 h-4 animate-spin text-blue-600" />
+            <span className="text-blue-600 text-sm">正在筛选...</span>
+          </div>
+        </div>
+      )}
+
       {/* Video Grid */}
       <div>
         <div className="flex items-center justify-between mb-6">
@@ -124,7 +222,7 @@ function HomePage() {
             </span>
           </h2>
           
-          {loading && (
+          {loading && !isFilterLoading && (
             <div className="flex items-center space-x-2 text-gray-500">
               <Loader className="w-4 h-4 animate-spin" />
               <span className="text-sm">加载中...</span>

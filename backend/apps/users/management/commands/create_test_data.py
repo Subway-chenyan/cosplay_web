@@ -145,14 +145,6 @@ class Command(BaseCommand):
             {'name': '2024年', 'category': '年份', 'color': '#00CED1', 'description': '2024年作品'},
             {'name': '2022年', 'category': '年份', 'color': '#FF69B4', 'description': '2022年作品'},
             
-            # 风格
-            {'name': '古风', 'category': '风格', 'color': '#8B4513', 'description': '古代风格'},
-            {'name': '现代', 'category': '风格', 'color': '#696969', 'description': '现代风格'},
-            {'name': '奇幻', 'category': '风格', 'color': '#9370DB', 'description': '奇幻风格'},
-            {'name': '科幻', 'category': '风格', 'color': '#00CED1', 'description': '科幻风格'},
-            {'name': '可爱', 'category': '风格', 'color': '#FFB6C1', 'description': '可爱风格'},
-            {'name': '帅气', 'category': '风格', 'color': '#4169E1', 'description': '帅气风格'},
-            
             # 地区
             {'name': '北京', 'category': '地区', 'color': '#DC143C', 'description': '北京地区'},
             {'name': '上海', 'category': '地区', 'color': '#FFD700', 'description': '上海地区'},

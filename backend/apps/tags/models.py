@@ -9,7 +9,6 @@ class Tag(models.Model):
     CATEGORY_CHOICES = [
         ('IP', 'IP'),
         ('年份', '年份'),
-        ('风格', '风格'),
         ('地区', '地区'),
         ('其他', '其他'),
     ]

@@ -50,7 +50,7 @@ export interface Competition {
 export interface Tag {
   id: string
   name: string
-  category: 'IP' | '年份' | '风格' | '地区' | '其他'
+  category: 'IP' | '年份' | '地区' | '其他'
   description: string
   color: string
   usage_count: number

@@ -66,6 +66,37 @@ def update_group_video_count(group):
 @receiver(post_save, sender=Video)
 def video_saved(sender, instance, created, **kwargs):
     """视频保存时的信号处理"""
+    from apps.tags.models import Tag, VideoTag
+    
+    # 自动创建和关联标签
+    def create_or_get_tag(name, category):
+        """创建或获取标签"""
+        tag, created = Tag.objects.get_or_create(
+            name=name,
+            category=category,
+            defaults={
+                'description': f'自动生成的{category}标签',
+                'color': '#007bff' if category == '地区' else '#28a745'
+            }
+        )
+        if not created:
+            # 更新使用次数
+            tag.usage_count += 1
+            tag.save(update_fields=['usage_count'])
+        return tag
+    
+    # 处理地区标签
+    if instance.group and instance.group.location:
+        location_tag = create_or_get_tag(instance.group.location, '地区')
+        # 关联地区标签到视频
+        VideoTag.objects.get_or_create(video=instance, tag=location_tag)
+    
+    # 处理年份标签
+    if instance.competition_year:
+        year_tag = create_or_get_tag(str(instance.competition_year), '年份')
+        # 关联年份标签到视频
+        VideoTag.objects.get_or_create(video=instance, tag=year_tag)
+    
     # 如果是新创建的视频
     if created:
         # 更新当前社团的视频数量
@@ -78,6 +109,8 @@ def video_saved(sender, instance, created, **kwargs):
                 old_instance = Video.objects.get(pk=instance.pk)
                 old_group = old_instance.group
                 new_group = instance.group
+                old_competition_year = old_instance.competition_year
+                new_competition_year = instance.competition_year
                 
                 # 如果社团发生了变化
                 if old_group != new_group:
@@ -90,6 +123,43 @@ def video_saved(sender, instance, created, **kwargs):
                 # 如果社团没有变化，但视频确实属于某个社团
                 elif new_group:
                     update_group_video_count(new_group)
+                
+                # 如果年份发生变化，需要处理标签关联
+                if old_competition_year != new_competition_year:
+                    # 移除旧的年份标签关联
+                    if old_competition_year:
+                        try:
+                            old_year_tag = Tag.objects.get(name=str(old_competition_year), category='年份')
+                            VideoTag.objects.filter(video=instance, tag=old_year_tag).delete()
+                            # 减少旧标签的使用次数
+                            old_year_tag.usage_count = max(0, old_year_tag.usage_count - 1)
+                            old_year_tag.save(update_fields=['usage_count'])
+                        except Tag.DoesNotExist:
+                            pass
+                    
+                    # 添加新的年份标签关联
+                    if new_competition_year:
+                        year_tag = create_or_get_tag(str(new_competition_year), '年份')
+                        VideoTag.objects.get_or_create(video=instance, tag=year_tag)
+                
+                # 如果社团的location发生变化，需要处理地区标签关联
+                if old_group and new_group and old_group.location != new_group.location:
+                    # 移除旧的地区标签关联
+                    if old_group.location:
+                        try:
+                            old_location_tag = Tag.objects.get(name=old_group.location, category='地区')
+                            VideoTag.objects.filter(video=instance, tag=old_location_tag).delete()
+                            # 减少旧标签的使用次数
+                            old_location_tag.usage_count = max(0, old_location_tag.usage_count - 1)
+                            old_location_tag.save(update_fields=['usage_count'])
+                        except Tag.DoesNotExist:
+                            pass
+                    
+                    # 添加新的地区标签关联
+                    if new_group.location:
+                        location_tag = create_or_get_tag(new_group.location, '地区')
+                        VideoTag.objects.get_or_create(video=instance, tag=location_tag)
+                        
             except Video.DoesNotExist:
                 # 如果找不到旧实例，直接更新新社团
                 if instance.group:
@@ -99,6 +169,27 @@ def video_saved(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Video)
 def video_deleted(sender, instance, **kwargs):
     """视频删除时的信号处理"""
+    from apps.tags.models import Tag
+    
+    # 减少相关标签的使用次数
+    # 处理地区标签
+    if instance.group and instance.group.location:
+        try:
+            location_tag = Tag.objects.get(name=instance.group.location, category='地区')
+            location_tag.usage_count = max(0, location_tag.usage_count - 1)
+            location_tag.save(update_fields=['usage_count'])
+        except Tag.DoesNotExist:
+            pass
+    
+    # 处理年份标签
+    if instance.competition_year:
+        try:
+            year_tag = Tag.objects.get(name=str(instance.competition_year), category='年份')
+            year_tag.usage_count = max(0, year_tag.usage_count - 1)
+            year_tag.save(update_fields=['usage_count'])
+        except Tag.DoesNotExist:
+            pass
+    
     # 更新社团的视频数量
     if instance.group:
         update_group_video_count(instance.group) 

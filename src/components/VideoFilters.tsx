@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../store/store'
 import { setFilters, clearFilters, setCurrentPage } from '../store/slices/videosSlice'
@@ -16,6 +16,7 @@ function VideoFilters() {
   const { tags } = useSelector((state: RootState) => state.tags)
   
   const [isOpen, setIsOpen] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     dispatch(fetchGroups())
@@ -23,7 +24,11 @@ function VideoFilters() {
     dispatch(fetchTags())
   }, [dispatch])
 
-  const handleFilterChange = (filterType: keyof VideoFiltersType, value: string) => {
+  const handleFilterChange = useCallback((filterType: keyof VideoFiltersType, value: string) => {
+    if (isProcessing) return // 防止重复点击
+    
+    setIsProcessing(true)
+    
     const currentValues = filters[filterType] as string[]
     const newValues = currentValues.includes(value)
       ? currentValues.filter(v => v !== value)
@@ -31,12 +36,21 @@ function VideoFilters() {
     
     dispatch(setFilters({ [filterType]: newValues }))
     dispatch(setCurrentPage(1)) // 重置到第一页
-  }
+    
+    // 延迟重置处理状态，避免快速连续点击
+    setTimeout(() => setIsProcessing(false), 200)
+  }, [dispatch, filters, isProcessing])
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
+    if (isProcessing) return // 防止重复点击
+    
+    setIsProcessing(true)
     dispatch(clearFilters())
     dispatch(setCurrentPage(1)) // 重置到第一页
-  }
+    
+    // 延迟重置处理状态
+    setTimeout(() => setIsProcessing(false), 200)
+  }, [dispatch, isProcessing])
 
   const hasActiveFilters = filters.groups.length > 0 || filters.competitions.length > 0 || filters.tags.length > 0
 
@@ -52,7 +66,12 @@ function VideoFilters() {
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1"
+              disabled={isProcessing}
+              className={`text-sm flex items-center space-x-1 transition-colors ${
+                isProcessing 
+                  ? 'text-gray-400 cursor-not-allowed' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
             >
               <X className="w-4 h-4" />
               <span>清除全部</span>
@@ -61,7 +80,7 @@ function VideoFilters() {
           
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-sm text-primary-600 hover:text-primary-700"
+            className="md:hidden text-sm text-primary-600 hover:text-primary-700 transition-colors"
           >
             {isOpen ? '收起' : '展开'}
           </button>
@@ -77,7 +96,8 @@ function VideoFilters() {
               <button
                 key={group.id}
                 onClick={() => handleFilterChange('groups', group.id)}
-                className={`filter-chip ${
+                disabled={isProcessing}
+                className={`filter-chip transition-all duration-200 ${
                   filters.groups.includes(group.id) ? 'active' : ''
                 }`}
               >
@@ -95,7 +115,8 @@ function VideoFilters() {
               <button
                 key={competition.id}
                 onClick={() => handleFilterChange('competitions', competition.id)}
-                className={`filter-chip ${
+                disabled={isProcessing}
+                className={`filter-chip transition-all duration-200 ${
                   filters.competitions.includes(competition.id) ? 'active' : ''
                 }`}
               >
@@ -110,7 +131,7 @@ function VideoFilters() {
           <h3 className="text-sm font-medium text-gray-700 mb-3">标签</h3>
           
           {/* 按分类分组显示标签 */}
-          {['IP', '风格', '年份', '地区'].map((category) => {
+          {['IP', '年份', '地区'].map((category) => {
             const categoryTags = tags.filter(tag => tag.category === category)
             if (categoryTags.length === 0) return null
             
@@ -122,8 +143,11 @@ function VideoFilters() {
                     <button
                       key={tag.id}
                       onClick={() => handleFilterChange('tags', tag.id)}
-                      className={`filter-chip ${
+                      disabled={isProcessing}
+                      className={`filter-chip transition-all duration-200 ${
                         filters.tags.includes(tag.id) ? 'active' : ''
+                      } ${
+                        isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
                       }`}
                       style={{
                         backgroundColor: filters.tags.includes(tag.id) ? tag.color : 'transparent',

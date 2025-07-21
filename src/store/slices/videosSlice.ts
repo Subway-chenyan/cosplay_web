@@ -6,6 +6,7 @@ interface VideosState {
   videos: Video[]
   currentVideo: Video | null
   loading: boolean
+  filterLoading: boolean // 新增：筛选加载状态
   error: string | null
   filters: VideoFilters
   searchQuery: string
@@ -21,6 +22,7 @@ const initialState: VideosState = {
   videos: [],
   currentVideo: null,
   loading: false,
+  filterLoading: false, // 新增：筛选加载状态
   error: null,
   filters: {
     groups: [],
@@ -64,14 +66,7 @@ export const fetchCompetitionVideos = createAsyncThunk(
   }
 )
 
-// 获取精选视频
-export const fetchFeaturedVideos = createAsyncThunk(
-  'videos/fetchFeaturedVideos',
-  async () => {
-    const response = await videoService.getFeaturedVideos()
-    return response
-  }
-)
+
 
 // 获取最新视频
 export const fetchLatestVideos = createAsyncThunk(
@@ -141,16 +136,26 @@ const videosSlice = createSlice({
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload
     },
+    setFilterLoading: (state, action: PayloadAction<boolean>) => {
+      state.filterLoading = action.payload
+    },
   },
   extraReducers: (builder) => {
     builder
       // 处理 fetchVideos
-      .addCase(fetchVideos.pending, (state) => {
-        state.loading = true
+      .addCase(fetchVideos.pending, (state, action) => {
+        // 判断是否为筛选操作（第一页且不是初始加载）
+        const isFiltering = action.meta.arg?.page === 1 && state.videos.length > 0
+        if (isFiltering) {
+          state.filterLoading = true
+        } else {
+          state.loading = true
+        }
         state.error = null
       })
       .addCase(fetchVideos.fulfilled, (state, action) => {
         state.loading = false
+        state.filterLoading = false
         state.videos = action.payload.results
         state.pagination = {
           count: action.payload.count,
@@ -160,6 +165,7 @@ const videosSlice = createSlice({
       })
       .addCase(fetchVideos.rejected, (state, action) => {
         state.loading = false
+        state.filterLoading = false
         state.error = action.error.message || '获取视频失败'
       })
       // 处理 searchVideos
@@ -180,24 +186,7 @@ const videosSlice = createSlice({
         state.loading = false
         state.error = action.error.message || '搜索视频失败'
       })
-      // 处理其他异步操作（精选、最新、热门等）
-      .addCase(fetchFeaturedVideos.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(fetchFeaturedVideos.fulfilled, (state, action) => {
-        state.loading = false
-        state.videos = action.payload.results
-        state.pagination = {
-          count: action.payload.count,
-          next: action.payload.next,
-          previous: action.payload.previous,
-        }
-      })
-      .addCase(fetchFeaturedVideos.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.error.message || '获取精选视频失败'
-      })
+      // 处理其他异步操作（最新、热门等）
       .addCase(fetchLatestVideos.fulfilled, (state, action) => {
         state.videos = action.payload.results
         state.pagination = {
@@ -235,7 +224,8 @@ export const {
   clearFilters, 
   setSearchQuery, 
   clearSearch,
-  setCurrentPage
+  setCurrentPage,
+  setFilterLoading
 } = videosSlice.actions
 
 export default videosSlice.reducer 
