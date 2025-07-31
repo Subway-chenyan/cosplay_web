@@ -8,8 +8,7 @@ class Tag(models.Model):
     """
     CATEGORY_CHOICES = [
         ('IP', 'IP'),
-        ('年份', '年份'),
-        ('地区', '地区'),
+        ('风格', '风格'),
         ('其他', '其他'),
     ]
     
@@ -61,4 +60,4 @@ class VideoTag(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.video.title} - {self.tag.name}" 
+        return f"{self.video.title} - {self.tag.name}"

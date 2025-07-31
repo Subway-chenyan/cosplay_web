@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../store/store'
 import { setFilters, clearFilters, setCurrentPage } from '../store/slices/videosSlice'
-import { fetchGroups } from '../store/slices/groupsSlice'
-import { fetchCompetitions } from '../store/slices/competitionsSlice'
 import { fetchTags } from '../store/slices/tagsSlice'
 import { VideoFilters as VideoFiltersType } from '../types'
 import { Filter, X } from 'lucide-react'
@@ -11,16 +9,12 @@ import { Filter, X } from 'lucide-react'
 function VideoFilters() {
   const dispatch = useDispatch<AppDispatch>()
   const { filters, pagination } = useSelector((state: RootState) => state.videos)
-  const { groups } = useSelector((state: RootState) => state.groups)
-  const { competitions } = useSelector((state: RootState) => state.competitions)
   const { tags } = useSelector((state: RootState) => state.tags)
   
   const [isOpen, setIsOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
-    dispatch(fetchGroups())
-    dispatch(fetchCompetitions())
     dispatch(fetchTags())
   }, [dispatch])
 
@@ -52,7 +46,7 @@ function VideoFilters() {
     setTimeout(() => setIsProcessing(false), 200)
   }, [dispatch, isProcessing])
 
-  const hasActiveFilters = filters.groups.length > 0 || filters.competitions.length > 0 || filters.tags.length > 0
+  const hasActiveFilters = filters.tags.length > 0
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -88,50 +82,12 @@ function VideoFilters() {
       </div>
 
       <div className={`space-y-6 ${isOpen ? 'block' : 'hidden md:block'}`}>
-        {/* 社团筛选 */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-3">社团</h3>
-          <div className="flex flex-wrap gap-2">
-            {groups.map((group) => (
-              <button
-                key={group.id}
-                onClick={() => handleFilterChange('groups', group.id)}
-                disabled={isProcessing}
-                className={`filter-chip transition-all duration-200 ${
-                  filters.groups.includes(group.id) ? 'active' : ''
-                }`}
-              >
-                {group.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 比赛筛选 */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-3">比赛</h3>
-          <div className="flex flex-wrap gap-2">
-            {competitions.map((competition) => (
-              <button
-                key={competition.id}
-                onClick={() => handleFilterChange('competitions', competition.id)}
-                disabled={isProcessing}
-                className={`filter-chip transition-all duration-200 ${
-                  filters.competitions.includes(competition.id) ? 'active' : ''
-                }`}
-              >
-                {competition.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* 标签筛选 */}
         <div>
           <h3 className="text-sm font-medium text-gray-700 mb-3">标签</h3>
           
           {/* 按分类分组显示标签 */}
-          {['IP', '年份', '地区'].map((category) => {
+          {['IP', '风格'].map((category) => {
             const categoryTags = tags.filter(tag => tag.category === category)
             if (categoryTags.length === 0) return null
             
@@ -172,9 +128,7 @@ function VideoFilters() {
             <div className="text-sm text-gray-600">
               当前筛选: 
               <span className="ml-2">
-                {filters.groups.length > 0 && `社团 ${filters.groups.length}个`}
-                {filters.competitions.length > 0 && ` 比赛 ${filters.competitions.length}个`}
-                {filters.tags.length > 0 && ` 标签 ${filters.tags.length}个`}
+                {filters.tags.length > 0 && `标签 ${filters.tags.length}个`}
               </span>
             </div>
             
@@ -188,4 +142,4 @@ function VideoFilters() {
   )
 }
 
-export default VideoFilters 
+export default VideoFilters

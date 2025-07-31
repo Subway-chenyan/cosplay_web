@@ -25,8 +25,6 @@ const initialState: VideosState = {
   filterLoading: false, // 新增：筛选加载状态
   error: null,
   filters: {
-    groups: [],
-    competitions: [],
     tags: [],
   },
   searchQuery: '',
@@ -122,8 +120,6 @@ const videosSlice = createSlice({
     },
     clearFilters: (state) => {
       state.filters = {
-        groups: [],
-        competitions: [],
         tags: [],
       }
     },
@@ -228,4 +224,4 @@ export const {
   setFilterLoading
 } = videosSlice.actions
 
-export default videosSlice.reducer 
+export default videosSlice.reducer

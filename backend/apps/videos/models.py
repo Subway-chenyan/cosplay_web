@@ -17,6 +17,10 @@ class Video(models.Model):
     description = models.TextField(blank=True, verbose_name='描述')
     url = models.URLField(verbose_name='视频链接')
     thumbnail = models.URLField(blank=True, verbose_name='缩略图')
+    
+    # 基础属性
+    year = models.IntegerField(blank=True, null=True, verbose_name='年份')
+    region = models.CharField(max_length=50, blank=True, verbose_name='地区')
 
     # 关联信息
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
@@ -42,6 +46,8 @@ class Video(models.Model):
             models.Index(fields=['group']),
             models.Index(fields=['competition']),
             models.Index(fields=['competition_year']),
+            models.Index(fields=['year']),
+            models.Index(fields=['region']),
         ]
 
     def __str__(self):
@@ -66,36 +72,6 @@ def update_group_video_count(group):
 @receiver(post_save, sender=Video)
 def video_saved(sender, instance, created, **kwargs):
     """视频保存时的信号处理"""
-    from apps.tags.models import Tag, VideoTag
-    
-    # 自动创建和关联标签
-    def create_or_get_tag(name, category):
-        """创建或获取标签"""
-        tag, created = Tag.objects.get_or_create(
-            name=name,
-            category=category,
-            defaults={
-                'description': f'自动生成的{category}标签',
-                'color': '#007bff' if category == '地区' else '#28a745'
-            }
-        )
-        if not created:
-            # 更新使用次数
-            tag.usage_count += 1
-            tag.save(update_fields=['usage_count'])
-        return tag
-    
-    # 处理地区标签
-    if instance.group and instance.group.location:
-        location_tag = create_or_get_tag(instance.group.location, '地区')
-        # 关联地区标签到视频
-        VideoTag.objects.get_or_create(video=instance, tag=location_tag)
-    
-    # 处理年份标签
-    if instance.competition_year:
-        year_tag = create_or_get_tag(str(instance.competition_year), '年份')
-        # 关联年份标签到视频
-        VideoTag.objects.get_or_create(video=instance, tag=year_tag)
     
     # 如果是新创建的视频
     if created:
@@ -192,4 +168,4 @@ def video_deleted(sender, instance, **kwargs):
     
     # 更新社团的视频数量
     if instance.group:
-        update_group_video_count(instance.group) 
+        update_group_video_count(instance.group)

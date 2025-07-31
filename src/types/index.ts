@@ -5,6 +5,8 @@ export interface Video {
   description: string
   url: string
   thumbnail: string
+  year?: number
+  region?: string
   uploaded_by?: string
   uploaded_by_username?: string
   group?: string
@@ -63,7 +65,7 @@ export interface Competition {
 export interface Tag {
   id: string
   name: string
-  category: 'IP' | '年份' | '地区' | '其他'
+  category: 'IP' | '风格' | '其他'
   description: string
   color: string
   usage_count: number
@@ -84,10 +86,9 @@ export interface User {
 }
 
 export interface VideoFilters {
-  groups: string[]
-  competitions: string[]
   tags: string[]
   year?: number
+  region?: string
   search?: string
 }
 
