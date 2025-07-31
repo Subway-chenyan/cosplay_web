@@ -91,11 +91,11 @@ function GroupsPage() {
                   {groups.map((group: any) => (
           <div
             key={group.id}
-            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 card-hover cursor-pointer"
+            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 card-hover cursor-pointer flex flex-col h-full"
             onClick={() => handleGroupClick(group.id)}
           >
             {/* Group Header */}
-            <div className="p-6">
+            <div className="p-6 flex-1 flex flex-col">
               <div className="flex items-center space-x-4 mb-4">
                 <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
                   {group.logo ? (
@@ -130,9 +130,11 @@ function GroupsPage() {
               </div>
 
               {/* Description */}
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                {group.description}
-              </p>
+              <div className="flex-1 mb-4">
+                <p className="text-gray-600 text-sm line-clamp-3 h-16">
+                  {group.description}
+                </p>
+              </div>
 
               {/* Stats */}
               <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
@@ -217,4 +219,4 @@ function GroupsPage() {
   )
 }
 
-export default GroupsPage 
+export default GroupsPage

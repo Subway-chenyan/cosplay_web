@@ -43,7 +43,7 @@ function SearchBar({ value, onChange, onClear, onSearch, placeholder = "搜索..
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-16 top-3.5 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-20 top-3.5 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="清除搜索"
           >
             <X className="h-4 w-4" />
@@ -66,4 +66,4 @@ function SearchBar({ value, onChange, onClear, onSearch, placeholder = "搜索..
   )
 }
 
-export default SearchBar 
+export default SearchBar
