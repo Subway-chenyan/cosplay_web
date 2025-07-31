@@ -1,10 +1,12 @@
 import { api } from './api'
-import { Group, PaginatedResponse } from '../types'
+import { Group, PaginatedResponse, ProvinceStats, CityStats } from '../types'
 
 interface GroupQueryParams {
   page?: number
   page_size?: number
   search?: string
+  province?: string
+  city?: string
   is_active?: boolean
   is_verified?: boolean
   ordering?: string
@@ -92,6 +94,27 @@ class GroupService {
   async leaveGroup(groupId: string) {
     return api.post(`/groups/${groupId}/leave/`)
   }
+
+  // 获取省份统计数据
+  async getProvinceStats(): Promise<{ province_stats: ProvinceStats[] }> {
+    return api.get<{ province_stats: ProvinceStats[] }>('/groups/by_province/')
+  }
+
+  // 获取城市统计数据
+  async getCityStats(province?: string): Promise<{ city_stats: CityStats[] }> {
+    const queryParams = province ? api.buildQueryParams({ province }) : ''
+    return api.get<{ city_stats: CityStats[] }>(`/groups/by_city/${queryParams}`)
+  }
+
+  // 按省份筛选社团
+  async getGroupsByProvince(province: string, params?: Omit<GroupQueryParams, 'province'>): Promise<PaginatedResponse<Group>> {
+    return this.getGroups({ ...params, province })
+  }
+
+  // 按城市筛选社团
+  async getGroupsByCity(city: string, params?: Omit<GroupQueryParams, 'city'>): Promise<PaginatedResponse<Group>> {
+    return this.getGroups({ ...params, city })
+  }
 }
 
-export const groupService = new GroupService() 
+export const groupService = new GroupService()

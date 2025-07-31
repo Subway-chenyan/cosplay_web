@@ -16,7 +16,9 @@ class Group(models.Model):
     
     # 基本信息
     founded_date = models.DateField(blank=True, null=True, verbose_name='成立时间')
-    location = models.CharField(max_length=100, blank=True, verbose_name='所在地')
+    province = models.CharField(max_length=50, blank=True, verbose_name='所在省份')
+    city = models.CharField(max_length=50, blank=True, verbose_name='所在城市')
+    location = models.CharField(max_length=100, blank=True, verbose_name='详细地址')
     website = models.URLField(blank=True, verbose_name='官方网站')
     email = models.EmailField(blank=True, verbose_name='联系邮箱')
     phone = models.CharField(max_length=20, blank=True, verbose_name='联系电话')
@@ -48,10 +50,12 @@ class Group(models.Model):
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['is_active']),
+            models.Index(fields=['province']),
+            models.Index(fields=['city']),
         ]
     
     def __str__(self):
         return self.name
     
     def get_absolute_url(self):
-        return f'/groups/{self.id}/' 
+        return f'/groups/{self.id}/'

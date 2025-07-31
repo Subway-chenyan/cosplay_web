@@ -23,6 +23,8 @@ export interface Group {
   description: string
   logo?: string
   founded_date?: string
+  province?: string
+  city?: string
   location?: string
   website?: string
   email?: string
@@ -36,6 +38,17 @@ export interface Group {
   award_count: number
   created_at: string
   updated_at: string
+}
+
+export interface ProvinceStats {
+  province: string
+  count: number
+}
+
+export interface CityStats {
+  province: string
+  city: string
+  count: number
 }
 
 export interface Competition {
@@ -107,4 +120,4 @@ export interface PaginatedResponse<T> {
   next?: string
   previous?: string
   results: T[]
-} 
+}

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from django.db import transaction
+from django.db.models import Count
 from .models import Group
 from .serializers import GroupSerializer
 from apps.videos.models import Video
@@ -17,8 +18,8 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.filter(is_active=True)
     serializer_class = GroupSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['name', 'location', 'description']
-    filterset_fields = []
+    search_fields = ['name', 'province', 'city', 'location', 'description']
+    filterset_fields = ['province', 'city', 'is_active']
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -94,4 +95,56 @@ class GroupViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({
                 'error': f'更新社团统计信息失败: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=False, methods=['get'])
+    def by_province(self, request):
+        """
+        按省份统计社团数量
+        """
+        try:
+            province_stats = Group.objects.filter(is_active=True).exclude(
+                province__isnull=True
+            ).exclude(
+                province__exact=''
+            ).values('province').annotate(
+                count=Count('id')
+            ).order_by('-count')
+            
+            return Response({
+                'province_stats': list(province_stats)
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': f'获取省份统计失败: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=False, methods=['get'])
+    def by_city(self, request):
+        """
+        按城市统计社团数量
+        """
+        try:
+            province = request.query_params.get('province', None)
+            queryset = Group.objects.filter(is_active=True).exclude(
+                city__isnull=True
+            ).exclude(
+                city__exact=''
+            )
+            
+            if province:
+                queryset = queryset.filter(province=province)
+            
+            city_stats = queryset.values('province', 'city').annotate(
+                count=Count('id')
+            ).order_by('province', '-count')
+            
+            return Response({
+                'city_stats': list(city_stats)
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': f'获取城市统计失败: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
