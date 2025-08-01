@@ -47,10 +47,10 @@ python generate_template.py
 #### 可选字段
 - `description`: 视频描述
 - `thumbnail`: 缩略图链接
-- `competition_year`: 比赛年份
+- `year`: 视频年份 (视频基础属性)
 - `group_name`: 所属社团名称
 - `competition_name`: 所属比赛名称
-- `tags`: 标签 (格式: `标签名:分类,标签名:分类`)
+- `tags`: 标签 (格式: `标签名:分类,标签名:分类`，分类仅支持：IP、风格、其他)
 
 #### 扩展字段
 当指定的社团、比赛不存在时，可填写相应的扩展字段来创建新的实体:
@@ -58,7 +58,9 @@ python generate_template.py
 **社团扩展字段**:
 - `group_description`: 社团描述
 - `group_founded_date`: 成立时间 (格式: YYYY-MM-DD)
-- `group_location`: 所在地
+- `group_province`: 所在省份
+- `group_city`: 所在城市
+- `group_location`: 详细地址
 - `group_website`: 官方网站
 - `group_email`: 联系邮箱
 - `group_phone`: 联系电话
@@ -103,16 +105,16 @@ python import_data.py data.xlsx test
 标签字段支持多个标签，格式为: `标签名:分类,标签名:分类`
 
 **支持的分类**:
-- 游戏IP
-- 动漫IP  
-- 年份
-- 地区
+- IP (包括游戏IP、动漫IP等)
+- 风格 (如古风、现代、甜美、帅气等)
 - 其他
 
 **示例**:
 ```
-初音未来:游戏IP,2024:年份,北京:地区
+初音未来:IP,甜美:风格,测试标签:其他
 ```
+
+**注意**: 年份现在是视频的基础属性，不再通过标签关联，请使用 `year` 字段。视频的地区信息将自动从关联的社团地区获取。
 
 ### 🏆 多奖项格式说明
 
@@ -138,7 +140,8 @@ python import_data.py data.xlsx test
 🔄 处理第2行...
 ✅ 创建新社团: 示例社团A
 ✅ 创建新比赛: 全国Cosplay大赛  
-✅ 创建新标签: 初音未来 (游戏IP)
+✅ 创建新标签: 初音未来 (IP)
+✅ 创建新标签: 甜美 (风格)
 ✅ 创建视频: 示例视频1 (BV1234567890)
 ✅ 创建新奖项: 全国Cosplay大赛 - 最佳团体奖
 ✅ 创建获奖记录: 示例视频1 - 最佳团体奖 (2024)
@@ -146,7 +149,6 @@ python import_data.py data.xlsx test
 ==================================================
 📈 导入完成!
 ✅ 成功: 2 条
-❌ 失败: 0 条
 ```
 
 ## 错误处理
@@ -200,4 +202,4 @@ A: 检查错误信息，修正Excel数据后重新导入
 A: 目前不支持更新，需要先删除再重新导入
 
 **Q: 支持哪些Excel格式？**  
-A: 支持 .xlsx 和 .xls 格式 
+A: 支持 .xlsx 和 .xls 格式

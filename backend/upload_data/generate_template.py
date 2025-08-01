@@ -22,17 +22,19 @@ def generate_template():
         # 视频扩展信息
         'description',     # 描述
         'thumbnail',       # 缩略图链接
-        'competition_year', # 比赛年份
+        'year',           # 视频年份
         
         # 关联实体名称
         'group_name',       # 社团名称
         'competition_name', # 比赛名称
-        'tags',            # 标签 (格式: 标签名:分类,标签名:分类)
+        'tags',            # 标签 (格式: 标签名:分类,标签名:分类，分类仅支持：IP、风格、其他)
         
         # 社团扩展信息 (当社团不存在时用于创建)
         'group_description',  # 社团描述
         'group_founded_date', # 成立时间 (格式: YYYY-MM-DD)
-        'group_location',     # 所在地
+        'group_province',     # 省份
+        'group_city',        # 城市
+        'group_location',     # 详细地址
         'group_website',      # 官方网站
         'group_email',        # 联系邮箱
         'group_phone',        # 联系电话
@@ -58,13 +60,15 @@ def generate_template():
         'url': ['https://www.bilibili.com/video/BV1234567890', 'https://www.bilibili.com/video/BV0987654321'],
         'description': ['这是一个示例视频描述', ''],
         'thumbnail': ['https://example.com/thumb1.jpg', ''],
-        'competition_year': [2024, 2023],
+        'year': [2024, 2023],
         'group_name': ['示例社团A', '示例社团B'],
         'competition_name': ['全国Cosplay大赛', 'Anime Expo'],
-        'tags': ['初音未来:IP,2024:年份', '东方Project:IP'],
+        'tags': ['初音未来:IP,甜美:风格', '东方Project:IP,古风:风格'],
         'group_description': ['这是一个专业的Cosplay社团', ''],
         'group_founded_date': ['2020-01-01', ''],
-        'group_location': ['北京', '上海'],
+        'group_province': ['北京市', '上海市'],
+        'group_city': ['北京市', '上海市'],
+        'group_location': ['朝阳区CBD', '浦东新区'],
         'group_website': ['https://example-group-a.com', ''],
         'group_email': ['contact@group-a.com', ''],
         'group_phone': ['13800138000', ''],
@@ -98,9 +102,9 @@ def generate_template():
             '字段名': columns,
             '是否必需': [
                 '是', '是', '是',  # bv_number, title, url
-                '否', '否', '否',  # description, thumbnail, competition_year
+                '否', '否', '否',  # description, thumbnail, year
                 '否', '否', '否',  # group_name, competition_name, tags
-                '否', '否', '否', '否', '否', '否', '否', '否', '否', '否',  # group扩展字段
+                '否', '否', '否', '否', '否', '否', '否', '否', '否', '否', '否', '否',  # group扩展字段
                 '否', '否',  # competition扩展字段
                 '否', '否', '否'   # award字段（支持多个）
             ],
@@ -110,13 +114,15 @@ def generate_template():
                 '视频链接',
                 '视频描述',
                 '缩略图链接',
-                '比赛年份',
+                '视频年份',
                 '所属社团名称，不存在则自动创建',
                 '所属比赛名称，不存在则自动创建',
-                '标签，格式：标签名:分类,标签名:分类',
+                '标签，格式：标签名:分类,标签名:分类，分类仅支持：IP、风格、其他',
                 '社团描述(新建社团时使用)',
                 '社团成立时间，格式：YYYY-MM-DD',
-                '社团所在地',
+                '社团所在省份',
+                '社团所在城市',
+                '社团详细地址',
                 '社团官网',
                 '社团邮箱',
                 '社团电话',
@@ -147,4 +153,4 @@ def generate_template():
     return template_path
 
 if __name__ == '__main__':
-    generate_template() 
+    generate_template()

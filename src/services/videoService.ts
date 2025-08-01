@@ -7,7 +7,7 @@ interface VideoQueryParams {
   search?: string
   groups?: string[]
   competitions?: string[]
-  competition_year?: number
+  year?: number
   tags?: string[]
   ordering?: string
 }
@@ -62,7 +62,7 @@ class VideoService {
       search: query,
       groups: filters?.groups,
       competitions: filters?.competitions,
-      competition_year: filters?.year,
+      year: filters?.year,
       tags: filters?.tags,
     }
     return this.getVideos(params)
@@ -93,7 +93,7 @@ class VideoService {
     }
     
     if (year) {
-      params.competition_year = year
+      params.year = year
     }
     
     return this.getVideos(params)
@@ -166,4 +166,4 @@ class VideoService {
   }
 }
 
-export const videoService = new VideoService() 
+export const videoService = new VideoService()

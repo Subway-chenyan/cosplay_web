@@ -6,14 +6,12 @@ export interface Video {
   url: string
   thumbnail: string
   year?: number
-  region?: string
   uploaded_by?: string
   uploaded_by_username?: string
   group?: string
   group_name?: string
   competition?: string
   competition_name?: string
-  competition_year?: number
   created_at: string
   updated_at: string
   tags: Tag[]
@@ -88,7 +86,6 @@ export interface User {
 export interface VideoFilters {
   tags: string[]
   year?: number
-  region?: string
   search?: string
 }
 

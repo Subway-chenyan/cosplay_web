@@ -62,14 +62,14 @@ function CompetitionDetailPage() {
 
   // 获取所有年份
   const availableYears = [...new Set(competitionVideos
-    .map(video => video.competition_year)
+    .map(video => video.year)
     .filter(year => year !== null && year !== undefined)
   )].sort((a, b) => b - a) // 按年份倒序排列
 
   // 根据筛选条件获取视频
   const getFilteredVideos = () => {
     if (viewMode === 'year' && selectedYear) {
-      return competitionVideos.filter(video => video.competition_year === selectedYear)
+      return competitionVideos.filter(video => video.year === selectedYear)
     } else if (viewMode === 'award' && selectedAward) {
       return competitionVideos.filter(video => {
         return awardRecords.some(record => 
@@ -406,11 +406,11 @@ function CompetitionDetailPage() {
                           </span>
                         </div>
                         {/* 年份标识 */}
-                        {video.competition_year && (
-                          <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white rounded px-2 py-1 text-xs">
-                            {video.competition_year}年
-                          </div>
-                        )}
+                    {video.year && (
+                      <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white rounded px-2 py-1 text-xs">
+                        {video.year}年
+                      </div>
+                    )}
                       </div>
                     ))}
                   </div>
@@ -450,9 +450,9 @@ function CompetitionDetailPage() {
                     onClick={() => handleVideoClick(video.id)}
                   />
                   {/* 年份标识 */}
-                  {video.competition_year && (
+                  {video.year && (
                     <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white rounded px-2 py-1 text-xs">
-                      {video.competition_year}年
+                      {video.year}年
                     </div>
                   )}
                 </div>
@@ -491,7 +491,7 @@ function CompetitionDetailPage() {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availableYears.map(year => {
-                const yearVideos = competitionVideos.filter(v => v.competition_year === year)
+                const yearVideos = competitionVideos.filter(v => v.year === year)
                 const yearAwardedVideos = yearVideos.filter(video => {
                   return awardRecords.some(record => record.video === video.id)
                 })
@@ -523,4 +523,4 @@ function CompetitionDetailPage() {
   )
 }
 
-export default CompetitionDetailPage 
+export default CompetitionDetailPage

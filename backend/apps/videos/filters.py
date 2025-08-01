@@ -14,7 +14,7 @@ class VideoFilter(django_filters.FilterSet):
     # 关联筛选
     groups = django_filters.CharFilter(field_name='group__id', method='filter_by_groups')
     competitions = django_filters.CharFilter(field_name='competition__id', method='filter_by_competitions')
-    competition_year = django_filters.NumberFilter(field_name='competition_year')
+
     tags = django_filters.CharFilter(field_name='tags__id', method='filter_by_tags')
 
     def filter_by_groups(self, queryset, name, value):
@@ -42,5 +42,5 @@ class VideoFilter(django_filters.FilterSet):
         model = Video
         fields = {
             'competition': ['exact'],
-            'competition_year': ['exact', 'gte', 'lte'],
-        } 
+            'year': ['exact', 'gte', 'lte'],
+        }

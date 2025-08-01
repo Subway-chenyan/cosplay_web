@@ -49,12 +49,29 @@ class DataImporter:
             return None
             
         try:
+            # 从地区字段中提取省份和城市
+            location = row.get('group_location', '')
+            province = row.get('group_province', '')
+            city = row.get('group_city', '')
+            
+            # 如果没有提供省份和城市，尝试从location中提取
+            if location and not (province and city):
+                # 简单的分割逻辑，假设格式为"省份 城市 详细地址"
+                parts = location.split()
+                if len(parts) >= 2:
+                    if not province:
+                        province = parts[0]
+                    if not city:
+                        city = parts[1]
+            
             group, created = Group.objects.get_or_create(
                 name=group_name,
                 defaults={
                     'description': row.get('group_description', ''),
                     'founded_date': self.parse_date(row.get('group_founded_date')),
-                    'location': row.get('group_location', ''),
+                    'province': province,
+                    'city': city,
+                    'location': location,
                     'website': row.get('group_website', ''),
                     'email': row.get('group_email', ''),
                     'phone': row.get('group_phone', ''),
@@ -126,11 +143,19 @@ class DataImporter:
             # 解析标签字符串: "标签名:分类,标签名:分类"
             tag_items = [item.strip() for item in str(tags_str).split(',') if item.strip()]
             
+            # 允许的标签分类
+            allowed_categories = ['IP', '风格', '其他']
+            
             for tag_item in tag_items:
                 if ':' in tag_item:
                     tag_name, tag_category = tag_item.split(':', 1)
                     tag_name = tag_name.strip()
                     tag_category = tag_category.strip()
+                    
+                    # 验证标签分类
+                    if tag_category not in allowed_categories:
+                        print(f"⚠️ 跳过无效标签分类: {tag_category}，仅支持: {', '.join(allowed_categories)}")
+                        continue
                 else:
                     tag_name = tag_item.strip()
                     tag_category = '其他'
@@ -221,8 +246,8 @@ class DataImporter:
             
             # 如果还是没有有效年份，使用默认年份
             if year is None:
-                if video.competition_year:
-                    year = video.competition_year
+                if video.year:
+                    year = video.year
                 else:
                     from datetime import datetime
                     year = datetime.now().year
@@ -300,7 +325,7 @@ class DataImporter:
                 thumbnail=row.get('thumbnail', ''),
                 group=group,
                 competition=competition,
-                competition_year=int(row['competition_year']) if row.get('competition_year') else None
+                year=int(row['year']) if row.get('year') else None
             )
             
             print(f"✅ 创建视频: {title} ({bv_number})")
@@ -376,4 +401,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main() 
+    main()

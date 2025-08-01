@@ -20,7 +20,6 @@ class Video(models.Model):
     
     # 基础属性
     year = models.IntegerField(blank=True, null=True, verbose_name='年份')
-    region = models.CharField(max_length=50, blank=True, verbose_name='地区')
 
     # 关联信息
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
@@ -31,7 +30,6 @@ class Video(models.Model):
                                  related_name='videos', verbose_name='标签')
     competition = models.ForeignKey('competitions.Competition', on_delete=models.SET_NULL, 
                                    null=True, blank=True, related_name='videos', verbose_name='所属比赛')
-    competition_year = models.IntegerField(blank=True, null=True, verbose_name='比赛年份')
 
     # 时间戳
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
@@ -45,9 +43,7 @@ class Video(models.Model):
             models.Index(fields=['bv_number']),
             models.Index(fields=['group']),
             models.Index(fields=['competition']),
-            models.Index(fields=['competition_year']),
             models.Index(fields=['year']),
-            models.Index(fields=['region']),
         ]
 
     def __str__(self):
@@ -85,8 +81,8 @@ def video_saved(sender, instance, created, **kwargs):
                 old_instance = Video.objects.get(pk=instance.pk)
                 old_group = old_instance.group
                 new_group = instance.group
-                old_competition_year = old_instance.competition_year
-                new_competition_year = instance.competition_year
+                old_year = old_instance.year
+                new_year = instance.year
                 
                 # 如果社团发生了变化
                 if old_group != new_group:
@@ -101,11 +97,11 @@ def video_saved(sender, instance, created, **kwargs):
                     update_group_video_count(new_group)
                 
                 # 如果年份发生变化，需要处理标签关联
-                if old_competition_year != new_competition_year:
+                if old_year != new_year:
                     # 移除旧的年份标签关联
-                    if old_competition_year:
+                    if old_year:
                         try:
-                            old_year_tag = Tag.objects.get(name=str(old_competition_year), category='年份')
+                            old_year_tag = Tag.objects.get(name=str(old_year), category='年份')
                             VideoTag.objects.filter(video=instance, tag=old_year_tag).delete()
                             # 减少旧标签的使用次数
                             old_year_tag.usage_count = max(0, old_year_tag.usage_count - 1)
@@ -114,8 +110,8 @@ def video_saved(sender, instance, created, **kwargs):
                             pass
                     
                     # 添加新的年份标签关联
-                    if new_competition_year:
-                        year_tag = create_or_get_tag(str(new_competition_year), '年份')
+                    if new_year:
+                        year_tag = create_or_get_tag(str(new_year), '年份')
                         VideoTag.objects.get_or_create(video=instance, tag=year_tag)
                 
                 # 如果社团的location发生变化，需要处理地区标签关联
@@ -158,9 +154,9 @@ def video_deleted(sender, instance, **kwargs):
             pass
     
     # 处理年份标签
-    if instance.competition_year:
+    if instance.year:
         try:
-            year_tag = Tag.objects.get(name=str(instance.competition_year), category='年份')
+            year_tag = Tag.objects.get(name=str(instance.year), category='年份')
             year_tag.usage_count = max(0, year_tag.usage_count - 1)
             year_tag.save(update_fields=['usage_count'])
         except Tag.DoesNotExist:

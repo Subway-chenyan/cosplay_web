@@ -324,7 +324,7 @@ class Command(BaseCommand):
                 'description': '历时3个月制作的原神璃月篇大型舞台剧，还原度极高的服装道具，精彩的剧情演绎。包含钟离、甘雨、胡桃等角色的精彩表演。',
                 'url': 'https://www.bilibili.com/video/BV1Uy3vzbEEo/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail.jpg',
-                'competition_year': 2023,
+                'year': 2023,
                 'competition_name': 'ChinaJoy Cosplay嘉年华',
             },
             {
@@ -333,7 +333,7 @@ class Command(BaseCommand):
                 'description': '次元工作室出品，特效制作精良，服装华丽，表演震撼。琪亚娜、芽衣、布洛妮娅等角色的精彩演绎。',
                 'url': 'https://www.bilibili.com/video/BV2Xy4wzaFFp/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail2.jpg',
-                'competition_year': 2023,
+                'year': 2023,
                 'competition_name': 'ChinaJoy Cosplay嘉年华',
             },
             {
@@ -342,7 +342,7 @@ class Command(BaseCommand):
                 'description': '梦境剧团倾力打造，大学生cosplay社团的用心之作。阿米娅、陈、德克萨斯等角色的精彩表演。',
                 'url': 'https://www.bilibili.com/video/BV3Zx5yaGGq/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail3.jpg',
-                'competition_year': 2024,
+                'year': 2024,
                 'competition_name': '国漫cosplay大赛',
             },
             {
@@ -351,7 +351,7 @@ class Command(BaseCommand):
                 'description': '致敬炎柱煉獄杏寿郎的个人cosplay作品，燃烧的意志永不熄灭。服装制作精良，表演感人至深。',
                 'url': 'https://www.bilibili.com/video/BV4Ay6zaHHr/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail4.jpg',
-                'competition_year': 2023,
+                'year': 2023,
                 'competition_name': '次元文化节',
             },
             {
@@ -360,7 +360,7 @@ class Command(BaseCommand):
                 'description': '唯美的貂蝉cosplay，梦幻的舞蹈表演。服装华丽，舞蹈优美，完美还原游戏中的角色。',
                 'url': 'https://www.bilibili.com/video/BV5Bz7zaIIs/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail5.jpg',
-                'competition_year': 2024,
+                'year': 2024,
                 'competition_name': '高校cosplay联赛',
             },
             {
@@ -369,7 +369,7 @@ class Command(BaseCommand):
                 'description': 'LOL阿狸皮肤cosplay，精美的服装制作和化妆技术。完美还原游戏中的角色形象。',
                 'url': 'https://www.bilibili.com/video/BV6Ca8zaJJt/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail6.jpg',
-                'competition_year': 2024,
+                'year': 2024,
                 'competition_name': 'ChinaJoy Cosplay嘉年华',
             },
             {
@@ -378,7 +378,7 @@ class Command(BaseCommand):
                 'description': '火影忍者经典对决场景的舞台剧演绎，特效制作精良，表演震撼。',
                 'url': 'https://www.bilibili.com/video/BV7Dd9zaKKu/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail7.jpg',
-                'competition_year': 2024,
+                'year': 2024,
                 'competition_name': '次元文化节',
             },
             {
@@ -387,7 +387,7 @@ class Command(BaseCommand):
                 'description': '海贼王空岛篇经典战斗场景的舞台剧演绎，服装道具制作精良。',
                 'url': 'https://www.bilibili.com/video/BV8Ee0zaLLv/',
                 'thumbnail': 'https://i0.hdslb.com/bfs/archive/thumbnail8.jpg',
-                'competition_year': 2024,
+                'year': 2024,
                 'competition_name': '国漫cosplay大赛',
             },
         ]
@@ -464,7 +464,7 @@ class Command(BaseCommand):
                         award=award,
                         video=video,
                         group=video.group,
-                        year=video.competition_year or 2024,
+                        year=video.year or 2024,
                         description=f'{video.title} 获得 {award.name}'
                     )
 
@@ -477,4 +477,4 @@ class Command(BaseCommand):
             group.save()
 
         # 更新标签的使用次数（已在create_relationships中处理）
-        pass 
+        pass

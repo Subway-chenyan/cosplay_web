@@ -148,15 +148,15 @@ function VideoCard({ video, onClick }: VideoCardProps) {
               <Trophy className="w-4 h-4 flex-shrink-0" />
               <span className="text-sm truncate">
                 {video.competition_name}
-                {/* {video.competition_year && ` (${video.competition_year})`} */}
+                {video.year && ` (${video.year})`}
               </span>
             </div>
           )}
           
-          {/* 创建时间 */}
+          {/* 年份 */}
           <div className="flex items-center space-x-2 text-gray-600">
             <Calendar className="w-4 h-4 flex-shrink-0" />
-            <span className="text-sm">{(video.competition_year)}</span>
+            <span className="text-sm">{video.year}</span>
           </div>
         </div>
       </div>
@@ -164,4 +164,4 @@ function VideoCard({ video, onClick }: VideoCardProps) {
   )
 }
 
-export default VideoCard 
+export default VideoCard

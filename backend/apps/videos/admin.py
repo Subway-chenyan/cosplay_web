@@ -15,7 +15,7 @@ class AwardRecordInlineFormSet(forms.models.BaseInlineFormSet):
         instance = super().save_new(form, commit=False)
         if hasattr(self, 'video_instance') and self.video_instance:
             instance.group = self.video_instance.group
-            instance.year = self.video_instance.competition_year or 2024  # 提供默认值
+            instance.year = self.video_instance.year or 2024  # 提供默认值
         else:
             # 如果视频对象不存在，设置默认值
             instance.year = 2024
@@ -46,8 +46,8 @@ class VideoAdmin(admin.ModelAdmin):
     """
     视频管理后台
     """
-    list_display = ['title', 'bv_number', 'group', 'get_tags', 'competition', 'competition_year', 'get_awards', 'created_at']
-    list_filter = ['group', 'tags', 'competition', 'competition_year', 'created_at']
+    list_display = ['bv_number', 'title', 'group', 'competition', 'year', 'uploaded_by', 'created_at']
+    list_filter = ['group', 'competition', 'year', 'uploaded_by', 'created_at']
     search_fields = ['title', 'description', 'bv_number', 'group__name', 'tags__name', 'competition__name']
     ordering = ['-created_at']
     filter_horizontal = ['tags']
@@ -57,8 +57,8 @@ class VideoAdmin(admin.ModelAdmin):
         ('基本信息', {
             'fields': ('bv_number', 'title', 'description', 'url', 'thumbnail')
         }),
-        ('关联信息', {
-            'fields': ('uploaded_by', 'group', 'competition', 'competition_year')
+        ('Competition Info', {
+            'fields': ('competition', 'year')
         }),
     )
     
@@ -80,4 +80,4 @@ class VideoAdmin(admin.ModelAdmin):
         """保存模型时的额外处理"""
         if not change and not obj.uploaded_by:
             obj.uploaded_by = request.user
-        super().save_model(request, obj, form, change) 
+        super().save_model(request, obj, form, change)

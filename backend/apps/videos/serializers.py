@@ -34,7 +34,7 @@ class VideoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'bv_number', 'title', 'description', 'url', 'thumbnail',
             'uploaded_by', 'uploaded_by_username', 'group', 'group_name', 
-            'competition', 'competition_name', 'competition_year',
+            'competition', 'competition_name', 'year',
             'tags', 'tag_ids', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id']
@@ -53,7 +53,7 @@ class VideoListSerializer(serializers.ModelSerializer):
         model = Video
         fields = [
             'id', 'bv_number', 'title', 'thumbnail', 'uploaded_by_username', 'group', 'group_name', 
-            'competition', 'competition_name', 'competition_year', 'tags', 'created_at'
+            'competition', 'competition_name', 'year', 'tags', 'created_at'
         ]
 
 
@@ -118,4 +118,4 @@ class ImportResultSerializer(serializers.Serializer):
         required=False
     )
     created_at = serializers.DateTimeField()
-    completed_at = serializers.DateTimeField(required=False) 
+    completed_at = serializers.DateTimeField(required=False)

@@ -48,7 +48,7 @@ export const fetchVideos = createAsyncThunk(
       search: params?.searchQuery,
       groups: params?.filters?.groups,
       competitions: params?.filters?.competitions,
-      competition_year: params?.filters?.year,
+      year: params?.filters?.year,
       tags: params?.filters?.tags,
     })
     return response
