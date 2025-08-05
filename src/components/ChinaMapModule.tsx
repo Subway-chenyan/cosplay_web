@@ -79,7 +79,7 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
         echarts.registerMap('china', geoData);
         
         const provinceData = Object.entries(clubData).map(([province, data]) => ({
-          name: provinceNameMap[province] || province,
+          name: province, // API返回的已经是完整省份名称，直接使用
           value: data.count,
           clubs: data.clubs
         }));
