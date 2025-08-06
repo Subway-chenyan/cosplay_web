@@ -26,6 +26,8 @@ const initialState: VideosState = {
   error: null,
   filters: {
     tags: [],
+    styleTag: undefined,
+    ipTag: undefined,
   },
   searchQuery: '',
   pagination: {
@@ -50,6 +52,8 @@ export const fetchVideos = createAsyncThunk(
       competitions: params?.filters?.competitions,
       year: params?.filters?.year,
       tags: params?.filters?.tags,
+      styleTag: params?.filters?.styleTag,
+      ipTag: params?.filters?.ipTag,
     })
     return response
   }
@@ -58,9 +62,20 @@ export const fetchVideos = createAsyncThunk(
 // 获取比赛视频
 export const fetchCompetitionVideos = createAsyncThunk(
   'videos/fetchCompetitionVideos',
-  async ({ competitionId, year }: { competitionId: string; year?: number }) => {
-    const response = await videoService.getCompetitionVideos(competitionId, year)
-    return response
+  async ({ competitionId, year, page = 1, append = false }: { 
+    competitionId: string; 
+    year?: number; 
+    page?: number; 
+    append?: boolean 
+  }) => {
+    const response = await videoService.getVideos({
+      competitions: [competitionId],
+      year: year,
+      page: page,
+      page_size: 50,
+      ordering: '-created_at'
+    })
+    return { ...response, append }
   }
 )
 
@@ -121,6 +136,8 @@ const videosSlice = createSlice({
     clearFilters: (state) => {
       state.filters = {
         tags: [],
+        styleTag: undefined,
+        ipTag: undefined,
       }
     },
     setSearchQuery: (state, action: PayloadAction<string>) => {
@@ -181,6 +198,28 @@ const videosSlice = createSlice({
       .addCase(searchVideos.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || '搜索视频失败'
+      })
+      // 处理比赛视频
+      .addCase(fetchCompetitionVideos.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchCompetitionVideos.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload.append) {
+          state.videos = [...state.videos, ...action.payload.results]
+        } else {
+          state.videos = action.payload.results
+        }
+        state.pagination = {
+          count: action.payload.count,
+          next: action.payload.next,
+          previous: action.payload.previous,
+        }
+      })
+      .addCase(fetchCompetitionVideos.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || '获取比赛视频失败'
       })
       // 处理其他异步操作（最新、热门等）
       .addCase(fetchLatestVideos.fulfilled, (state, action) => {

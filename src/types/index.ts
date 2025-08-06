@@ -85,6 +85,10 @@ export interface User {
 
 export interface VideoFilters {
   tags: string[]
+  styleTag?: string // 风格标签，单选
+  ipTag?: string // IP标签，单选
+  groups?: string[]
+  competitions?: string[]
   year?: number
   search?: string
 }

@@ -16,6 +16,8 @@ class VideoFilter(django_filters.FilterSet):
     competitions = django_filters.CharFilter(field_name='competition__id', method='filter_by_competitions')
 
     tags = django_filters.CharFilter(field_name='tags__id', method='filter_by_tags')
+    styleTag = django_filters.CharFilter(method='filter_by_style_tag')
+    ipTag = django_filters.CharFilter(method='filter_by_ip_tag')
 
     def filter_by_groups(self, queryset, name, value):
         """按社团ID筛选"""
@@ -32,10 +34,25 @@ class VideoFilter(django_filters.FilterSet):
         return queryset
     
     def filter_by_tags(self, queryset, name, value):
-        """按标签ID筛选"""
+        """按标签ID筛选（AND逻辑）"""
         if value:
             tag_ids = value.split(',')
-            return queryset.filter(tags__id__in=tag_ids).distinct()
+            # 使用AND逻辑：视频必须包含所有指定的标签
+            for tag_id in tag_ids:
+                queryset = queryset.filter(tags__id=tag_id)
+            return queryset.distinct()
+        return queryset
+    
+    def filter_by_style_tag(self, queryset, name, value):
+        """按风格标签筛选（单选）"""
+        if value:
+            return queryset.filter(tags__id=value, tags__category='风格').distinct()
+        return queryset
+    
+    def filter_by_ip_tag(self, queryset, name, value):
+        """按IP标签筛选（单选）"""
+        if value:
+            return queryset.filter(tags__id=value, tags__category='IP').distinct()
         return queryset
     
     class Meta:

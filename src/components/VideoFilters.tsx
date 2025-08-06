@@ -4,7 +4,7 @@ import { RootState, AppDispatch } from '../store/store'
 import { setFilters, clearFilters, setCurrentPage } from '../store/slices/videosSlice'
 import { fetchTags } from '../store/slices/tagsSlice'
 import { VideoFilters as VideoFiltersType } from '../types'
-import { Filter, X } from 'lucide-react'
+import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 function VideoFilters() {
   const dispatch = useDispatch<AppDispatch>()
@@ -13,27 +13,60 @@ function VideoFilters() {
   
   const [isOpen, setIsOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [expandedCategories, setExpandedCategories] = useState<{[key: string]: boolean}>({
+    'IP': false,
+    '风格': false,
+    '其他': false
+  })
 
   useEffect(() => {
     dispatch(fetchTags())
   }, [dispatch])
 
-  const handleFilterChange = useCallback((filterType: keyof VideoFiltersType, value: string) => {
-    if (isProcessing) return // 防止重复点击
+  const handleTagClick = useCallback((tagId: string, category: string) => {
+    if (isProcessing) return
     
     setIsProcessing(true)
     
-    const currentValues = filters[filterType] as string[]
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value]
+    let newFilters: Partial<VideoFiltersType> = {}
     
-    dispatch(setFilters({ [filterType]: newValues }))
-    dispatch(setCurrentPage(1)) // 重置到第一页
+    if (category === '风格') {
+      // 风格标签单选
+      newFilters.styleTag = filters.styleTag === tagId ? undefined : tagId
+    } else if (category === 'IP') {
+      // IP标签单选
+      newFilters.ipTag = filters.ipTag === tagId ? undefined : tagId
+    } else {
+      // 其他标签多选（AND逻辑）
+      const currentTags = filters.tags || []
+      const newTags = currentTags.includes(tagId)
+        ? currentTags.filter(t => t !== tagId)
+        : [...currentTags, tagId]
+      newFilters.tags = newTags
+    }
     
-    // 延迟重置处理状态，避免快速连续点击
+    dispatch(setFilters(newFilters))
+    dispatch(setCurrentPage(1))
+    
     setTimeout(() => setIsProcessing(false), 200)
   }, [dispatch, filters, isProcessing])
+
+  const toggleCategoryExpansion = useCallback((category: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }))
+  }, [])
+
+  const isTagSelected = useCallback((tagId: string, category: string) => {
+    if (category === '风格') {
+      return filters.styleTag === tagId
+    } else if (category === 'IP') {
+      return filters.ipTag === tagId
+    } else {
+      return filters.tags?.includes(tagId) || false
+    }
+  }, [filters])
 
   const handleClearFilters = useCallback(() => {
     if (isProcessing) return // 防止重复点击
@@ -46,7 +79,7 @@ function VideoFilters() {
     setTimeout(() => setIsProcessing(false), 200)
   }, [dispatch, isProcessing])
 
-  const hasActiveFilters = filters.tags.length > 0
+  const hasActiveFilters = filters.tags.length > 0 || filters.styleTag || filters.ipTag
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -87,28 +120,56 @@ function VideoFilters() {
           <h3 className="text-sm font-medium text-gray-700 mb-3">标签</h3>
           
           {/* 按分类分组显示标签 */}
-          {['IP', '风格'].map((category) => {
+          {['IP', '风格', '其他'].map((category) => {
             const categoryTags = tags.filter(tag => tag.category === category)
             if (categoryTags.length === 0) return null
             
+            const isExpanded = expandedCategories[category]
+            const maxVisibleTags = 6
+            const visibleTags = isExpanded ? categoryTags : categoryTags.slice(0, maxVisibleTags)
+            const hasMoreTags = categoryTags.length > maxVisibleTags
+            
             return (
               <div key={category} className="mb-4">
-                <h4 className="text-xs font-medium text-gray-500 mb-2">{category}</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-medium text-gray-500">
+                    {category}
+                    {(category === '风格' || category === 'IP') && (
+                      <span className="ml-1 text-xs text-gray-400">(单选)</span>
+                    )}
+                  </h4>
+                  {hasMoreTags && (
+                    <button
+                      onClick={() => toggleCategoryExpansion(category)}
+                      className="flex items-center text-xs text-primary-600 hover:text-primary-700 transition-colors"
+                    >
+                      {isExpanded ? (
+                        <>
+                          收起 <ChevronUp className="w-3 h-3 ml-1" />
+                        </>
+                      ) : (
+                        <>
+                          展开 <ChevronDown className="w-3 h-3 ml-1" />
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
-                  {categoryTags.map((tag) => (
+                  {visibleTags.map((tag) => (
                     <button
                       key={tag.id}
-                      onClick={() => handleFilterChange('tags', tag.id)}
+                      onClick={() => handleTagClick(tag.id, category)}
                       disabled={isProcessing}
                       className={`filter-chip transition-all duration-200 ${
-                        filters.tags.includes(tag.id) ? 'active' : ''
+                        isTagSelected(tag.id, category) ? 'active' : ''
                       } ${
                         isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
                       }`}
                       style={{
-                        backgroundColor: filters.tags.includes(tag.id) ? tag.color : 'transparent',
+                        backgroundColor: isTagSelected(tag.id, category) ? tag.color : 'transparent',
                         borderColor: tag.color,
-                        color: filters.tags.includes(tag.id) ? 'white' : tag.color,
+                        color: isTagSelected(tag.id, category) ? 'white' : tag.color,
                       }}
                     >
                       {tag.name}
@@ -127,8 +188,22 @@ function VideoFilters() {
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">
               当前筛选: 
-              <span className="ml-2">
-                {filters.tags.length > 0 && `标签 ${filters.tags.length}个`}
+              <span className="ml-2 space-x-2">
+                {filters.styleTag && (
+                  <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                    风格: {tags.find(t => t.id === filters.styleTag)?.name}
+                  </span>
+                )}
+                {filters.ipTag && (
+                  <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                    IP: {tags.find(t => t.id === filters.ipTag)?.name}
+                  </span>
+                )}
+                {filters.tags.length > 0 && (
+                  <span className="inline-block px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">
+                    其他标签: {filters.tags.length}个
+                  </span>
+                )}
               </span>
             </div>
             

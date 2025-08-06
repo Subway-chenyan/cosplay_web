@@ -9,6 +9,8 @@ interface VideoQueryParams {
   competitions?: string[]
   year?: number
   tags?: string[]
+  styleTag?: string
+  ipTag?: string
   ordering?: string
 }
 
@@ -30,6 +32,12 @@ class VideoService {
     }
     if (params?.tags && params.tags.length > 0) {
       queryParams.tags = params.tags
+    }
+    if (params?.styleTag) {
+      queryParams.styleTag = params.styleTag
+    }
+    if (params?.ipTag) {
+      queryParams.ipTag = params.ipTag
     }
     
     const queryString = api.buildQueryParams(queryParams)
