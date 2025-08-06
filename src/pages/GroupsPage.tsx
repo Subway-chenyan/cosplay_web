@@ -2,16 +2,16 @@ import { useEffect, useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchGroups, searchGroups } from '../store/slices/groupsSlice'
+import { fetchGroups, searchGroups, setCurrentPage } from '../store/slices/groupsSlice'
 import SearchBar from '../components/SearchBar'
 import ChinaMapModule from '../components/ChinaMapModule'
-import { Users, MapPin, Calendar, ExternalLink, CheckCircle, X } from 'lucide-react'
+import { Users, MapPin, Calendar, ExternalLink, CheckCircle, X, Loader } from 'lucide-react'
 import { Group } from '../types'
 
 function GroupsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { groups, loading, error } = useSelector((state: RootState) => state.groups)
+  const { groups, loading, error, pagination, currentPage } = useSelector((state: RootState) => state.groups)
   const [inputValue, setInputValue] = useState('')
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null)
   const [filteredGroups, setFilteredGroups] = useState<Group[]>([])
@@ -21,8 +21,10 @@ function GroupsPage() {
 
   useEffect(() => {
     console.log('GroupsPage - useEffect triggered')
-    dispatch(fetchGroups())
-  }, [dispatch])
+    if (groups.length === 0) {
+      dispatch(fetchGroups({ page: 1 }))
+    }
+  }, [dispatch, groups.length])
 
   const handleInputChange = useCallback((value: string) => {
     console.log('GroupsPage - handleInputChange:', value)
@@ -52,10 +54,17 @@ function GroupsPage() {
       console.log('GroupsPage - dispatching searchGroups')
       dispatch(searchGroups(inputValue))
     } else {
-      console.log('GroupsPage - dispatching fetchGroups')
-      dispatch(fetchGroups())
-    }
+        console.log('GroupsPage - dispatching fetchGroups')
+        dispatch(fetchGroups({ page: 1 }))
+      }
   }, [dispatch, inputValue])
+
+  const handleLoadMore = () => {
+    if (pagination.next && !loading) {
+      dispatch(setCurrentPage(currentPage + 1))
+      dispatch(fetchGroups({ page: currentPage + 1 }))
+    }
+  }
 
   const handleGroupClick = (groupId: string) => {
     navigate(`/group/${groupId}`)
@@ -266,6 +275,33 @@ function GroupsPage() {
           </div>
         )}
       </div>
+
+      {/* Load More Button */}
+      {pagination.next && !inputValue && (
+        <div className="text-center mt-8">
+          <button
+            onClick={handleLoadMore}
+            className="btn-primary"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin mr-2" />
+                加载中...
+              </>
+            ) : (
+              '加载更多社团'
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Total Count Display */}
+      {groups.length > 0 && (
+        <div className="text-center mt-4 text-sm text-gray-500">
+          已显示 {groups.length} / {pagination.count} 个社团
+        </div>
+      )}
     </div>
   )
 }

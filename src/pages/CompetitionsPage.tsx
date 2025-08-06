@@ -2,26 +2,33 @@ import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchCompetitions } from '../store/slices/competitionsSlice'
-import { Trophy, Calendar, Award, Users } from 'lucide-react'
+import { fetchCompetitions, setCurrentPage } from '../store/slices/competitionsSlice'
+import { Trophy, Calendar, Award, Users, Loader } from 'lucide-react'
 import { Competition } from '../types'
 
 function CompetitionsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { competitions, loading, error } = useSelector((state: RootState) => state.competitions)
+  const { competitions, loading, error, pagination, currentPage } = useSelector((state: RootState) => state.competitions)
 
   useEffect(() => {
-    dispatch(fetchCompetitions())
-  }, [dispatch])
+    if (competitions.length === 0) {
+      dispatch(fetchCompetitions({ page: 1 }))
+    }
+  }, [dispatch, competitions.length])
 
   const handleCompetitionClick = (competition: Competition) => {
-    navigate(`/competitions/${competition.id}`, {
-      state: { competition }
-    })
+    navigate(`/competition/${competition.id}`)
   }
 
-  if (loading) {
+  const handleLoadMore = () => {
+    if (pagination.next && !loading) {
+      dispatch(setCurrentPage(currentPage + 1))
+      dispatch(fetchCompetitions({ page: currentPage + 1 }))
+    }
+  }
+
+  if (loading && competitions.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
@@ -58,15 +65,7 @@ function CompetitionsPage() {
         </p>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
-      ) : error ? (
-        <div className="text-center py-12">
-          <p className="text-red-600">{error}</p>
-        </div>
-      ) : competitions && competitions.length > 0 ? (
+      {competitions && competitions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {competitions.map((competition) => (
             <div
@@ -121,8 +120,35 @@ function CompetitionsPage() {
           <p className="text-gray-600">暂无比赛数据</p>
         </div>
       )}
+
+      {/* Load More Button */}
+      {pagination.next && (
+        <div className="text-center mt-8">
+          <button
+            onClick={handleLoadMore}
+            className="btn-primary"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin mr-2" />
+                加载中...
+              </>
+            ) : (
+              '加载更多比赛'
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Total Count Display */}
+      {competitions.length > 0 && (
+        <div className="text-center mt-4 text-sm text-gray-500">
+          已显示 {competitions.length} / {pagination.count} 个比赛
+        </div>
+      )}
     </div>
   )
 }
 
-export default CompetitionsPage 
+export default CompetitionsPage

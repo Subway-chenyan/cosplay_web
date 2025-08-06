@@ -31,14 +31,15 @@ export const fetchCompetitions = createAsyncThunk(
     page?: number
     search?: string
     year?: number
+    append?: boolean
   }) => {
     const response = await competitionService.getCompetitions({
       page: params?.page || 1,
-      page_size: 12,
+      page_size: 50, // 增加每页数量
       search: params?.search,
       year: params?.year,
     })
-    return response
+    return { ...response, append: params?.append || (params?.page || 1) > 1 }
   }
 )
 
@@ -86,7 +87,13 @@ const competitionsSlice = createSlice({
       })
       .addCase(fetchCompetitions.fulfilled, (state, action) => {
         state.loading = false
-        state.competitions = action.payload.results
+        if (action.payload.append) {
+          // 追加模式：将新数据添加到现有数据中
+          state.competitions = [...state.competitions, ...action.payload.results]
+        } else {
+          // 替换模式：替换所有数据
+          state.competitions = action.payload.results
+        }
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
@@ -135,4 +142,4 @@ const competitionsSlice = createSlice({
 })
 
 export const { setCurrentPage } = competitionsSlice.actions
-export default competitionsSlice.reducer 
+export default competitionsSlice.reducer

@@ -9,7 +9,7 @@ import sys
 import django
 
 # 设置Django环境
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cosplay_backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cosplay_api.settings')
 django.setup()
 
 from apps.tags.models import Tag, VideoTag

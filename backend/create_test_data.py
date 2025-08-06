@@ -12,8 +12,26 @@ django.setup()
 
 from apps.groups.models import Group
 from django.contrib.auth import get_user_model
+from apps.tags.models import Tag
 
 User = get_user_model()
+
+def create_test_tags():
+    """创建测试标签数据"""
+    tags = [
+        {'name': '动作', 'category': '风格'},
+        {'name': '角色', 'category': '风格'},
+        {'name': '背景', 'category': '风格'},
+        {'name': '火影忍者', 'category': 'IP'},
+        {'name': '死神', 'category': 'IP'},
+        {'name': '海贼王', 'category': 'IP'},
+        {'name': '咒术回站', 'category': 'IP'},
+        {'name': '剑网三', 'category': 'IP'},
+        {'name': '星穹铁道', 'category': 'IP'},
+        {'name': '游戏', 'category': 'IP'},
+    ]
+    Tag.objects.bulk_create([Tag(**tag) for tag in tags])
+    print(f"创建了 {len(tags)} 个标签")
 
 def create_test_groups():
     """创建测试社团数据"""
@@ -187,4 +205,7 @@ def create_test_groups():
     print(f"数据库中现有 {Group.objects.count()} 个社团")
 
 if __name__ == '__main__':
-    create_test_groups()
+    # create_test_groups()
+    create_test_tags()
+
+

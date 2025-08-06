@@ -32,15 +32,17 @@ export const fetchGroups = createAsyncThunk(
     search?: string
     is_active?: boolean
     is_verified?: boolean
+    append?: boolean
   }) => {
+    console.log('groupsSlice - fetchGroups thunk called with params:', params)
     const response = await groupService.getGroups({
       page: params?.page || 1,
-      page_size: 12,
+      page_size: 50,
       search: params?.search,
       is_active: params?.is_active,
       is_verified: params?.is_verified,
     })
-    return response
+    return { ...response, append: params?.append || (params?.page || 1) > 1 }
   }
 )
 
@@ -99,7 +101,13 @@ const groupsSlice = createSlice({
       })
       .addCase(fetchGroups.fulfilled, (state, action) => {
         state.loading = false
-        state.groups = action.payload.results
+        if (action.payload.append) {
+          // 追加模式：将新数据添加到现有数据中
+          state.groups = [...state.groups, ...action.payload.results]
+        } else {
+          // 替换模式：替换所有数据
+          state.groups = action.payload.results
+        }
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
@@ -156,4 +164,4 @@ const groupsSlice = createSlice({
 })
 
 export const { setCurrentPage } = groupsSlice.actions
-export default groupsSlice.reducer 
+export default groupsSlice.reducer

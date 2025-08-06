@@ -1,9 +1,19 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { PaginatedResponse } from '../types'
 
+// 根据环境配置API基础URL
+const getBaseURL = () => {
+  // 在开发环境中使用Vite代理
+  if (import.meta.env.DEV) {
+    return '/api'
+  }
+  // 在生产环境中使用完整域名
+  return 'http://data.cosdrama.cn/api'
+}
+
 // 创建axios实例
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: getBaseURL(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -152,4 +162,4 @@ class ApiService {
 }
 
 export const api = new ApiService()
-export default axiosInstance 
+export default axiosInstance
