@@ -12,4 +12,6 @@ urlpatterns = [
     path('records/', views.AwardRecordViewSet.as_view({'get': 'list', 'post': 'create'}), name='awardrecord-list'),
     path('records/<uuid:pk>/', views.AwardRecordViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='awardrecord-detail'),
     path('records/by_competition/', views.AwardRecordViewSet.as_view({'get': 'by_competition'}), name='awardrecord-by-competition'),
-] 
+    path('<uuid:award_id>/videos/', views.AwardVideosView.as_view(), name='award-videos'),
+    path('<uuid:award_id>/years/<int:competition_year_id>/videos/', views.AwardVideosView.as_view(), name='award-year-videos'),
+]

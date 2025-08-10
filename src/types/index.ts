@@ -101,12 +101,21 @@ export interface Award {
   updated_at: string
 }
 
+export interface CompetitionYear {
+  id: string
+  competition: string
+  year: number
+  created_at: string
+  updated_at: string
+}
+
 export interface AwardRecord {
   id: string
   award: string
   video?: string
   group?: string
-  year: number
+  competition_year: string
+  competition_year_detail?: CompetitionYear
   description: string
   award_name?: string
   award_level?: string

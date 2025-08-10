@@ -58,19 +58,24 @@ export const fetchVideos = createAsyncThunk(
 // 获取比赛视频
 export const fetchCompetitionVideos = createAsyncThunk(
   'videos/fetchCompetitionVideos',
-  async ({ competitionId, year, page = 1, append = false }: { 
+  async ({ competitionId, year, page = 1, pageSize = 100, append = false }: { 
     competitionId: string; 
     year?: number; 
     page?: number; 
+    pageSize?: number;
     append?: boolean 
   }) => {
-    const response = await videoService.getVideos({
-      competitions: [competitionId],
-      year: year,
-      page: page,
-      page_size: 50,
-      ordering: '-created_at'
-    })
+    let response
+    if (year) {
+      response = await videoService.getCompetitionYearVideos(competitionId, year, page, pageSize)
+    } else {
+      response = await videoService.getVideos({
+        competitions: [competitionId],
+        page: page,
+        page_size: pageSize,
+        ordering: '-created_at'
+      })
+    }
     return { ...response, append }
   }
 )
@@ -109,6 +114,15 @@ export const searchVideos = createAsyncThunk(
   'videos/searchVideos',
   async ({ query, filters }: { query: string; filters?: VideoFilters }) => {
     const response = await videoService.searchVideos(query, filters)
+    return response
+  }
+)
+
+// 获取社团视频
+export const fetchGroupVideos = createAsyncThunk(
+  'videos/fetchGroupVideos',
+  async ({ groupId, page = 1 }: { groupId: string; page?: number }) => {
+    const response = await videoService.getGroupVideos(groupId, page, 12)
     return response
   }
 )
@@ -192,6 +206,42 @@ const videosSlice = createSlice({
       .addCase(searchVideos.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || '搜索视频失败'
+      })
+      // 处理比赛视频
+      .addCase(fetchCompetitionVideos.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchCompetitionVideos.fulfilled, (state, action) => {
+        state.loading = false
+        state.videos = action.payload.results
+        state.pagination = {
+          count: action.payload.count,
+          next: action.payload.next,
+          previous: action.payload.previous,
+        }
+      })
+      .addCase(fetchCompetitionVideos.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || '获取比赛视频失败'
+      })
+      // 处理社团视频
+      .addCase(fetchGroupVideos.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchGroupVideos.fulfilled, (state, action) => {
+        state.loading = false
+        state.videos = action.payload.results
+        state.pagination = {
+          count: action.payload.count,
+          next: action.payload.next,
+          previous: action.payload.previous,
+        }
+      })
+      .addCase(fetchGroupVideos.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || '获取社团视频失败'
       })
       // 处理其他异步操作（最新、热门等）
       .addCase(fetchLatestVideos.fulfilled, (state, action) => {

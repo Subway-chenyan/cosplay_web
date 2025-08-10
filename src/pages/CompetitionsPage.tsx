@@ -18,7 +18,7 @@ function CompetitionsPage() {
   }, [dispatch, competitions.length])
 
   const handleCompetitionClick = (competition: Competition) => {
-    navigate(`/competition/${competition.id}`)
+    navigate(`/competitions/${competition.id}`)
   }
 
   const handleLoadMore = () => {

@@ -312,6 +312,7 @@ from .serializers import (
 )
 from .filters import VideoFilter
 from .bulk_import import process_bulk_import, get_import_template
+from .pagination import OptimizedVideoPagination, LargeResultsSetPagination
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -323,8 +324,9 @@ class VideoViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = VideoFilter
     search_fields = ['title', 'description', 'bv_number']
-    ordering_fields = ['created_at']
+    ordering_fields = ['created_at', 'year', 'play_count', 'like_count']
     ordering = ['-created_at']
+    pagination_class = OptimizedVideoPagination
     
     def get_serializer_class(self):
         if self.action == 'list':
@@ -397,6 +399,89 @@ class VideoViewSet(viewsets.ModelViewSet):
         """
         查询导入任务状态
         """
+
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.AllowAny],
+        url_path='competition/(?P<competition_id>[^/.]+)/stats'
+    )
+    def competition_stats(self, request, competition_id=None):
+        """
+        获取比赛视频的统计信息，包括年份分布和总数
+        """
+        try:
+            videos = self.queryset.filter(competition_id=competition_id)
+            
+            # 年份统计
+            year_stats = videos.values('year').annotate(
+                count=models.Count('id')
+            ).order_by('year')
+            
+            # 总视频数
+            total_count = videos.count()
+            
+            # 奖项统计
+            award_stats = videos.values('award__name').annotate(
+                count=models.Count('id')
+            ).order_by('-count')
+            
+            return Response({
+                'total_videos': total_count,
+                'year_distribution': list(year_stats),
+                'award_distribution': list(award_stats),
+                'competition_id': competition_id
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': f'获取统计信息失败: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.AllowAny],
+        url_path='competition/(?P<competition_id>[^/.]+)/optimized'
+    )
+    def competition_optimized(self, request, competition_id=None):
+        """
+        优化的比赛视频列表API，支持高效筛选和分页
+        """
+        try:
+            # 使用LargeResultsSetPagination处理大量数据
+            self.pagination_class = LargeResultsSetPagination
+            
+            # 获取基础查询集
+            queryset = self.queryset.filter(competition_id=competition_id)
+            
+            # 应用筛选
+            year = request.query_params.get('year')
+            if year:
+                queryset = queryset.filter(year=year)
+                
+            award = request.query_params.get('award')
+            if award:
+                queryset = queryset.filter(award__name=award)
+            
+            # 应用排序
+            ordering = request.query_params.get('ordering', '-created_at')
+            if ordering in ['year', '-year', 'play_count', '-play_count', 'like_count', '-like_count']:
+                queryset = queryset.order_by(ordering)
+            
+            # 分页和序列化
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            return Response({
+                'error': f'获取视频列表失败: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
         cache_key = f"import_task_{task_id}"
         task_data = cache.get(cache_key)
         

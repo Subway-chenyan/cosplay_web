@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,6 +9,7 @@ from .models import Group
 from .serializers import GroupSerializer
 from apps.videos.models import Video
 from apps.awards.models import AwardRecord
+from apps.videos.serializers import VideoSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -148,3 +149,17 @@ class GroupViewSet(viewsets.ModelViewSet):
             return Response({
                 'error': f'获取城市统计失败: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GroupVideosView(generics.ListAPIView):
+    """
+    获取指定社团的所有视频
+    """
+    serializer_class = VideoSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        group_id = self.kwargs['group_id']
+        return Video.objects.filter(
+            group_id=group_id
+        ).select_related('group', 'competition').prefetch_related('tags')

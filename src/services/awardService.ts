@@ -75,6 +75,24 @@ class AwardService {
     return response.results
   }
 
+  // 获取奖项的视频
+  async getAwardVideos(awardId: string, page: number = 1, pageSize: number = 12) {
+    const queryParams = api.buildQueryParams({
+      page,
+      page_size: pageSize,
+    })
+    return api.get(`/awards/${awardId}/videos/${queryParams}`)
+  }
+
+  // 获取奖项特定年份的视频
+  async getAwardYearVideos(awardId: string, competitionYearId: number, page: number = 1, pageSize: number = 12) {
+    const queryParams = api.buildQueryParams({
+      page,
+      page_size: pageSize,
+    })
+    return api.get(`/awards/${awardId}/years/${competitionYearId}/videos/${queryParams}`)
+  }
+
   // 获取社团的获奖记录
   async getGroupAwardRecords(groupId: string): Promise<AwardRecord[]> {
     const response = await this.getAwardRecords({
@@ -115,4 +133,4 @@ class AwardService {
   }
 }
 
-export const awardService = new AwardService() 
+export const awardService = new AwardService()

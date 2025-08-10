@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store/store'
 import { fetchGroups } from '../store/slices/groupsSlice'
-import { fetchVideos } from '../store/slices/videosSlice'
+import { fetchGroupVideos } from '../store/slices/videosSlice'
 import { fetchAwardRecords } from '../store/slices/awardsSlice'
 import VideoCard from '../components/VideoCard'
 import { 
@@ -30,24 +30,22 @@ function GroupDetailPage() {
     if (groups.length === 0) {
       dispatch(fetchGroups() as any)
     }
-    if (videos.length === 0) {
-      dispatch(fetchVideos() as any)
+    if (id) {
+      dispatch(fetchGroupVideos({ groupId: id }) as any)
     }
     if (awardRecords.length === 0) {
       dispatch(fetchAwardRecords() as any)
     }
-  }, [dispatch, groups.length, videos.length, awardRecords.length])
+  }, [dispatch, groups.length, id, awardRecords.length])
 
   const group = groups.find(g => g.id === id)
   
-  // 获取该社团的所有视频
-  const groupVideos = videos.filter(video => 
-    video.group === id
-  )
+  // 获取该社团的所有视频（使用API直接获取的数据）
+  // 由于我们使用了fetchGroupVideos，这些视频已经是该社团的了
+  const groupVideos = videos
 
   // 调试信息
   console.log('社团ID:', id)
-  console.log('所有视频数量:', videos.length)
   console.log('社团视频数量:', groupVideos.length)
   console.log('社团视频:', groupVideos.map(v => ({ id: v.id, title: v.title, group: v.group, group_name: v.group_name })))
 
@@ -239,7 +237,7 @@ function GroupDetailPage() {
                           {awardRecord.competition_name || ''}
                         </span>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {awardRecord.year}年
+                          {awardRecord.competition_year_detail?.year || '未知年份'}年
                         </span>
                       </div>
                       
@@ -300,4 +298,4 @@ function GroupDetailPage() {
   )
 }
 
-export default GroupDetailPage 
+export default GroupDetailPage

@@ -45,7 +45,8 @@ class AwardRecord(models.Model):
                              related_name='award_records', verbose_name='获奖社团')
     
     # 详细信息
-    year = models.IntegerField(verbose_name='获奖年份')
+    competition_year = models.ForeignKey('competitions.CompetitionYear', on_delete=models.CASCADE, 
+                                       related_name='award_records', verbose_name='比赛年份')
     description = models.TextField(blank=True, verbose_name='获奖描述')
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
@@ -54,10 +55,15 @@ class AwardRecord(models.Model):
     class Meta:
         verbose_name = '获奖记录'
         verbose_name_plural = '获奖记录'
-        ordering = ['-year', '-created_at']
+        ordering = ['-competition_year__year', '-created_at']
+        indexes = [
+            models.Index(fields=['competition_year', 'award']),
+            models.Index(fields=['video', 'competition_year']),
+            models.Index(fields=['group', 'competition_year']),
+        ]
     
     def __str__(self):
-        return f"{self.award.name} ({self.year})"
+        return f"{self.award.name} ({self.competition_year.year})"
 
 
 def update_group_award_count(group):
@@ -110,4 +116,4 @@ def award_record_deleted(sender, instance, **kwargs):
     """获奖记录删除时的信号处理"""
     # 更新社团的获奖数量
     if instance.group:
-        update_group_award_count(instance.group) 
+        update_group_award_count(instance.group)

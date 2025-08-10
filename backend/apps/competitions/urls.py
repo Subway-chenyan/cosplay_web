@@ -7,4 +7,5 @@ router.register(r'', views.CompetitionViewSet, basename='competition')
 
 urlpatterns = [
     path('', include(router.urls)),
-] 
+    path('<uuid:competition_id>/years/<int:year>/videos/', views.CompetitionYearVideosView.as_view(), name='competition-year-videos'),
+]

@@ -73,11 +73,10 @@ class GroupService {
   // 获取社团的视频
   async getGroupVideos(groupId: string, page: number = 1, pageSize: number = 12) {
     const queryParams = api.buildQueryParams({
-      groups: [groupId],
       page,
       page_size: pageSize,
     })
-    return api.get(`/videos/${queryParams}`)
+    return api.get(`/groups/${groupId}/videos/${queryParams}`)
   }
 
   // 获取社团成员

@@ -44,6 +44,8 @@ class Video(models.Model):
             models.Index(fields=['group']),
             models.Index(fields=['competition']),
             models.Index(fields=['year']),
+            models.Index(fields=['group', 'year']),  # 社团+年份查询
+            models.Index(fields=['competition', 'year']),  # 比赛+年份查询
         ]
 
     def __str__(self):

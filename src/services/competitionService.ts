@@ -70,6 +70,20 @@ class CompetitionService {
     return api.get(`/videos/${queryParams}`)
   }
 
+  // 获取比赛特定年份的视频
+  async getCompetitionYearVideos(competitionId: string, year: number, page: number = 1, pageSize: number = 12) {
+    const queryParams = api.buildQueryParams({
+      page,
+      page_size: pageSize,
+    })
+    return api.get(`/competitions/${competitionId}/years/${year}/videos/${queryParams}`)
+  }
+
+  // 获取比赛的所有年份
+  async getCompetitionYears(competitionId: string) {
+    return api.get(`/competitions/${competitionId}/years/`)
+  }
+
   // 获取比赛的获奖记录
   async getCompetitionAwards(competitionId: string) {
     return api.get(`/competitions/${competitionId}/awards/`)
@@ -87,4 +101,4 @@ class CompetitionService {
   }
 }
 
-export const competitionService = new CompetitionService() 
+export const competitionService = new CompetitionService()

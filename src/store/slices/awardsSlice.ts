@@ -50,7 +50,11 @@ export const fetchAwardRecords = createAsyncThunk(
 export const fetchCompetitionAwardRecords = createAsyncThunk(
   'awards/fetchCompetitionAwardRecords',
   async ({ competitionId, year }: { competitionId: string; year?: number }) => {
-    return await awardService.getCompetitionAwardRecords(competitionId, year)
+    if (year) {
+      return await awardService.getAwardYearVideos(competitionId, year)
+    } else {
+      return await awardService.getCompetitionAwardRecords(competitionId)
+    }
   }
 )
 
@@ -150,4 +154,4 @@ const awardsSlice = createSlice({
 })
 
 export const { clearAwards, clearCompetitionAwards, clearAwardRecords } = awardsSlice.actions
-export default awardsSlice.reducer 
+export default awardsSlice.reducer

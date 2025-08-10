@@ -18,7 +18,7 @@ class AwardRecordAdmin(admin.ModelAdmin):
     """
     获奖记录管理后台
     """
-    list_display = ['award', 'video', 'group', 'year', 'created_at']
-    list_filter = ['year', 'award__competition', 'created_at']
+    list_display = ['award', 'video', 'group', 'competition_year', 'created_at']
+    list_filter = ['competition_year__year', 'award__competition', 'created_at']
     search_fields = ['award__name', 'video__title', 'group__name']
-    ordering = ['-year', '-created_at'] 
+    ordering = ['-competition_year__year', '-created_at']

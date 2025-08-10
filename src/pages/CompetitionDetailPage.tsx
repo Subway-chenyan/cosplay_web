@@ -34,6 +34,9 @@ function CompetitionDetailPage() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [selectedAward, setSelectedAward] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'year' | 'award'>('year')
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
 
   useEffect(() => {
     if (competitions.length === 0) {
@@ -47,18 +50,18 @@ function CompetitionDetailPage() {
   // 获取比赛数据
   useEffect(() => {
     if (id) {
-      dispatch(fetchCompetitionVideos({ competitionId: id }) as any)
+      setPage(1)
+      setHasMore(true)
+      dispatch(fetchCompetitionVideos({ competitionId: id, year: selectedYear || undefined, page: 1, pageSize: 100 }) as any)
       dispatch(fetchCompetitionAwards(id) as any)
       dispatch(fetchCompetitionAwardRecords({ competitionId: id }) as any)
     }
-  }, [dispatch, id])
+  }, [dispatch, id, selectedYear])
 
   const competition = competitions.find(c => c.id === id)
   
-  // 获取该比赛的所有视频（通过比赛ID筛选）
-  const competitionVideos = videos.filter(video => 
-    video.competition === competition?.id
-  )
+  // 获取该比赛的所有视频（fetchCompetitionVideos 已按 competitionId 拉取）
+  const competitionVideos = videos
 
   // 获取所有年份
   const availableYears = [...new Set(competitionVideos
@@ -182,7 +185,49 @@ function CompetitionDetailPage() {
     setSelectedYear(null)
     setSelectedAward(null)
     setViewMode('year')
+    setPage(1)
+    setHasMore(true)
   }
+
+  // 加载更多视频
+  const loadMoreVideos = async () => {
+    if (!hasMore || isLoadingMore) return
+    
+    setIsLoadingMore(true)
+    const nextPage = page + 1
+    
+    try {
+      const response = await dispatch(fetchCompetitionVideos({ 
+        competitionId: id!, 
+        year: selectedYear || undefined, 
+        page: nextPage, 
+        pageSize: 100,
+        append: true 
+      }) as any)
+      
+      if (response.payload && response.payload.results.length < 100) {
+        setHasMore(false)
+      }
+      setPage(nextPage)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }
+
+  // 监听滚动事件实现无限滚动
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop 
+        >= document.documentElement.offsetHeight - 100
+      ) {
+        loadMoreVideos()
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [page, hasMore, isLoadingMore, selectedYear])
 
   if (!competition) {
     return (

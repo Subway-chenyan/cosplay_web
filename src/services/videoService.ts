@@ -107,6 +107,20 @@ class VideoService {
     return this.getVideos(params)
   }
 
+  // 获取比赛年份视频
+  async getCompetitionYearVideos(competitionId: string, year: number, page: number = 1, pageSize: number = 50): Promise<PaginatedResponse<Video>> {
+    return api.get<PaginatedResponse<Video>>(`/competitions/${competitionId}/years/${year}/videos/?page=${page}&page_size=${pageSize}`)
+  }
+
+  // 获取社团视频
+  async getGroupVideos(groupId: string, page: number = 1, pageSize: number = 12): Promise<PaginatedResponse<Video>> {
+    const queryParams = api.buildQueryParams({
+      page,
+      page_size: pageSize,
+    })
+    return api.get<PaginatedResponse<Video>>(`/groups/${groupId}/videos/${queryParams}`)
+  }
+
   // 获取相关视频（根据标签）
   async getRelatedVideos(videoId: string, limit: number = 6): Promise<PaginatedResponse<Video>> {
     try {

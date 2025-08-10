@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
@@ -6,6 +6,8 @@ from django.db import transaction
 from .models import Award, AwardRecord
 from .serializers import AwardSerializer, AwardRecordSerializer
 from apps.groups.models import Group
+from apps.videos.models import Video
+from apps.videos.serializers import VideoSerializer
 
 
 class AwardViewSet(viewsets.ModelViewSet):
@@ -139,4 +141,27 @@ class AwardRecordViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({
                 'error': f'更新社团获奖数量统计失败: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AwardVideosView(generics.ListAPIView):
+    """
+    获取指定奖项的所有获奖视频
+    """
+    serializer_class = VideoSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        award_id = self.kwargs['award_id']
+        competition_year_id = self.kwargs.get('competition_year_id')
+        
+        # 获取该奖项的所有获奖记录对应的视频
+        award_records = AwardRecord.objects.filter(award_id=award_id)
+        
+        if competition_year_id:
+            award_records = award_records.filter(competition_year_id=competition_year_id)
+        
+        video_ids = award_records.values_list('video_id', flat=True)
+        return Video.objects.filter(
+            id__in=video_ids
+        ).select_related('group', 'competition').prefetch_related('tags')

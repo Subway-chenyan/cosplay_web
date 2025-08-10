@@ -7,4 +7,5 @@ router.register(r'', views.GroupViewSet, basename='group')
 
 urlpatterns = [
     path('', include(router.urls)),
-] 
+    path('<uuid:group_id>/videos/', views.GroupVideosView.as_view(), name='group-videos'),
+]
