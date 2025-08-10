@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../store/store'
-import { fetchGroups } from '../store/slices/groupsSlice'
 import { fetchGroupVideos } from '../store/slices/videosSlice'
 import { fetchAwardRecords } from '../store/slices/awardsSlice'
+import { groupService } from '../services/groupService'
 import VideoCard from '../components/VideoCard'
 import { 
   ArrowLeft, 
@@ -26,19 +26,45 @@ function GroupDetailPage() {
   const { videos } = useSelector((state: RootState) => state.videos)
   const { awardRecords } = useSelector((state: RootState) => state.awards)
 
+  const [currentGroup, setCurrentGroup] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    if (groups.length === 0) {
-      dispatch(fetchGroups() as any)
+    const loadGroup = async () => {
+      if (!id) return
+      
+      setLoading(true)
+      
+      // 首先尝试从已加载的社团中查找
+      const existingGroup = groups.find(g => g.id === id)
+      if (existingGroup) {
+        setCurrentGroup(existingGroup)
+      } else {
+        // 如果找不到，则从API获取
+        try {
+          const groupData = await groupService.getGroupById(id)
+          setCurrentGroup(groupData)
+        } catch (error) {
+          console.error('获取社团详情失败:', error)
+        }
+      }
+      
+      setLoading(false)
     }
+
+    loadGroup()
+  }, [id, groups])
+
+  useEffect(() => {
     if (id) {
       dispatch(fetchGroupVideos({ groupId: id }) as any)
     }
     if (awardRecords.length === 0) {
       dispatch(fetchAwardRecords() as any)
     }
-  }, [dispatch, groups.length, id, awardRecords.length])
+  }, [dispatch, id, awardRecords.length])
 
-  const group = groups.find(g => g.id === id)
+  const group = currentGroup
   
   // 获取该社团的所有视频（使用API直接获取的数据）
   // 由于我们使用了fetchGroupVideos，这些视频已经是该社团的了
@@ -70,6 +96,17 @@ function GroupDetailPage() {
 
   const handleVideoClick = (videoId: string) => {
     navigate(`/video/${videoId}`)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">正在加载社团信息...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!group) {
