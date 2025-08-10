@@ -4,6 +4,7 @@ from django import forms
 from .models import Video
 from apps.tags.models import VideoTag
 from apps.awards.models import AwardRecord
+from apps.competitions.models import CompetitionYear
 
 class VideoTagInline(admin.TabularInline):
     model = VideoTag
@@ -11,14 +12,70 @@ class VideoTagInline(admin.TabularInline):
 
 class AwardRecordInlineFormSet(forms.models.BaseInlineFormSet):
     def save_new(self, form, commit=True):
-        """保存新的获奖记录时自动填充社团和年份"""
+        """保存新的获奖记录时自动填充社团和比赛年份"""
         instance = super().save_new(form, commit=False)
         if hasattr(self, 'video_instance') and self.video_instance:
             instance.group = self.video_instance.group
-            instance.year = self.video_instance.year or 2024  # 提供默认值
-        else:
-            # 如果视频对象不存在，设置默认值
-            instance.year = 2024
+            # 自动设置比赛年份
+            from apps.competitions.models import CompetitionYear
+            try:
+                competition_year = CompetitionYear.objects.get(
+                    competition=self.video_instance.competition,
+                    year=self.video_instance.year
+                )
+                instance.competition_year = competition_year
+            except CompetitionYear.DoesNotExist:
+                # 如果找不到对应的CompetitionYear，创建一个新的
+                competition_year = CompetitionYear.objects.create(
+                    competition=self.video_instance.competition,
+                    year=self.video_instance.year
+                )
+                instance.competition_year = competition_year
+        if commit:
+            instance.save()
+        return instance
+
+class AwardRecordInlineForm(forms.ModelForm):
+    """
+    内联获奖记录表单，允许直接输入年份数字
+    """
+    year_input = forms.IntegerField(
+        label='年份',
+        help_text='输入年份数字',
+        min_value=2000,
+        max_value=2030,
+        required=True
+    )
+    
+    class Meta:
+        model = AwardRecord
+        fields = ['award', 'year_input', 'description']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and hasattr(self.instance, 'competition_year') and self.instance.competition_year:
+            self.fields['year_input'].initial = self.instance.competition_year.year
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        year = self.cleaned_data.get('year_input')
+        
+        if year and hasattr(self, 'video_instance') and self.video_instance:
+            # 根据视频的比赛和输入的年份查找或创建CompetitionYear
+            competition = self.video_instance.competition
+            try:
+                competition_year = CompetitionYear.objects.get(
+                    competition=competition,
+                    year=year
+                )
+            except CompetitionYear.DoesNotExist:
+                competition_year = CompetitionYear.objects.create(
+                    competition=competition,
+                    year=year
+                )
+            instance.competition_year = competition_year
+            instance.group = self.video_instance.group
+        
         if commit:
             instance.save()
         return instance
@@ -26,20 +83,23 @@ class AwardRecordInlineFormSet(forms.models.BaseInlineFormSet):
 class AwardRecordInline(admin.TabularInline):
     model = AwardRecord
     extra = 0
-    fields = ('award', 'description')  # 只显示奖项和描述
+    fields = ('award', 'year_input', 'description')  # 显示奖项、年份输入框和描述
+    readonly_fields = ()
     autocomplete_fields = ['award']
-    formset = AwardRecordInlineFormSet
+    form = AwardRecordInlineForm
+    ordering = ['-created_at']
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
-        original_formset = formset
+        original_form = self.form
         
-        class CustomFormSet(original_formset):
+        class CustomForm(original_form):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 self.video_instance = obj
         
-        return CustomFormSet
+        formset.form = CustomForm
+        return formset
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):

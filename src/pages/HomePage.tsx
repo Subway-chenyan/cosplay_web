@@ -168,22 +168,7 @@ function HomePage() {
           <p className="text-xl text-primary-100 mb-6">
             探索精彩的cosplay舞台剧表演，发现优秀的社团作品
           </p>
-          
-          <div className="flex justify-center space-x-8 text-primary-100">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{pagination.count}</div>
-              <div className="text-sm">精彩视频</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">50+</div>
-              <div className="text-sm">优质社团</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">20+</div>
-              <div className="text-sm">热门比赛</div>
-            </div>
           </div>
-        </div>
       </div>
 
       {/* Search Bar */}
@@ -269,4 +254,4 @@ function HomePage() {
   )
 }
 
-export default HomePage 
+export default HomePage

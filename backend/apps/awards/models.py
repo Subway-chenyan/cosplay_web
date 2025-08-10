@@ -55,7 +55,7 @@ class AwardRecord(models.Model):
     class Meta:
         verbose_name = '获奖记录'
         verbose_name_plural = '获奖记录'
-        ordering = ['-competition_year__year', '-created_at']
+        ordering = ['-created_at']
         indexes = [
             models.Index(fields=['competition_year', 'award']),
             models.Index(fields=['video', 'competition_year']),

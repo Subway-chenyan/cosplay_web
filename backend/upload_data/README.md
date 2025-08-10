@@ -127,7 +127,7 @@ python import_data.py data.xlsx test
 
 ### ⚠️ 注意事项
 
-1. **BV号唯一性**: 每个BV号必须唯一，重复的BV号会导致导入失败
+1. **BV号更新**: 当BV号已存在时，系统会自动更新现有视频的所有相关数据（包括视频信息、标签、获奖记录等），而不是报错
 2. **日期格式**: 日期字段请使用 YYYY-MM-DD 格式 (如: 2024-01-01)
 3. **URL格式**: 网址字段需要包含完整的协议 (如: https://)
 4. **事务回滚**: 如果某行数据导入失败，只有该行会被跳过，其他数据不受影响
@@ -179,16 +179,30 @@ upload_data/
 - **错误容错**: 单行错误不会影响其他数据的导入
 - **关联创建**: 智能识别并创建缺失的关联实体
 
-## 数据模型关系
+## 数据结构更新说明
+
+### 主要变更 (2024年更新)
+
+1. **UUID主键**: 所有模型现在使用UUID作为主键，替代了之前的自增整数ID
+2. **比赛年份模型**: 新增`CompetitionYear`模型，用于管理比赛的年份信息
+3. **获奖记录关联**: `AwardRecord`现在通过`CompetitionYear`关联比赛年份，而不是直接使用年份字段
+
+### 更新后的数据模型关系
 
 ```
-Video (视频)
-├── Group (社团) - ForeignKey
-├── Competition (比赛) - ForeignKey  
-├── Tags (标签) - ManyToMany
-└── AwardRecord (获奖记录)
-    └── Award (奖项) - ForeignKey to Competition
+Video (视频) - UUID主键
+├── Group (社团) - UUID主键, ForeignKey
+├── Competition (比赛) - UUID主键, ForeignKey  
+├── Tags (标签) - UUID主键, ManyToMany
+└── AwardRecord (获奖记录) - UUID主键
+    ├── Award (奖项) - UUID主键, ForeignKey to Competition
+    └── CompetitionYear (比赛年份) - UUID主键, ForeignKey to Competition
 ```
+
+### 兼容性说明
+- Excel导入格式保持不变，系统会自动处理UUID生成和CompetitionYear创建
+- 现有数据导入脚本已更新以支持新结构
+- 所有UUID字段由系统自动生成，无需手动填写
 
 ## 常见问题
 

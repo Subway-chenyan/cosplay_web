@@ -21,7 +21,7 @@ try:
     
     from apps.videos.models import Video
     from apps.groups.models import Group
-    from apps.competitions.models import Competition
+    from apps.competitions.models import Competition, CompetitionYear
     from apps.awards.models import Award, AwardRecord
     from apps.tags.models import Tag, VideoTag
 except ImportError:
@@ -114,6 +114,30 @@ class DataImporter:
             print(f"❌ 创建比赛失败: {e}")
             return None
     
+    def get_or_create_competition_year(self, competition, year):
+        """获取或创建比赛年份"""
+        if not competition or not year:
+            return None
+            
+        try:
+            year_int = int(year)
+            competition_year, created = CompetitionYear.objects.get_or_create(
+                competition=competition,
+                year=year_int,
+                defaults={
+                    'description': f'{competition.name} {year}年比赛'
+                }
+            )
+            
+            if created:
+                print(f"✅ 创建新比赛年份: {competition.name} - {year}")
+            
+            return competition_year
+            
+        except Exception as e:
+            print(f"❌ 创建比赛年份失败: {e}")
+            return None
+    
     def get_or_create_award(self, competition, award_name):
         """获取或创建奖项"""
         if not award_name or not competition:
@@ -177,7 +201,7 @@ class DataImporter:
         except Exception as e:
             print(f"❌ 创建标签失败: {e}")
     
-    def create_multiple_awards(self, video, competition, row):
+    def create_multiple_awards(self, video, competition, row, competition_year=None):
         """创建多个奖项和获奖记录"""
         if not competition:
             return
@@ -221,7 +245,7 @@ class DataImporter:
                         award_year = award_years[i] if i < len(award_years) else ''
                         award_description = award_descriptions[i] if i < len(award_descriptions) else ''
                         
-                        self.create_award_record(video, award, award_year, award_description)
+                        self.create_award_record(video, award, award_year, award_description, competition_year)
                     else:
                         print(f"❌ 无法创建奖项: {award_name}")
                     
@@ -230,7 +254,7 @@ class DataImporter:
             import traceback
             print(f"详细错误: {traceback.format_exc()}")
 
-    def create_award_record(self, video, award, award_year, award_description):
+    def create_award_record(self, video, award, award_year, award_description, competition_year=None):
         """创建获奖记录"""
         if not award:
             return
@@ -253,20 +277,23 @@ class DataImporter:
                     year = datetime.now().year
                 print(f"💡 使用默认年份: {year}")
             
-            award_record, created = AwardRecord.objects.get_or_create(
+            # 获取或创建比赛年份
+            if competition_year is None:
+                competition_year = self.get_or_create_competition_year(award.competition, year)
+            
+            if not competition_year:
+                print(f"❌ 无法创建比赛年份: {award.competition.name} - {year}")
+                return
+            
+            award_record = AwardRecord.objects.create(
                 award=award,
                 video=video,
-                year=year,
-                defaults={
-                    'description': award_description or '',
-                    'group': video.group
-                }
+                competition_year=competition_year,
+                description=award_description or '',
+                group=video.group
             )
             
-            if created:
-                print(f"✅ 创建获奖记录: {video.title} - {award.name} ({year})")
-            else:
-                print(f"ℹ️ 获奖记录已存在: {video.title} - {award.name} ({year})")
+            print(f"✅ 创建获奖记录: {video.title} - {award.name} ({year})")
                 
         except Exception as e:
             print(f"❌ 创建获奖记录失败: {e}")
@@ -307,34 +334,52 @@ class DataImporter:
                 self.log_error(row_num, "缺少必需字段 (bv_number, title, url)")
                 return False
             
-            # 检查BV号是否已存在
-            if Video.objects.filter(bv_number=bv_number).exists():
-                self.log_error(row_num, f"BV号已存在: {bv_number}")
-                return False
-            
-            # 创建关联实体
+            # 获取或创建关联实体
             group = self.get_or_create_group(row, row.get('group_name'))
             competition = self.get_or_create_competition(row, row.get('competition_name'))
             
-            # 创建视频
-            video = Video.objects.create(
+            # 获取或创建比赛年份
+            competition_year = None
+            if competition and row.get('year'):
+                competition_year = self.get_or_create_competition_year(competition, row['year'])
+            
+            # 获取或创建视频
+            video, created = Video.objects.get_or_create(
                 bv_number=bv_number,
-                title=title,
-                description=row.get('description', ''),
-                url=url,
-                thumbnail=row.get('thumbnail', ''),
-                group=group,
-                competition=competition,
-                year=int(row['year']) if row.get('year') else None
+                defaults={
+                    'title': title,
+                    'description': row.get('description', ''),
+                    'url': url,
+                    'thumbnail': row.get('thumbnail', ''),
+                    'group': group,
+                    'competition': competition,
+                    'year': int(row['year']) if row.get('year') else None
+                }
             )
             
-            print(f"✅ 创建视频: {title} ({bv_number})")
+            if created:
+                print(f"✅ 创建视频: {title} ({bv_number})")
+            else:
+                # 更新现有视频数据
+                old_title = video.title
+                video.title = title
+                video.description = row.get('description', '')
+                video.url = url
+                video.thumbnail = row.get('thumbnail', '')
+                video.group = group
+                video.competition = competition
+                video.year = int(row['year']) if row.get('year') else None
+                video.save()
+                print(f"🔄 更新视频: {old_title} -> {title} ({bv_number})")
             
-            # 创建标签关联
+            # 创建标签关联（先清除现有标签再重新创建）
+            VideoTag.objects.filter(video=video).delete()
             self.create_tags(video, row.get('tags'))
             
             # 创建奖项和获奖记录（支持多个奖项）
-            self.create_multiple_awards(video, competition, row)
+            # 先清除现有获奖记录再重新创建
+            AwardRecord.objects.filter(video=video).delete()
+            self.create_multiple_awards(video, competition, row, competition_year)
             
             self.success_count += 1
             return True

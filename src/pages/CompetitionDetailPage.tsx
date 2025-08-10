@@ -270,25 +270,7 @@ function CompetitionDetailPage() {
             {competition.description}
           </p>
 
-          {/* 比赛统计 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
-              <div className="text-4xl font-bold mb-2">{availableYears.length}</div>
-              <div className="text-yellow-100 text-lg">举办年份</div>
-            </div>
-            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
-              <div className="text-4xl font-bold mb-2">{competitionAwards.length}</div>
-              <div className="text-yellow-100 text-lg">设置奖项</div>
-            </div>
-            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
-              <div className="text-4xl font-bold mb-2">{competitionVideos.length}</div>
-              <div className="text-yellow-100 text-lg">参赛作品</div>
-            </div>
-            <div className="bg-white bg-opacity-15 rounded-xl p-6 backdrop-blur-sm">
-              <div className="text-4xl font-bold mb-2">{awardRecords.length}</div>
-              <div className="text-yellow-100 text-lg">获奖记录</div>
-            </div>
-          </div>
+
         </div>
       </div>
 
