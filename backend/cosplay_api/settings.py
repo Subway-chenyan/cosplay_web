@@ -211,10 +211,17 @@ SIMPLE_JWT = {
 }
 
 # CORS Settings
-# 去除重复的域名，确保每个域名只出现一次，并添加预览端口支持
+# 确保每个域名只出现一次，并添加预览端口支持
 cors_origins_default = 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:4173,http://localhost:4174,https://www.cosdrama.cn,https://cosdrama.cn'
-cors_origins_list = list(set(config('CORS_ALLOWED_ORIGINS', default=cors_origins_default).split(',')))
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_list if origin.strip()]
+cors_origins_raw = config('CORS_ALLOWED_ORIGINS', default=cors_origins_default).split(',')
+# 去重并保持顺序，确保不会有重复的域名
+cors_origins_seen = set()
+CORS_ALLOWED_ORIGINS = []
+for origin in cors_origins_raw:
+    origin = origin.strip()
+    if origin and origin not in cors_origins_seen:
+        cors_origins_seen.add(origin)
+        CORS_ALLOWED_ORIGINS.append(origin)
 
 CORS_ALLOW_CREDENTIALS = True
 

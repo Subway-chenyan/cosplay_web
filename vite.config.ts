@@ -27,5 +27,13 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 4173,
     allowedHosts: ['www.cosdrama.cn', 'localhost'],
+    proxy: {
+      '/api': {
+        target: 'https://data.cosdrama.cn',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+      },
+    },
   },
 })
