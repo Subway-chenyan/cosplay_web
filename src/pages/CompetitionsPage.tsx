@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchCompetitions, setCurrentPage } from '../store/slices/competitionsSlice'
-import { Trophy, Calendar, Award, Users, Loader } from 'lucide-react'
+import { Trophy, Calendar, Loader } from 'lucide-react'
 import { Competition } from '../types'
 
 function CompetitionsPage() {

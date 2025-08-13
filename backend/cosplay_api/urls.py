@@ -53,6 +53,7 @@ urlpatterns = [
     path('api/tags/', include('apps.tags.urls')),
     path('api/awards/', include('apps.awards.urls')),
     path('api/users/', include('apps.users.urls')),
+    path('api/map/', include('apps.map.urls')),
 ]
 
 # Serve static and media files in development
@@ -63,4 +64,4 @@ if settings.DEBUG:
 # Admin site configuration
 admin.site.site_header = 'Cosplay舞台剧视频数据库管理'
 admin.site.site_title = 'Cosplay管理后台'
-admin.site.index_title = '欢迎使用Cosplay管理后台' 
+admin.site.index_title = '欢迎使用Cosplay管理后台'

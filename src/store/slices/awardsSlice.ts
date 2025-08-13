@@ -47,7 +47,7 @@ export const fetchAwardRecords = createAsyncThunk(
 )
 
 // 获取比赛的获奖记录
-export const fetchCompetitionAwardRecords = createAsyncThunk(
+export const fetchCompetitionAwardRecords = createAsyncThunk<AwardRecord[], { competitionId: string; year?: number }>(
   'awards/fetchCompetitionAwardRecords',
   async ({ competitionId, year }: { competitionId: string; year?: number }) => {
     if (year) {

@@ -65,8 +65,8 @@ cp ../env_template.txt .env
 
 ### 4. 数据库迁移
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+python3 manage.py makemigrations
+python3 manage.py migrate
 ```
 
 ### 5. 创建超级用户

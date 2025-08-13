@@ -11,7 +11,6 @@ import {
   MapPin, 
   Calendar, 
   ExternalLink, 
-  CheckCircle,
   Users,
   Trophy,
   Award,
@@ -86,13 +85,13 @@ function GroupDetailPage() {
   )
 
   // 获取其他视频（非获奖视频）
-  const otherVideos = groupVideos.filter(video => 
-    !groupAwards.some(awardRecord => awardRecord.video === video.id)
-  )
+  // const otherVideos = groupVideos.filter(video => 
+  //   !groupAwards.some(awardRecord => awardRecord.video === video.id)
+  // )
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN')
-  }
+  // const formatDate = (dateString: string) => {
+  //   return new Date(dateString).toLocaleDateString('zh-CN')
+  // }
 
   const handleVideoClick = (videoId: string) => {
     navigate(`/video/${videoId}`)

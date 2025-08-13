@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { Competition, PaginatedResponse } from '../../types'
+import { Competition } from '../../types'
 import { competitionService } from '../../services/competitionService'
 
 interface CompetitionsState {

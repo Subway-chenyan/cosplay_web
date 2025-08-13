@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { Group, PaginatedResponse } from '../../types'
+import { Group } from '../../types'
 import { groupService } from '../../services/groupService'
 
 interface GroupsState {

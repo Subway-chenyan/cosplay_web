@@ -5,7 +5,7 @@ import { RootState, AppDispatch } from '../store/store'
 import { fetchGroups, searchGroups, setCurrentPage } from '../store/slices/groupsSlice'
 import SearchBar from '../components/SearchBar'
 import ChinaMapModule from '../components/ChinaMapModule'
-import { Users, MapPin, Calendar, ExternalLink, CheckCircle, X, Loader } from 'lucide-react'
+import { Users, MapPin, Calendar, ExternalLink, X, Loader } from 'lucide-react'
 import { Group } from '../types'
 
 function GroupsPage() {

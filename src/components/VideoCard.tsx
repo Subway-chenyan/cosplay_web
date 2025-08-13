@@ -1,5 +1,5 @@
 import { Video } from '../types'
-import { Play, Calendar, Clock, Users, Trophy, ImageIcon } from 'lucide-react'
+import { Play, Calendar, Users, Trophy, ImageIcon } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 interface VideoCardProps {
@@ -14,9 +14,9 @@ function VideoCard({ video, onClick }: VideoCardProps) {
   const imgRef = useRef<HTMLImageElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN')
-  }
+  // const formatDate = (dateString: string) => {
+  //   return new Date(dateString).toLocaleDateString('zh-CN')
+  // }
 
   // 懒加载实现
   useEffect(() => {

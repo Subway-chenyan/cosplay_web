@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { Video, VideoFilters, PaginatedResponse } from '../../types'
+import { Video, VideoFilters } from '../../types'
 import { videoService } from '../../services/videoService'
 
 interface VideosState {

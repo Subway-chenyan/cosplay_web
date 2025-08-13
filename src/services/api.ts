@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { PaginatedResponse } from '../types'
+// import { PaginatedResponse } from '../types'
 
 // 根据环境配置API基础URL
 const getBaseURL = () => {
@@ -7,8 +7,12 @@ const getBaseURL = () => {
   if (import.meta.env.DEV) {
     return '/api'
   }
+  // 在预览模式下，检查是否为本地环境
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000/api'
+  }
   // 在生产环境中使用完整域名
-  return 'http://data.cosdrama.cn/api'
+  return 'https://data.cosdrama.cn/api'
 }
 
 // 创建axios实例

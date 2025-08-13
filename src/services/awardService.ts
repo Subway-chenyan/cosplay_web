@@ -85,12 +85,13 @@ class AwardService {
   }
 
   // 获取奖项特定年份的视频
-  async getAwardYearVideos(awardId: string, competitionYearId: number, page: number = 1, pageSize: number = 12) {
+  async getAwardYearVideos(awardId: string, competitionYearId: number, page: number = 1, pageSize: number = 12): Promise<AwardRecord[]> {
     const queryParams = api.buildQueryParams({
       page,
       page_size: pageSize,
     })
-    return api.get(`/awards/${awardId}/years/${competitionYearId}/videos/${queryParams}`)
+    const response = await api.get<PaginatedResponse<AwardRecord>>(`/awards/${awardId}/years/${competitionYearId}/videos/${queryParams}`)
+    return response.results
   }
 
   // 获取社团的获奖记录

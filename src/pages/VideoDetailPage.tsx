@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchVideoDetail, fetchRelatedVideos } from '../store/slices/videosSlice'
+import { fetchVideoDetail } from '../store/slices/videosSlice'
 import { videoService } from '../services/videoService'
 import { groupService } from '../services/groupService'
 import VideoCard from '../components/VideoCard'
@@ -10,11 +10,8 @@ import { Video, Group } from '../types'
 import { 
   ArrowLeft, 
   Calendar, 
-  Clock, 
-  Users, 
   MapPin, 
   ExternalLink, 
-  CheckCircle,
   Play,
   Globe,
   Loader
@@ -28,7 +25,7 @@ function VideoDetailPage() {
   const [isPlayerLoaded, setIsPlayerLoaded] = useState(false)
   const [relatedVideos, setRelatedVideos] = useState<Video[]>([])
   const [groupDetails, setGroupDetails] = useState<Group | null>(null)
-  const [loadingRelated, setLoadingRelated] = useState(false)
+  const [, setLoadingRelated] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -63,9 +60,9 @@ function VideoDetailPage() {
 
   const video = currentVideo && currentVideo.id === id ? currentVideo : null
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN')
-  }
+  // const formatDate = (dateString: string) => {
+  //   return new Date(dateString).toLocaleDateString('zh-CN')
+  // }
 
   // 从B站URL提取视频ID
   const getBilibiliVideoId = (url: string) => {

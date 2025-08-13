@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { Tag, PaginatedResponse } from '../../types'
+import { Tag } from '../../types'
 import { tagService } from '../../services/tagService'
 
 interface TagsState {
@@ -135,4 +135,4 @@ const tagsSlice = createSlice({
   },
 })
 
-export default tagsSlice.reducer 
+export default tagsSlice.reducer

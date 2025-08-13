@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as echarts from 'echarts';
-import { Search, MapPin, Users } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 import { fetchChinaGeoJSON, provinceNameMap } from '../data/chinaGeoJSON';
 import { groupService } from '../services/groupService';
-import { ProvinceStats, Group } from '../types';
+import { Group } from '../types';
 
 interface ClubData {
   [province: string]: {
@@ -24,8 +24,8 @@ interface ChinaMapModuleProps {
 const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvinceSelect }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
-  const [selectedProvince, setSelectedProvince] = useState<string>('');
-  const [selectedClubs, setSelectedClubs] = useState<Group[]>([]);
+  const [, setSelectedProvince] = useState<string>('');
+  const [, setSelectedClubs] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [clubData, setClubData] = useState<ClubData>({});
   const [error, setError] = useState<string | null>(null);

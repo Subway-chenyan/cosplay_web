@@ -32,7 +32,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 DJANGO_ENV = config('DJANGO_ENV', default='development')
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,data.cosdrama.cn,www.cosdrama.cn,cosdrama.cn').split(',')
 
 # Application definition
 
@@ -61,6 +61,7 @@ LOCAL_APPS = [
     'apps.tags',
     'apps.awards',
     'apps.users',
+    'apps.map',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -210,7 +211,10 @@ SIMPLE_JWT = {
 }
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000').split(',')
+# 去除重复的域名，确保每个域名只出现一次，并添加预览端口支持
+cors_origins_default = 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:4173,http://localhost:4174,https://www.cosdrama.cn,https://cosdrama.cn'
+cors_origins_list = list(set(config('CORS_ALLOWED_ORIGINS', default=cors_origins_default).split(',')))
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_list if origin.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
 

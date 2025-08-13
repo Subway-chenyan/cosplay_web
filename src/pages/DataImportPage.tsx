@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Upload, Download, AlertCircle, CheckCircle, Loader2, FileText, Database, Key, Lock } from 'lucide-react'
+import { Upload, Download, AlertCircle, Loader2, FileText, Database, Key, Lock } from 'lucide-react'
 import { RootState, AppDispatch } from '../store/store'
 import { 
   verifyUploadKey,
@@ -9,9 +9,7 @@ import {
   downloadTemplate, 
   clearCurrentTask, 
   clearError,
-  setUploadKey,
-  resetKeyValidation,
-  ImportTask 
+  resetKeyValidation 
 } from '../store/slices/dataImportSlice'
 
 const DataImportPage: React.FC = () => {
@@ -427,4 +425,4 @@ const DataImportPage: React.FC = () => {
   )
 }
 
-export default DataImportPage 
+export default DataImportPage

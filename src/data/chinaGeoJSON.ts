@@ -2,6 +2,8 @@
 // 数据来源：阿里云DataV.GeoAtlas (https://datav.aliyun.com/portal/school/atlas/area_selector)
 // 这里使用简化版本的中国地图数据，实际项目中建议从阿里云DataV下载完整数据
 
+import { fullChinaGeoJSON } from './fullChinaGeoJSON';
+
 export const chinaGeoJSON = {
   "type": "FeatureCollection",
   "features": [
@@ -131,18 +133,32 @@ export const chinaGeoJSON = {
 // 获取在线地图数据的函数
 export const fetchChinaGeoJSON = async () => {
   try {
-    // 使用阿里云DataV的API获取中国地图数据
-    // 注意：这个API可能需要跨域处理
+    // 尝试通过后端代理获取地图数据，避免跨域问题
+    const response = await fetch('/api/map/china-geojson');
+    if (response.ok) {
+      const data = await response.json();
+      console.log('成功获取完整地图数据');
+      return data;
+    }
+  } catch (error) {
+    console.warn('无法通过后端代理获取地图数据，尝试直接获取:', error);
+  }
+  
+  try {
+    // 备用方案：直接请求阿里云API（可能遇到跨域问题）
     const response = await fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json');
     if (response.ok) {
-      return await response.json();
+      const data = await response.json();
+      console.log('成功获取在线地图数据');
+      return data;
     }
   } catch (error) {
     console.warn('无法获取在线地图数据，使用本地简化数据:', error);
   }
   
-  // 如果在线获取失败，返回本地简化数据
-  return chinaGeoJSON;
+  // 如果所有在线获取都失败，返回本地完整数据
+  console.log('使用本地完整地图数据');
+  return fullChinaGeoJSON;
 };
 
 // 省份名称映射（用于数据匹配）
