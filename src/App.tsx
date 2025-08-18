@@ -7,6 +7,7 @@ import CompetitionsPage from './pages/CompetitionsPage'
 import CompetitionDetailPage from './pages/CompetitionDetailPage'
 import VideoDetailPage from './pages/VideoDetailPage'
 import DataImportPage from './pages/DataImportPage'
+import ManagementPage from './pages/ManagementPage'
 
 function App() {
   return (
@@ -20,10 +21,11 @@ function App() {
           <Route path="/competitions" element={<CompetitionsPage />} />
           <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
           <Route path="/data-import" element={<DataImportPage />} />
+          <Route path="/management" element={<ManagementPage />} />
         </Route>
       </Routes>
     </div>
   )
 }
 
-export default App 
+export default App

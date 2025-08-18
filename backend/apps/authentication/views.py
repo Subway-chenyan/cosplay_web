@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from apps.users.serializers import UserSerializer
 
 User = get_user_model()
@@ -80,4 +81,53 @@ class MeView(APIView):
     
     def get(self, request):
         serializer = UserSerializer(request.user)
-        return Response(serializer.data) 
+        return Response(serializer.data)
+
+
+class VerifyManagementKeyView(APIView):
+    """
+    验证管理密钥
+    """
+    permission_classes = []
+    
+    def post(self, request):
+        management_key = request.data.get('management_key')
+        
+        if not management_key:
+            return Response({
+                'valid': False,
+                'message': '管理密钥不能为空'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 从设置中获取管理密钥，如果没有设置则使用默认值
+        expected_key = getattr(settings, 'MANAGEMENT_KEY', 'admin123')
+        
+        if management_key == expected_key:
+            # 创建一个临时用户token用于管理操作
+            try:
+                # 尝试获取管理员用户，如果不存在则创建
+                admin_user, created = User.objects.get_or_create(
+                    username='admin_management',
+                    defaults={
+                        'is_staff': True,
+                        'is_superuser': True,
+                        'email': 'admin@management.local'
+                    }
+                )
+                
+                refresh = RefreshToken.for_user(admin_user)
+                return Response({
+                    'valid': True,
+                    'message': '管理密钥验证成功',
+                    'token': str(refresh.access_token)
+                }, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({
+                    'valid': False,
+                    'message': f'创建管理token失败: {str(e)}'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({
+                'valid': False,
+                'message': '管理密钥错误'
+            }, status=status.HTTP_401_UNAUTHORIZED)

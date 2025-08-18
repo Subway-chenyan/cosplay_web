@@ -114,6 +114,14 @@ class ApiService {
     return response.data
   }
 
+  // 验证管理权限密钥
+  async verifyManagementKey(managementKey: string): Promise<{valid: boolean, message: string, token?: string}> {
+    const response = await axiosInstance.post('/auth/verify-management-key/', {
+      management_key: managementKey
+    })
+    return response.data
+  }
+
   async downloadTemplate(importType: string, uploadKey: string): Promise<Blob> {
     const response = await axiosInstance.get(`/videos/import/template/?type=${importType}`, {
       headers: {

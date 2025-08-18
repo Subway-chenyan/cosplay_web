@@ -11,6 +11,7 @@ function Header() {
     { name: '社团', href: '/groups' },
     { name: '比赛', href: '/competitions' },
     { name: '数据导入', href: '/data-import' },
+    { name: '数据管理', href: '/management' },
   ]
 
   const isActive = (path: string) => location.pathname === path
@@ -87,4 +88,4 @@ function Header() {
   )
 }
 
-export default Header 
+export default Header
