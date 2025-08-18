@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Plus, Edit, Save, X, AlertCircle, CheckCircle, Lock } from 'lucide-react'
+import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock } from 'lucide-react'
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
 import { videoService } from '../services/videoService'
 import { authService } from '../services/authService'
 import { api } from '../services/api'
-import { Group, Competition, Video } from '../types'
+import { Group } from '../types'
 
 interface SearchableSelectProps {
   placeholder: string
-  value: string
   onChange: (value: string, item?: any) => void
   searchFunction: (query: string) => Promise<any>
   displayField: string
@@ -19,7 +18,6 @@ interface SearchableSelectProps {
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
   placeholder,
-  value,
   onChange,
   searchFunction,
   displayField,
@@ -223,7 +221,7 @@ const ManagementPage: React.FC = () => {
   }
 
   // 处理社团选择（用于编辑）
-  const handleGroupSelect = (groupId: string, group: Group) => {
+  const handleGroupSelect = (_groupId: string, group: Group) => {
     setSelectedGroupForEdit(group)
     setGroupForm({
       id: group.id,
@@ -608,7 +606,6 @@ const ManagementPage: React.FC = () => {
                       </label>
                       <SearchableSelect
                         placeholder="搜索并选择社团"
-                        value={videoForm.group}
                         onChange={(value) => setVideoForm({ ...videoForm, group: value })}
                         searchFunction={groupService.searchGroups.bind(groupService)}
                         displayField="name"
@@ -622,7 +619,6 @@ const ManagementPage: React.FC = () => {
                       </label>
                       <SearchableSelect
                         placeholder="搜索并选择比赛"
-                        value={videoForm.competition}
                         onChange={(value) => setVideoForm({ ...videoForm, competition: value })}
                         searchFunction={competitionService.searchCompetitions.bind(competitionService)}
                         displayField="name"
@@ -704,7 +700,6 @@ const ManagementPage: React.FC = () => {
                     </label>
                     <SearchableSelect
                       placeholder="搜索并选择要编辑的社团"
-                      value={selectedGroupForEdit?.id || ''}
                       onChange={handleGroupSelect}
                       searchFunction={groupService.searchGroups.bind(groupService)}
                       displayField="name"

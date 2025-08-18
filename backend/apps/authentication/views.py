@@ -7,8 +7,23 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from apps.users.serializers import UserSerializer
+import json
+import os
 
 User = get_user_model()
+
+def load_upload_config():
+    """加载上传配置"""
+    config_path = os.path.join(settings.BASE_DIR, 'upload_data', 'config.json')
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return {
+            "upload_key": "cosplay_upload_key_2024",
+            "max_file_size": 52428800,
+            "allowed_extensions": [".xlsx", ".xls", ".csv"]
+        }
 
 
 class LoginView(APIView):
@@ -99,8 +114,9 @@ class VerifyManagementKeyView(APIView):
                 'message': '管理密钥不能为空'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # 从设置中获取管理密钥，如果没有设置则使用默认值
-        expected_key = getattr(settings, 'MANAGEMENT_KEY', 'admin123')
+        # 从配置文件中获取上传密钥，与数据导入页面使用相同的密钥
+        config = load_upload_config()
+        expected_key = config.get('upload_key')
         
         if management_key == expected_key:
             # 创建一个临时用户token用于管理操作
