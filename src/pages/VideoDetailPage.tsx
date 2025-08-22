@@ -64,10 +64,15 @@ function VideoDetailPage() {
   //   return new Date(dateString).toLocaleDateString('zh-CN')
   // }
 
-  // 从B站URL提取视频ID
-  const getBilibiliVideoId = (url: string) => {
-    const match = url.match(/(?:bilibili\.com\/video\/)?(BV[a-zA-Z0-9]+)/i)
-    return match ? match[1] : null
+  // 从B站URL提取视频ID和分P信息
+  const getBilibiliVideoInfo = (url: string) => {
+    const bvMatch = url.match(/(?:bilibili\.com\/video\/)?(BV[a-zA-Z0-9]+)/i)
+    const pageMatch = url.match(/[?&]p=(\d+)/i)
+    
+    return {
+      bvNumber: bvMatch ? bvMatch[1] : null,
+      page: pageMatch ? parseInt(pageMatch[1]) : 1
+    }
   }
 
   const handleVideoClick = (videoId: string) => {
@@ -107,7 +112,7 @@ function VideoDetailPage() {
     )
   }
 
-  const bvNumber = getBilibiliVideoId(video.url)
+  const { bvNumber, page } = getBilibiliVideoInfo(video.url)
 
   return (
     <div className="space-y-6">
@@ -139,7 +144,7 @@ function VideoDetailPage() {
                     </div>
                   )}
                   <iframe
-                    src={`//player.bilibili.com/player.html?bvid=${bvNumber}&page=1&autoplay=0`}
+                    src={`//player.bilibili.com/player.html?bvid=${bvNumber}&page=${page}&autoplay=0`}
                     className="w-full h-full"
                     scrolling="no"
                     frameBorder="0"
