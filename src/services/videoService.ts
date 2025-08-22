@@ -186,6 +186,15 @@ class VideoService {
     link.remove()
     window.URL.revokeObjectURL(url)
   }
+
+  // 搜索社团（用于视频创建时选择社团）
+  async searchGroups(search?: string, pageSize: number = 20) {
+    const queryParams = api.buildQueryParams({
+      search: search || '',
+      page_size: pageSize,
+    })
+    return api.get(`/videos/search-groups/${queryParams}`)
+  }
 }
 
 export const videoService = new VideoService()

@@ -96,8 +96,18 @@ class CompetitionService {
 
   // 获取年份列表
   async getYearList(): Promise<number[]> {
-    const response = await api.get<{ years: number[] }>('/competitions/years/')
-    return response.years
+    const response = await api.get<number[]>('/competitions/years/')
+    return response
+  }
+
+  // 获取比赛配置
+  async getCompetitionConfig(competitionId: string) {
+    return api.get(`/competitions/${competitionId}/config/`)
+  }
+
+  // 更新比赛配置
+  async updateCompetitionConfig(competitionId: string, config: any) {
+    return api.patch(`/competitions/${competitionId}/update_config/`, { config })
   }
 }
 

@@ -11,6 +11,11 @@ class Competition(models.Model):
     description = models.TextField(blank=True, verbose_name='比赛描述')
     website = models.URLField(blank=True, verbose_name='官网链接')
     
+    # 配置字段
+    banner_image = models.URLField(blank=True, verbose_name='Banner背景图片')
+    banner_gradient = models.JSONField(blank=True, default=list, verbose_name='Banner渐变色')
+    award_display_order = models.JSONField(blank=True, default=list, verbose_name='奖项显示顺序')
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     

@@ -42,8 +42,10 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
         
         for (const stat of response.province_stats) {
           if (stat.province) {
-            // 获取该省份的社团详情
-            const groupsResponse = await groupService.getGroupsByProvince(stat.province);
+            // 获取该省份的社团详情，设置较大的page_size以获取所有社团
+            const groupsResponse = await groupService.getGroupsByProvince(stat.province, {
+              page_size: 100 // 设置较大的页面大小以获取更多社团
+            });
             transformedData[stat.province] = {
               count: stat.count,
               clubs: groupsResponse.results

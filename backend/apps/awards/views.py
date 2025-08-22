@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.db.models import Q
 from django.db import transaction
 from .models import Award, AwardRecord
-from .serializers import AwardSerializer, AwardRecordSerializer
+from .serializers import AwardSerializer, AwardRecordSerializer, AwardRecordDetailSerializer
 from apps.groups.models import Group
 from apps.videos.models import Video
 from apps.videos.serializers import VideoSerializer
@@ -72,7 +72,7 @@ class AwardRecordViewSet(viewsets.ModelViewSet):
         
         # 获取这些奖项的所有获奖记录
         records = AwardRecord.objects.filter(award_id__in=award_ids)
-        serializer = self.get_serializer(records, many=True)
+        serializer = AwardRecordDetailSerializer(records, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])

@@ -607,7 +607,7 @@ const ManagementPage: React.FC = () => {
                       <SearchableSelect
                         placeholder="搜索并选择社团"
                         onChange={(value) => setVideoForm({ ...videoForm, group: value })}
-                        searchFunction={groupService.searchGroups.bind(groupService)}
+                        searchFunction={videoService.searchGroups.bind(videoService)}
                         displayField="name"
                         valueField="id"
                       />

@@ -117,6 +117,9 @@ class VideoAdmin(admin.ModelAdmin):
         ('基本信息', {
             'fields': ('bv_number', 'title', 'description', 'url', 'thumbnail')
         }),
+        ('社团信息', {
+            'fields': ('group',)
+        }),
         ('Competition Info', {
             'fields': ('competition', 'year')
         }),

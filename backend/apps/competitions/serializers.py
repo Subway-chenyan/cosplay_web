@@ -22,5 +22,9 @@ class CompetitionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Competition
-        fields = ['id', 'name', 'description', 'website', 'years', 'created_at', 'updated_at']
+        fields = [
+            'id', 'name', 'description', 'website', 'years', 
+            'banner_image', 'banner_gradient', 'award_display_order',
+            'created_at', 'updated_at'
+        ]
         read_only_fields = ['id', 'created_at', 'updated_at']

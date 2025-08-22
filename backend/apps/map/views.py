@@ -1,15 +1,19 @@
 import requests
+import logging
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 import logging
 
 logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+@cache_page(60 * 60 * 24)  # 缓存24小时
 def china_geojson(request):
     """
     获取中国地图GeoJSON数据的代理API

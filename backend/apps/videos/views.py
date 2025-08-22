@@ -313,6 +313,8 @@ from .serializers import (
 from .filters import VideoFilter
 from .bulk_import import process_bulk_import, get_import_template
 from .pagination import OptimizedVideoPagination, LargeResultsSetPagination
+from apps.groups.models import Group
+from apps.groups.serializers import GroupSerializer
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -535,4 +537,51 @@ class VideoViewSet(viewsets.ModelViewSet):
             instructions_df.to_excel(writer, index=False, sheet_name='字段说明', header=False)
         
         return response
+    
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.AllowAny],
+        url_path='search-groups'
+    )
+    def search_groups(self, request):
+        """
+        搜索社团（用于视频创建时选择社团）
+        """
+        search_query = request.query_params.get('search', '').strip()
+        page_size = min(int(request.query_params.get('page_size', 20)), 50)  # 限制最大返回数量
+        
+        # 构建查询条件
+        queryset = Group.objects.filter(is_active=True)
+        
+        if search_query:
+            # 支持按社团名称、省份、城市、地区搜索
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(province__icontains=search_query) |
+                Q(city__icontains=search_query) |
+                Q(location__icontains=search_query)
+            )
+        
+        # 按名称排序，限制返回数量
+        groups = queryset.order_by('name')[:page_size]
+        
+        # 序列化数据，只返回必要字段
+        groups_data = []
+        for group in groups:
+            groups_data.append({
+                'id': group.id,
+                'name': group.name,
+                'location': group.location or f"{group.province or ''}{group.city or ''}".strip(),
+                'province': group.province,
+                'city': group.city,
+                'video_count': group.video_count,
+                'is_active': group.is_active
+            })
+        
+        return Response({
+            'results': groups_data,
+            'count': len(groups_data),
+            'search_query': search_query
+        })
     

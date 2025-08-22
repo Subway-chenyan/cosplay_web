@@ -3,10 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchVideoDetail } from '../store/slices/videosSlice'
-import { videoService } from '../services/videoService'
 import { groupService } from '../services/groupService'
-import VideoCard from '../components/VideoCard'
-import { Video, Group } from '../types'
+import { Group } from '../types'
 import { 
   ArrowLeft, 
   Calendar, 
@@ -23,9 +21,9 @@ function VideoDetailPage() {
   const navigate = useNavigate()
   const { currentVideo, loading } = useSelector((state: RootState) => state.videos)
   const [isPlayerLoaded, setIsPlayerLoaded] = useState(false)
-  const [relatedVideos, setRelatedVideos] = useState<Video[]>([])
+
   const [groupDetails, setGroupDetails] = useState<Group | null>(null)
-  const [, setLoadingRelated] = useState(false)
+
 
   useEffect(() => {
     if (id) {
@@ -36,21 +34,14 @@ function VideoDetailPage() {
   useEffect(() => {
     const fetchRelatedData = async () => {
       if (currentVideo && currentVideo.id === id) {
-        setLoadingRelated(true)
         try {
           // 获取社团详情
           if (currentVideo.group) {
             const group = await groupService.getGroupById(currentVideo.group)
             setGroupDetails(group)
-            
-            // 获取相关视频
-            const related = await videoService.getRelatedVideos(currentVideo.id, 8)
-            setRelatedVideos(related.results)
           }
         } catch (error) {
           console.error('Error fetching related data:', error)
-        } finally {
-          setLoadingRelated(false)
         }
       }
     }
@@ -73,11 +64,6 @@ function VideoDetailPage() {
       bvNumber: bvMatch ? bvMatch[1] : null,
       page: pageMatch ? parseInt(pageMatch[1]) : 1
     }
-  }
-
-  const handleVideoClick = (videoId: string) => {
-    // 跳转到其他视频的详情页
-    navigate(`/video/${videoId}`)
   }
 
   const handleGroupClick = () => {
@@ -325,36 +311,7 @@ function VideoDetailPage() {
             </div>
           )}
 
-          {/* 相关视频 */}
-          {relatedVideos.length > 0 && (
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                更多来自 {video.group_name} 的视频
-              </h2>
-              
-              <div className="space-y-4">
-                {relatedVideos.map((relatedVideo) => (
-                  <div key={relatedVideo.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                    <VideoCard
-                      video={relatedVideo}
-                      onClick={() => handleVideoClick(relatedVideo.id)}
-                    />
-                  </div>
-                ))}
-              </div>
-              
-              {relatedVideos.length >= 8 && (
-                <div className="mt-4 text-center">
-                  <Link
-                    to={`/groups`}
-                    className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                  >
-                    查看更多视频 →
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
+
         </div>
       </div>
     </div>
