@@ -117,6 +117,7 @@ export interface AwardRecord {
   competition_year: string
   competition_year_detail?: CompetitionYear
   description: string
+  drama_name?: string
   award_name?: string
   award_level?: string
   competition_name?: string

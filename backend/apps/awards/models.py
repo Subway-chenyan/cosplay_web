@@ -47,6 +47,7 @@ class AwardRecord(models.Model):
     # 详细信息
     competition_year = models.ForeignKey('competitions.CompetitionYear', on_delete=models.CASCADE, 
                                        related_name='award_records', verbose_name='比赛年份')
+    drama_name = models.CharField(max_length=200, blank=True, verbose_name='剧名')
     description = models.TextField(blank=True, verbose_name='获奖描述')
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')

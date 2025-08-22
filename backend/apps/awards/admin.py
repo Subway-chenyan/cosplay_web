@@ -17,7 +17,7 @@ class AwardRecordAdminForm(forms.ModelForm):
     
     class Meta:
         model = AwardRecord
-        fields = ['award', 'video', 'group', 'competition_year', 'description']
+        fields = ['award', 'video', 'group', 'competition_year', 'drama_name', 'description']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,13 +65,13 @@ class AwardRecordAdmin(admin.ModelAdmin):
     获奖记录管理后台
     """
     form = AwardRecordAdminForm
-    list_display = ['award', 'video', 'group', 'get_competition_year', 'created_at']
+    list_display = ['award', 'video', 'group', 'drama_name', 'get_competition_year', 'created_at']
     list_filter = ['competition_year__year', 'award__competition', 'created_at']
     
     def get_competition_year(self, obj):
         return obj.competition_year.year if obj.competition_year else '-'
     get_competition_year.short_description = '比赛年份'
-    search_fields = ['award__name', 'video__title', 'group__name']
+    search_fields = ['award__name', 'video__title', 'group__name', 'drama_name']
     ordering = ['-created_at']
     
     def get_fields(self, request, obj=None):

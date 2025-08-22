@@ -27,7 +27,7 @@ class AwardRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = AwardRecord
         fields = [
-            'id', 'award', 'video', 'group', 'competition_year', 'description', 
+            'id', 'award', 'video', 'group', 'competition_year', 'drama_name', 'description', 
             'award_name', 'competition_name', 
             'video_title', 'group_name', 'created_at', 'updated_at'
         ]

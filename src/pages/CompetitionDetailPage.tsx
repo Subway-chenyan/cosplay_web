@@ -177,8 +177,29 @@ function CompetitionDetailPage() {
     })
   }
 
+  // 获取没有视频的获奖记录（基于筛选条件）
+  const getAwardRecordsWithoutVideo = () => {
+    const recordsWithoutVideo: { [awardId: string]: { award: any; records: any[] } } = {}
+    
+    competitionAwards.forEach(award => {
+      const recordsForAward = awardRecords.filter(record => 
+        record.award === award.id && !record.video
+      )
+      
+      if (recordsForAward.length > 0) {
+        recordsWithoutVideo[award.id] = {
+          award,
+          records: recordsForAward
+        }
+      }
+    })
+    
+    return recordsWithoutVideo
+  }
+
   const awardedVideos = getAwardedVideos()
   const unawardedVideos = getUnawardedVideos()
+  const awardRecordsWithoutVideo = getAwardRecordsWithoutVideo()
 
   // 重置筛选
   const resetFilters = () => {
@@ -438,6 +459,82 @@ function CompetitionDetailPage() {
                         {video.year}年
                       </div>
                     )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* 没有视频的获奖记录展示 */}
+      {Object.keys(awardRecordsWithoutVideo).length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center space-x-3">
+            <Medal className="w-6 h-6 text-purple-600" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              获奖记录（无视频）
+              {selectedYear && ` (${selectedYear}年)`}
+              {selectedAward && ` (${competitionAwards.find(a => a.id === selectedAward)?.name})`}
+            </h2>
+          </div>
+          
+          {Object.entries(awardRecordsWithoutVideo).map(([awardId, { award, records }]) => {
+            const awardInfo = createAwardInfo(award.name)
+            return (
+              <div key={awardId} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                {/* 奖项标题 */}
+                <div className={`p-6 ${awardInfo.color} border-b ${awardInfo.borderColor}`}>
+                  <div className="flex items-center space-x-3">
+                    {awardInfo.icon}
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{awardInfo.label}</h3>
+                    </div>
+                    <div className="ml-auto">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${awardInfo.color} ${awardInfo.textColor}`}>
+                        {records.length} 个记录
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 获奖记录列表 */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {records.map((record) => (
+                      <div key={record.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="space-y-2">
+                          {/* 剧名 */}
+                          {record.drama_name && (
+                            <div className="flex items-center space-x-2">
+                              <Play className="w-4 h-4 text-gray-500" />
+                              <span className="font-medium text-gray-900">{record.drama_name}</span>
+                            </div>
+                          )}
+                          
+                          {/* 社团名称 */}
+                          {record.group_name && (
+                            <div className="flex items-center space-x-2">
+                              <Users className="w-4 h-4 text-gray-500" />
+                              <span className="text-gray-700">{record.group_name}</span>
+                            </div>
+                          )}
+                          
+                          {/* 描述 */}
+                          {record.description && (
+                            <div className="text-sm text-gray-600">
+                              {record.description}
+                            </div>
+                          )}
+                          
+                          {/* 无视频提示 */}
+                          <div className="flex items-center space-x-1 text-xs text-gray-500 bg-gray-100 rounded px-2 py-1">
+                            <X className="w-3 h-3" />
+                            <span>暂无视频</span>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
