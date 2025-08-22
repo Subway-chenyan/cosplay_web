@@ -19616,3 +19616,320 @@ INFO 2025-08-18 17:25:39,235 basehttp 119285 140217377556032 "GET /admin/jsi18n/
 INFO 2025-08-18 17:25:39,239 basehttp 119285 140217354212928 "GET /static/admin/js/calendar.js HTTP/1.0" 200 8466
 INFO 2025-08-18 17:25:39,240 basehttp 119285 140217344771648 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.0" 200 19319
 INFO 2025-08-18 17:25:40,095 basehttp 119285 140217377556032 "GET /static/admin/img/icon-calendar.svg HTTP/1.0" 304 0
+INFO 2025-08-22 09:43:17,175 autoreload 426851 139760231510464 Watching for file changes with StatReloader
+INFO 2025-08-22 09:43:25,922 autoreload 426851 139760231510464 /home/ubuntu/cosplay_web/backend/apps/awards/serializers.py changed, reloading.
+INFO 2025-08-22 09:43:26,469 autoreload 426962 140052438192576 Watching for file changes with StatReloader
+INFO 2025-08-22 09:44:16,272 autoreload 426962 140052438192576 /home/ubuntu/cosplay_web/backend/apps/awards/admin.py changed, reloading.
+INFO 2025-08-22 09:44:16,858 autoreload 428693 140107643920832 Watching for file changes with StatReloader
+INFO 2025-08-22 09:44:27,906 autoreload 428693 140107643920832 /home/ubuntu/cosplay_web/backend/apps/awards/admin.py changed, reloading.
+INFO 2025-08-22 09:44:28,422 autoreload 429049 140052424344000 Watching for file changes with StatReloader
+INFO 2025-08-22 09:44:36,440 autoreload 429049 140052424344000 /home/ubuntu/cosplay_web/backend/apps/awards/admin.py changed, reloading.
+INFO 2025-08-22 09:44:36,998 autoreload 429308 139732971463104 Watching for file changes with StatReloader
+INFO 2025-08-22 09:44:55,138 autoreload 429923 139729178116544 Watching for file changes with StatReloader
+INFO 2025-08-22 09:45:04,720 autoreload 430277 140484702380480 Watching for file changes with StatReloader
+INFO 2025-08-22 09:45:25,550 basehttp 430277 140484297467456 "GET /api/awards/records/ HTTP/1.1" 200 514
+INFO 2025-08-22 09:45:34,012 basehttp 430277 140484297467456 "GET /api/awards/records/ HTTP/1.1" 200 514
+INFO 2025-08-22 09:46:06,811 basehttp 429308 139732566550080 "GET /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.0" 200 41417
+INFO 2025-08-22 09:46:08,838 basehttp 429308 139732566550080 "GET /admin/awards/awardrecord/ HTTP/1.0" 200 14471
+INFO 2025-08-22 09:46:10,805 basehttp 429308 139732566550080 "GET /admin/jsi18n/ HTTP/1.0" 200 8560
+INFO 2025-08-22 09:46:14,478 basehttp 429308 139732566550080 "GET /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.0" 200 41417
+INFO 2025-08-22 09:46:14,644 basehttp 429308 139732566550080 "GET /admin/jsi18n/ HTTP/1.0" 200 8560
+INFO 2025-08-22 09:46:20,955 basehttp 429308 139732566550080 "GET /admin/videos/video/d30dc380-84d2-4e7e-9f1d-4125dd860d85/delete/?_to_field=id&_popup=1 HTTP/1.0" 200 3680
+INFO 2025-08-22 09:46:21,083 basehttp 429308 139732566550080 "GET /static/admin/js/cancel.js HTTP/1.0" 200 884
+WARNING 2025-08-22 09:46:31,884 log 429308 139732566550080 Forbidden (Origin checking failed - https://data.cosdrama.cn does not match any trusted origins.): /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/
+WARNING 2025-08-22 09:46:31,885 basehttp 429308 139732566550080 "POST /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.0" 403 2567
+WARNING 2025-08-22 09:46:49,543 log 429308 139732566550080 Forbidden (Origin checking failed - https://data.cosdrama.cn does not match any trusted origins.): /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/
+WARNING 2025-08-22 09:46:49,544 basehttp 429308 139732566550080 "POST /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.0" 403 2567
+INFO 2025-08-22 09:46:51,630 basehttp 429308 139732566550080 "GET /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.0" 200 41417
+WARNING 2025-08-22 09:46:54,879 log 429308 139732566550080 Forbidden (Origin checking failed - https://data.cosdrama.cn does not match any trusted origins.): /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/
+WARNING 2025-08-22 09:46:54,880 basehttp 429308 139732566550080 "POST /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.0" 403 2567
+INFO 2025-08-22 09:47:42,511 basehttp 429308 139732566550080 "GET /api/awards/records/ HTTP/1.1" 200 514
+INFO 2025-08-22 09:47:48,332 basehttp 429308 139732566550080 "GET /api/awards HTTP/1.1" 301 0
+INFO 2025-08-22 09:47:48,401 basehttp 429308 139732566550080 "GET /api/awards/ HTTP/1.1" 200 11856
+INFO 2025-08-22 09:47:48,645 basehttp 429308 139732566550080 "GET /static/rest_framework/css/bootstrap.min.css HTTP/1.1" 200 121457
+INFO 2025-08-22 09:47:48,648 basehttp 429308 139732553963072 "GET /static/rest_framework/css/bootstrap-tweaks.css HTTP/1.1" 200 3385
+INFO 2025-08-22 09:47:48,803 basehttp 429308 139732566550080 "GET /static/rest_framework/css/prettify.css HTTP/1.1" 200 817
+INFO 2025-08-22 09:47:48,808 basehttp 429308 139732553963072 "GET /static/rest_framework/css/default.css HTTP/1.1" 200 1152
+INFO 2025-08-22 09:47:48,833 basehttp 429308 139732566550080 "GET /static/rest_framework/js/jquery-3.5.1.min.js HTTP/1.1" 200 89476
+INFO 2025-08-22 09:47:48,834 basehttp 429308 139732553963072 "GET /static/rest_framework/js/ajax-form.js HTTP/1.1" 200 3597
+INFO 2025-08-22 09:47:48,913 basehttp 429308 139732553963072 "GET /static/rest_framework/js/csrf.js HTTP/1.1" 200 1719
+INFO 2025-08-22 09:47:48,931 basehttp 429308 139732566550080 "GET /static/rest_framework/js/bootstrap.min.js HTTP/1.1" 200 39680
+INFO 2025-08-22 09:47:49,036 basehttp 429308 139732545570368 "GET /static/rest_framework/js/prettify-min.js HTTP/1.1" 200 13632
+INFO 2025-08-22 09:47:49,052 basehttp 429308 139732315002432 "GET /static/rest_framework/js/default.js HTTP/1.1" 200 1268
+INFO 2025-08-22 09:47:49,504 basehttp 429308 139732315002432 "GET /static/rest_framework/img/grid.png HTTP/1.1" 200 1458
+INFO 2025-08-22 09:47:49,654 basehttp 429308 139732315002432 "GET /static/rest_framework/fonts/glyphicons-halflings-regular.woff2 HTTP/1.1" 200 18028
+WARNING 2025-08-22 09:47:51,088 log 429308 139732323395136 Not Found: /favicon.ico
+WARNING 2025-08-22 09:47:51,089 basehttp 429308 139732323395136 "GET /favicon.ico HTTP/1.1" 404 4040
+WARNING 2025-08-22 09:48:11,907 log 429308 139732315002432 Not Found: /admins/
+WARNING 2025-08-22 09:48:11,907 basehttp 429308 139732315002432 "GET /admins/ HTTP/1.1" 404 4028
+INFO 2025-08-22 09:48:15,728 basehttp 429308 139732545570368 "GET /admin/ HTTP/1.1" 200 13241
+INFO 2025-08-22 09:48:15,823 basehttp 429308 139732545570368 "GET /static/admin/css/base.css HTTP/1.1" 200 21207
+INFO 2025-08-22 09:48:15,826 basehttp 429308 139732315002432 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2929
+INFO 2025-08-22 09:48:15,863 basehttp 429308 139732545570368 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2694
+INFO 2025-08-22 09:48:15,866 basehttp 429308 139732315002432 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-08-22 09:48:15,971 basehttp 429308 139732323395136 "GET /static/admin/css/responsive.css HTTP/1.1" 200 18533
+INFO 2025-08-22 09:48:16,086 basehttp 429308 139732323395136 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2025-08-22 09:48:16,087 basehttp 429308 139732545570368 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-22 09:48:16,163 basehttp 429308 139732545570368 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-08-22 09:48:16,167 basehttp 429308 139732323395136 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2025-08-22 09:48:16,169 basehttp 429308 139732315002432 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 200 392
+INFO 2025-08-22 09:48:19,258 basehttp 429308 139732323395136 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 14471
+INFO 2025-08-22 09:48:19,365 basehttp 429308 139732323395136 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6566
+INFO 2025-08-22 09:48:19,375 basehttp 429308 139732566550080 "GET /static/admin/js/core.js HTTP/1.1" 200 5682
+INFO 2025-08-22 09:48:19,376 basehttp 429308 139732553963072 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-08-22 09:48:19,377 basehttp 429308 139732545570368 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 292458
+INFO 2025-08-22 09:48:19,381 basehttp 429308 139732315002432 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 09:48:19,404 basehttp 429308 139732566550080 "GET /static/admin/js/actions.js HTTP/1.1" 200 7872
+INFO 2025-08-22 09:48:19,405 basehttp 429308 139732323395136 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 8943
+INFO 2025-08-22 09:48:19,417 basehttp 429308 139732553963072 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-08-22 09:48:19,683 basehttp 429308 139732545570368 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-08-22 09:48:19,747 basehttp 429308 139732553963072 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-08-22 09:48:19,815 basehttp 429308 139732323395136 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-08-22 09:48:19,862 basehttp 429308 139732315002432 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 232381
+INFO 2025-08-22 09:48:20,454 basehttp 429308 139732315002432 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-08-22 09:48:20,455 basehttp 429308 139732323395136 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-08-22 09:48:21,903 basehttp 429308 139732323395136 "GET /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.1" 200 41417
+INFO 2025-08-22 09:48:22,035 basehttp 429308 139732323395136 "GET /static/admin/css/forms.css HTTP/1.1" 200 9047
+INFO 2025-08-22 09:48:22,046 basehttp 429308 139732553963072 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-08-22 09:48:22,052 basehttp 429308 139732315002432 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 09:48:22,281 basehttp 429308 139732315002432 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2025-08-22 09:48:22,283 basehttp 429308 139732553963072 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11900
+INFO 2025-08-22 09:48:22,343 basehttp 429308 139732315002432 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2025-08-22 09:48:51,679 basehttp 429308 139732315002432 "POST /admin/awards/awardrecord/2b44966b-67bb-469d-ab34-ac4b6664b8b3/change/ HTTP/1.1" 302 0
+INFO 2025-08-22 09:48:51,747 basehttp 429308 139732315002432 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 14721
+INFO 2025-08-22 09:48:51,837 basehttp 429308 139732315002432 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 09:48:52,156 basehttp 429308 139732315002432 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2025-08-22 09:52:49,938 basehttp 429308 139732315002432 "GET /admin/awards/awardrecord/add/ HTTP/1.1" 200 41092
+INFO 2025-08-22 09:52:50,298 basehttp 429308 139732315002432 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 09:53:05,558 basehttp 429308 139732315002432 "POST /admin/awards/awardrecord/add/ HTTP/1.1" 302 0
+INFO 2025-08-22 09:53:05,614 basehttp 429308 139732315002432 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 15345
+INFO 2025-08-22 09:53:05,798 basehttp 429308 139732315002432 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+WARNING 2025-08-22 09:54:38,772 log 429308 139732323395136 Unauthorized: /api/tags/
+WARNING 2025-08-22 09:54:38,772 basehttp 429308 139732323395136 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 401 179
+WARNING 2025-08-22 09:54:38,809 log 429308 139732323395136 Unauthorized: /api/videos/
+WARNING 2025-08-22 09:54:38,810 basehttp 429308 139732323395136 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 401 179
+WARNING 2025-08-22 09:54:39,499 log 429308 139732323395136 Unauthorized: /api/videos/
+WARNING 2025-08-22 09:54:39,501 basehttp 429308 139732323395136 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 401 179
+WARNING 2025-08-22 09:54:39,953 log 429308 139732323395136 Unauthorized: /api/videos/
+WARNING 2025-08-22 09:54:39,953 basehttp 429308 139732323395136 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 401 179
+WARNING 2025-08-22 09:54:39,982 log 429308 139732323395136 Unauthorized: /api/tags/
+WARNING 2025-08-22 09:54:39,982 basehttp 429308 139732323395136 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 401 179
+WARNING 2025-08-22 09:54:40,395 log 429308 139732323395136 Unauthorized: /api/videos/
+WARNING 2025-08-22 09:54:40,395 basehttp 429308 139732323395136 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 401 179
+INFO 2025-08-22 09:56:24,159 autoreload 450769 140191587254720 Watching for file changes with StatReloader
+INFO 2025-08-22 09:56:48,746 autoreload 451778 140671691964864 Watching for file changes with StatReloader
+INFO 2025-08-22 09:56:51,020 basehttp 451778 140671287162432 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 09:56:51,241 basehttp 451778 140671287162432 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 09:56:51,820 basehttp 451778 140671287162432 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 09:56:56,345 basehttp 451778 140671287162432 "GET /api/competitions/?page=1&page_size=50 HTTP/1.0" 200 878
+INFO 2025-08-22 09:56:56,610 basehttp 451778 140671287162432 "GET /api/competitions/?page=1&page_size=50 HTTP/1.0" 200 878
+INFO 2025-08-22 09:56:58,015 basehttp 451778 140671260935744 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 09:56:58,026 basehttp 451778 140671287162432 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+INFO 2025-08-22 09:56:58,037 basehttp 451778 140671277721152 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 09:56:58,240 basehttp 451778 140671277721152 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 09:56:58,392 basehttp 451778 140671269328448 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 09:56:59,610 basehttp 451778 140671269328448 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 09:56:59,733 basehttp 451778 140671277721152 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+INFO 2025-08-22 09:57:00,003 basehttp 451778 140671269328448 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 09:57:01,287 basehttp 451778 140671277721152 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 09:57:01,290 basehttp 451778 140671269328448 "GET /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/?page=1&page_size=100 HTTP/1.0" 200 1438
+INFO 2025-08-22 09:57:01,301 basehttp 451778 140671287162432 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+WARNING 2025-08-22 09:57:24,182 log 451778 140671287162432 Not Found: /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/
+WARNING 2025-08-22 09:57:24,183 basehttp 451778 140671287162432 "GET /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/?page=2&page_size=100 HTTP/1.0" 404 28
+WARNING 2025-08-22 09:57:25,538 log 451778 140671287162432 Not Found: /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/
+WARNING 2025-08-22 09:57:25,539 basehttp 451778 140671287162432 "GET /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/?page=3&page_size=100 HTTP/1.0" 404 28
+WARNING 2025-08-22 09:57:26,020 log 451778 140671287162432 Not Found: /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/
+WARNING 2025-08-22 09:57:26,020 basehttp 451778 140671287162432 "GET /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/?page=4&page_size=100 HTTP/1.0" 404 28
+WARNING 2025-08-22 09:57:26,262 log 451778 140671287162432 Not Found: /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/
+WARNING 2025-08-22 09:57:26,262 basehttp 451778 140671287162432 "GET /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/?page=5&page_size=100 HTTP/1.0" 404 28
+WARNING 2025-08-22 09:57:26,795 log 451778 140671287162432 Not Found: /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/
+WARNING 2025-08-22 09:57:26,796 basehttp 451778 140671287162432 "GET /api/competitions/1ab9ef24-924c-4a71-ae44-f94018671029/years/2015/videos/?page=6&page_size=100 HTTP/1.0" 404 28
+INFO 2025-08-22 09:58:09,845 basehttp 451778 140671287162432 "GET /api/videos/d30dc380-84d2-4e7e-9f1d-4125dd860d85/ HTTP/1.0" 200 689
+INFO 2025-08-22 09:58:10,156 basehttp 451778 140671287162432 "GET /api/videos/d30dc380-84d2-4e7e-9f1d-4125dd860d85/ HTTP/1.0" 200 689
+INFO 2025-08-22 09:58:10,274 basehttp 451778 140671287162432 "GET /api/groups/ca10c8a0-51f0-4ce4-8c66-20763b0ef099/ HTTP/1.0" 200 519
+INFO 2025-08-22 09:58:10,320 basehttp 451778 140671287162432 "GET /api/groups/ca10c8a0-51f0-4ce4-8c66-20763b0ef099/ HTTP/1.0" 200 519
+INFO 2025-08-22 09:58:10,716 basehttp 451778 140671287162432 "GET /api/videos/d30dc380-84d2-4e7e-9f1d-4125dd860d85/ HTTP/1.0" 200 689
+INFO 2025-08-22 09:58:11,170 basehttp 451778 140671269328448 "GET /api/videos/d30dc380-84d2-4e7e-9f1d-4125dd860d85/ HTTP/1.0" 200 689
+INFO 2025-08-22 09:58:11,192 basehttp 451778 140671287162432 "GET /api/videos/?page=1&page_size=8&ordering=-created_at HTTP/1.0" 200 4716
+INFO 2025-08-22 09:58:11,679 basehttp 451778 140671287162432 "GET /api/videos/?page=1&page_size=8&ordering=-created_at HTTP/1.0" 200 4716
+INFO 2025-08-22 09:58:13,955 basehttp 451778 140671287162432 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 09:58:14,000 basehttp 451778 140671269328448 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 09:58:14,197 basehttp 451778 140671269328448 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 09:58:14,423 basehttp 451778 140671269328448 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 09:58:19,799 basehttp 451778 140671269328448 "GET /api/videos/42a97685-b40a-47b5-8f4a-2608ae8d816e/ HTTP/1.0" 200 696
+INFO 2025-08-22 09:58:20,232 basehttp 451778 140671269328448 "GET /api/videos/42a97685-b40a-47b5-8f4a-2608ae8d816e/ HTTP/1.0" 200 696
+INFO 2025-08-22 09:58:25,822 basehttp 451778 140671269328448 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 09:58:25,907 basehttp 451778 140671269328448 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 09:58:26,078 basehttp 451778 140671269328448 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 09:58:26,300 basehttp 451778 140671269328448 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+WARNING 2025-08-22 10:00:50,490 log 451778 140671269328448 Not Found: /
+WARNING 2025-08-22 10:00:50,491 basehttp 451778 140671269328448 "GET / HTTP/1.0" 404 3991
+INFO 2025-08-22 10:23:58,373 autoreload 451778 140671691964864 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 10:23:58,864 autoreload 503621 139831169831360 Watching for file changes with StatReloader
+INFO 2025-08-22 10:24:11,879 autoreload 503621 139831169831360 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 10:24:12,394 autoreload 504052 140373931475392 Watching for file changes with StatReloader
+INFO 2025-08-22 10:24:35,635 autoreload 504052 140373931475392 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:24:36,143 autoreload 504432 140119834837440 Watching for file changes with StatReloader
+INFO 2025-08-22 10:25:19,763 autoreload 504432 140119834837440 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:25:20,276 autoreload 505005 140535819243968 Watching for file changes with StatReloader
+INFO 2025-08-22 10:25:24,140 autoreload 505005 140535819243968 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:25:24,697 autoreload 505105 139758320820672 Watching for file changes with StatReloader
+INFO 2025-08-22 10:25:55,061 autoreload 505105 139758320820672 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:25:55,593 autoreload 505624 140535641547200 Watching for file changes with StatReloader
+INFO 2025-08-22 10:26:50,463 autoreload 505624 140535641547200 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:26:50,983 autoreload 506803 140361676767680 Watching for file changes with StatReloader
+INFO 2025-08-22 10:26:59,945 autoreload 506803 140361676767680 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:27:00,538 autoreload 507047 139952368734656 Watching for file changes with StatReloader
+INFO 2025-08-22 10:27:41,131 autoreload 507047 139952368734656 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:27:41,634 autoreload 507571 139993662071232 Watching for file changes with StatReloader
+INFO 2025-08-22 10:27:50,570 autoreload 507571 139993662071232 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:27:51,084 autoreload 507719 140440464814528 Watching for file changes with StatReloader
+INFO 2025-08-22 10:28:56,079 autoreload 507719 140440464814528 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:28:56,623 autoreload 508377 140550424744384 Watching for file changes with StatReloader
+INFO 2025-08-22 10:29:05,582 autoreload 508377 140550424744384 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:29:06,104 autoreload 508533 140422047789504 Watching for file changes with StatReloader
+INFO 2025-08-22 10:30:00,985 autoreload 508533 140422047789504 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:30:01,526 autoreload 509233 140080260727232 Watching for file changes with StatReloader
+INFO 2025-08-22 10:30:04,391 autoreload 509233 140080260727232 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:30:04,895 autoreload 509299 139926864544192 Watching for file changes with StatReloader
+INFO 2025-08-22 10:30:55,634 autoreload 509299 139926864544192 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:30:56,175 autoreload 510241 140145423081920 Watching for file changes with StatReloader
+INFO 2025-08-22 10:31:06,169 autoreload 510241 140145423081920 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:31:06,705 autoreload 510457 140097046348224 Watching for file changes with StatReloader
+INFO 2025-08-22 10:32:08,695 autoreload 510457 140097046348224 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:32:09,261 autoreload 511147 140648267141568 Watching for file changes with StatReloader
+INFO 2025-08-22 10:32:18,229 autoreload 511147 140648267141568 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 10:32:18,779 autoreload 511303 139981017407936 Watching for file changes with StatReloader
+INFO 2025-08-22 10:38:46,753 autoreload 517990 140686009876928 Watching for file changes with StatReloader
+INFO 2025-08-22 10:53:55,702 basehttp 517990 140685596550720 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 10:53:55,740 basehttp 517990 140685604943424 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 10:53:55,765 basehttp 517990 140685604943424 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 10:53:55,818 basehttp 517990 140685596550720 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 10:53:55,833 basehttp 517990 140685604943424 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 10:53:55,868 basehttp 517990 140685604943424 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 10:53:56,300 basehttp 517990 140685604943424 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 10:53:56,774 basehttp 517990 140685604943424 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 10:53:58,255 basehttp 517990 140685604943424 "GET /api/competitions/?page=1&page_size=50 HTTP/1.0" 200 878
+INFO 2025-08-22 10:53:58,446 basehttp 517990 140685604943424 "GET /api/competitions/?page=1&page_size=50 HTTP/1.0" 200 878
+INFO 2025-08-22 10:53:58,925 basehttp 517990 140685604943424 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+INFO 2025-08-22 10:53:59,350 basehttp 517990 140685596550720 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 10:53:59,389 basehttp 517990 140685586060864 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 10:53:59,389 basehttp 517990 140685577668160 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+INFO 2025-08-22 10:53:59,670 basehttp 517990 140685604943424 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 10:53:59,798 basehttp 517990 140685604943424 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 10:53:59,821 basehttp 517990 140685604943424 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 10:54:00,393 basehttp 517990 140685604943424 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 10:55:19,830 basehttp 517990 140685604943424 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 15095
+WARNING 2025-08-22 10:55:25,702 log 517990 140685604943424 Not Found: /favicon.ico
+WARNING 2025-08-22 10:55:25,703 basehttp 517990 140685604943424 "GET /favicon.ico HTTP/1.1" 404 4040
+INFO 2025-08-22 10:55:29,408 basehttp 517990 140685577668160 "GET /admin/videos/video/ HTTP/1.1" 200 86561
+INFO 2025-08-22 10:55:29,575 basehttp 517990 140685577668160 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 10:55:31,677 basehttp 517990 140685577668160 "GET /admin/videos/video/d30dc380-84d2-4e7e-9f1d-4125dd860d85/change/ HTTP/1.1" 200 28918
+INFO 2025-08-22 10:55:31,793 basehttp 517990 140685604943424 "GET /static/admin/js/inlines.js HTTP/1.1" 200 15526
+INFO 2025-08-22 10:55:31,801 basehttp 517990 140685577668160 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 10:55:32,083 basehttp 517990 140685577668160 "GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+INFO 2025-08-22 10:55:32,158 basehttp 517990 140685577668160 "GET /static/admin/img/tooltag-arrowright.svg HTTP/1.1" 200 280
+INFO 2025-08-22 10:55:32,293 basehttp 517990 140685577668160 "GET /static/admin/img/inline-delete.svg HTTP/1.1" 200 560
+INFO 2025-08-22 10:59:50,913 autoreload 517990 140686009876928 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 10:59:51,446 autoreload 540139 140388540019136 Watching for file changes with StatReloader
+INFO 2025-08-22 10:59:53,916 basehttp 540139 140388135237184 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 10:59:54,305 basehttp 540139 140388135237184 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 10:59:55,036 basehttp 540139 140388135237184 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 11:06:42,880 basehttp 540139 140388135237184 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 11:06:43,024 basehttp 540139 140388135237184 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 11:06:43,040 basehttp 540139 140388052497984 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 11:08:51,569 basehttp 540139 140388052497984 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 11:08:51,930 basehttp 540139 140388052497984 "GET /api/competitions/?page=1&page_size=50 HTTP/1.0" 200 878
+INFO 2025-08-22 11:08:51,936 basehttp 540139 140388135237184 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 11:08:51,948 basehttp 540139 140388044105280 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 11:08:52,163 basehttp 540139 140388135237184 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+INFO 2025-08-22 11:08:52,358 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 200 50095
+INFO 2025-08-22 11:08:52,828 basehttp 540139 140388044105280 "GET /api/competitions/?page=1&page_size=50 HTTP/1.0" 200 878
+INFO 2025-08-22 11:08:52,842 basehttp 540139 140388044105280 "GET /api/awards/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 271
+INFO 2025-08-22 11:08:52,872 basehttp 540139 140388044105280 "GET /api/awards/records/by_competition/?competition=1ab9ef24-924c-4a71-ae44-f94018671029 HTTP/1.0" 200 878
+INFO 2025-08-22 11:08:53,860 basehttp 540139 140388044105280 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+INFO 2025-08-22 11:08:54,569 basehttp 540139 140388044105280 "GET /api/groups/?page=1&page_size=50 HTTP/1.0" 200 8666
+WARNING 2025-08-22 11:09:00,547 log 540139 140388044105280 Not Found: /api/videos/
+WARNING 2025-08-22 11:09:00,547 basehttp 540139 140388044105280 "GET /api/videos/?page=2&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 404 28
+WARNING 2025-08-22 11:09:01,103 log 540139 140388044105280 Not Found: /api/videos/
+WARNING 2025-08-22 11:09:01,104 basehttp 540139 140388044105280 "GET /api/videos/?page=3&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 404 28
+WARNING 2025-08-22 11:09:01,577 log 540139 140388044105280 Not Found: /api/videos/
+WARNING 2025-08-22 11:09:01,577 basehttp 540139 140388044105280 "GET /api/videos/?page=4&page_size=100&competitions=1ab9ef24-924c-4a71-ae44-f94018671029&ordering=-created_at HTTP/1.0" 404 28
+INFO 2025-08-22 11:09:04,205 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:09:04,564 basehttp 540139 140388044105280 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:09:04,693 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:09:05,001 basehttp 540139 140388044105280 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:09:57,432 basehttp 540139 140388044105280 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:10:01,173 basehttp 540139 140388135237184 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:10:01,219 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:10:01,249 basehttp 540139 140388044105280 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:10:01,303 basehttp 540139 140388135237184 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:10:01,319 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:10:01,348 basehttp 540139 140388044105280 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:10:01,778 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:10:02,264 basehttp 540139 140388044105280 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:10:06,476 basehttp 540139 140388044105280 "POST /api/videos/import/verify-key/ HTTP/1.0" 200 45
+INFO 2025-08-22 11:10:12,955 basehttp 540139 140388044105280 "POST /api/videos/import/start/ HTTP/1.0" 200 84
+INFO 2025-08-22 11:10:15,006 basehttp 540139 140388135237184 "GET /api/videos/import/status/0dabf468-367b-4421-93b1-7f3d0a20078a/ HTTP/1.0" 200 7238
+INFO 2025-08-22 11:13:31,252 basehttp 540139 140388135237184 "POST /api/videos/import/verify-key/ HTTP/1.0" 200 45
+INFO 2025-08-22 11:13:36,218 basehttp 540139 140388135237184 "POST /api/videos/import/start/ HTTP/1.0" 200 84
+INFO 2025-08-22 11:13:38,315 basehttp 540139 140388044105280 "GET /api/videos/import/status/98e5f7ee-d408-4bd0-b651-715d1714d964/ HTTP/1.0" 200 7238
+INFO 2025-08-22 11:13:56,342 basehttp 540139 140388044105280 "GET /admin/videos/video/d30dc380-84d2-4e7e-9f1d-4125dd860d85/change/ HTTP/1.1" 200 36574
+INFO 2025-08-22 11:14:01,803 basehttp 540139 140388044105280 "GET /admin/awards/awardrecord/ HTTP/1.1" 200 73788
+INFO 2025-08-22 11:14:02,017 basehttp 540139 140388044105280 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:14:15,645 basehttp 540139 140388135237184 "GET /admin/awards/awardrecord/?p=2 HTTP/1.1" 200 76367
+INFO 2025-08-22 11:14:15,860 basehttp 540139 140388044105280 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:14:21,791 basehttp 540139 140388135237184 "GET /admin/awards/awardrecord/?p=3 HTTP/1.1" 200 57018
+INFO 2025-08-22 11:14:21,887 basehttp 540139 140388044105280 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:14:27,296 basehttp 540139 140388044105280 "GET /admin/awards/awardrecord/dec6331d-b941-4517-977f-42be308ac6df/change/?_changelist_filters=p%3D3 HTTP/1.1" 200 56343
+INFO 2025-08-22 11:14:27,585 basehttp 540139 140388044105280 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:14:32,536 basehttp 540139 140388135237184 "GET /admin/awards/awardrecord/?p=3 HTTP/1.1" 200 57018
+INFO 2025-08-22 11:16:10,062 basehttp 540139 140388052497984 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:16:10,103 basehttp 540139 140388135237184 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:16:10,200 basehttp 540139 140388135237184 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:16:10,268 basehttp 540139 140388135237184 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:16:10,441 basehttp 540139 140388135237184 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:16:10,594 basehttp 540139 140388135237184 "GET /api/videos/?page=1&page_size=12 HTTP/1.0" 200 6912
+INFO 2025-08-22 11:16:11,418 basehttp 540139 140388135237184 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:16:11,536 basehttp 540139 140388135237184 "GET /api/tags/?page=1&page_size=100 HTTP/1.0" 200 3242
+INFO 2025-08-22 11:16:57,036 basehttp 540139 140388135237184 "GET /admin/awards/awardrecord/?p=2 HTTP/1.1" 200 76367
+INFO 2025-08-22 11:16:57,174 basehttp 540139 140388135237184 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:17:12,512 basehttp 540139 140388044105280 "GET /admin/awards/awardrecord/f6ddc492-1eff-433d-9034-ce3d93916b32/change/?_changelist_filters=p%3D2 HTTP/1.1" 200 56361
+INFO 2025-08-22 11:17:12,727 basehttp 540139 140388044105280 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:17:16,000 autoreload 540139 140388540019136 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 11:17:16,647 autoreload 569326 139957610815936 Watching for file changes with StatReloader
+INFO 2025-08-22 11:17:33,100 basehttp 569326 139957205947968 "GET /admin/groups/group/ HTTP/1.1" 200 60869
+INFO 2025-08-22 11:17:33,206 basehttp 569326 139957197555264 "GET /admin/jsi18n/ HTTP/1.1" 200 8560
+INFO 2025-08-22 11:17:33,222 autoreload 569326 139957610815936 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 11:17:33,773 autoreload 569608 140610279993792 Watching for file changes with StatReloader
+INFO 2025-08-22 11:17:44,816 autoreload 569608 140610279993792 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 11:17:45,317 autoreload 569858 140519060861376 Watching for file changes with StatReloader
+INFO 2025-08-22 11:17:59,385 autoreload 569858 140519060861376 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 11:17:59,889 autoreload 570305 140336826597824 Watching for file changes with StatReloader
+INFO 2025-08-22 11:18:29,375 autoreload 570305 140336826597824 /home/ubuntu/cosplay_web/backend/upload_data/generate_template.py changed, reloading.
+INFO 2025-08-22 11:18:29,904 autoreload 570808 140690280251840 Watching for file changes with StatReloader
+INFO 2025-08-22 11:28:40,002 autoreload 585446 139704188588480 Watching for file changes with StatReloader
+INFO 2025-08-22 11:28:51,134 basehttp 585446 139703783765568 "POST /api/videos/import/verify-key/ HTTP/1.0" 200 45
+INFO 2025-08-22 11:28:58,586 basehttp 585446 139703783765568 "POST /api/videos/import/start/ HTTP/1.0" 200 84
+INFO 2025-08-22 11:29:00,647 basehttp 585446 139703774324288 "GET /api/videos/import/status/56d1e6d8-5067-4dbb-afa6-4ad59b7a9b86/ HTTP/1.0" 200 7303
+INFO 2025-08-22 11:29:50,857 autoreload 585446 139704188588480 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 11:29:51,400 autoreload 588218 139657205723584 Watching for file changes with StatReloader
+INFO 2025-08-22 11:30:28,564 autoreload 589053 140628427178432 Watching for file changes with StatReloader
+INFO 2025-08-22 11:30:29,943 basehttp 589053 140628023359040 "POST /api/videos/import/verify-key/ HTTP/1.0" 200 45
+INFO 2025-08-22 11:30:34,267 basehttp 589053 140628023359040 "POST /api/videos/import/start/ HTTP/1.0" 200 84
+INFO 2025-08-22 11:30:36,709 basehttp 589053 140628013917760 "GET /api/videos/import/status/3d498a02-1d86-407f-ba0b-80c2ff30ca4e/ HTTP/1.0" 200 7303
+INFO 2025-08-22 11:32:32,145 basehttp 589053 140628013917760 "POST /api/videos/import/verify-key/ HTTP/1.0" 200 45
+INFO 2025-08-22 11:32:40,122 basehttp 589053 140628013917760 "POST /api/videos/import/start/ HTTP/1.0" 200 84
+INFO 2025-08-22 11:32:42,172 basehttp 589053 140628023359040 "GET /api/videos/import/status/74f35a7a-5765-40e6-9a4e-e515180b029d/ HTTP/1.0" 200 7303
+INFO 2025-08-22 11:33:36,884 autoreload 589053 140628427178432 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 11:33:37,634 autoreload 596425 140469634105792 Watching for file changes with StatReloader
+INFO 2025-08-22 11:33:52,782 autoreload 596425 140469634105792 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 11:33:53,323 autoreload 596974 139835070800320 Watching for file changes with StatReloader
+INFO 2025-08-22 11:34:44,163 autoreload 597925 139782672224704 Watching for file changes with StatReloader
+INFO 2025-08-22 11:35:10,092 basehttp 597925 139782267389504 "POST /api/videos/import/verify-key/ HTTP/1.0" 200 45
+INFO 2025-08-22 11:35:14,335 basehttp 597925 139782267389504 "POST /api/videos/import/start/ HTTP/1.0" 200 84
+INFO 2025-08-22 11:35:16,810 basehttp 597925 139782257948224 "GET /api/videos/import/status/8eda608a-d2fa-4d6b-a9e5-98a9e2722bb6/ HTTP/1.0" 200 7303
+INFO 2025-08-22 11:36:59,329 autoreload 597925 139782672224704 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 11:36:59,854 autoreload 602633 140078676918720 Watching for file changes with StatReloader
+INFO 2025-08-22 11:37:16,969 autoreload 602633 140078676918720 /home/ubuntu/cosplay_web/backend/upload_data/import_data.py changed, reloading.
+INFO 2025-08-22 11:37:17,486 autoreload 603152 139681403322816 Watching for file changes with StatReloader

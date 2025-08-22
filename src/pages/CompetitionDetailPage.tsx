@@ -440,12 +440,19 @@ function CompetitionDetailPage() {
                 {/* 视频网格 */}
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {videos.map((video) => (
-                      <div key={video.id} className="relative">
-                        <VideoCard
-                          video={video}
-                          onClick={() => handleVideoClick(video.id)}
-                        />
+                    {videos.map((video) => {
+                      // 获取该视频对应的获奖记录中的drama_name
+                      const awardRecord = awardRecords.find(record => 
+                        record.video === video.id && record.award === award.id
+                      )
+                      
+                      return (
+                        <div key={video.id} className="relative">
+                          <VideoCard
+                            video={video}
+                            onClick={() => handleVideoClick(video.id)}
+                            dramaName={awardRecord?.drama_name}
+                          />
                         {/* 奖项标识 */}
                         <div className={`absolute top-2 right-2 ${awardInfo.color} rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm backdrop-blur-sm`}>
                           {awardInfo.icon}
@@ -459,8 +466,9 @@ function CompetitionDetailPage() {
                         {video.year}年
                       </div>
                     )}
-                      </div>
-                    ))}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>

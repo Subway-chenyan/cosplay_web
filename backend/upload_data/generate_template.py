@@ -51,6 +51,7 @@ def generate_template():
         'award_names',        # 奖项名称（多个用逗号分隔）
         'award_years',        # 获奖年份（多个用逗号分隔）
         'award_descriptions', # 获奖描述（多个用逗号分隔）
+        'drama_names',        # 剧名（多个用逗号分隔，对应每个奖项）
     ]
     
     # 创建示例数据
@@ -81,6 +82,7 @@ def generate_template():
         'award_names': ['最佳团体奖,最佳创意奖,观众选择奖', '最佳个人奖'],
         'award_years': ['2024,2024,2024', '2023'],
         'award_descriptions': ['获得团体组第一名,创意设计优秀,观众投票最高', '获得个人组金奖'],
+        'drama_names': ['初音未来演唱会,原创剧目,粉丝互动', '东方Project音乐剧'],
     }
     
     # 创建DataFrame
@@ -101,12 +103,12 @@ def generate_template():
         field_descriptions = {
             '字段名': columns,
             '是否必需': [
-                '是', '是', '是',  # bv_number, title, url
+                '否', '否', '否',  # bv_number, title, url (可选)
                 '否', '否', '否',  # description, thumbnail, year
                 '否', '否', '否',  # group_name, competition_name, tags
                 '否', '否', '否', '否', '否', '否', '否', '否', '否', '否', '否', '否',  # group扩展字段
                 '否', '否',  # competition扩展字段
-                '否', '否', '否'   # award字段（支持多个）
+                '否', '否', '否', '是'   # award字段（drama_names为必填）
             ],
             '说明': [
                 'B站视频BV号，必须唯一',
@@ -134,7 +136,8 @@ def generate_template():
                 '比赛官网',
                 '奖项名称，多个奖项用逗号分隔，不存在则自动创建',
                 '获奖年份，多个年份用逗号分隔，需与奖项数量对应',
-                '获奖描述，多个描述用逗号分隔，需与奖项数量对应'
+                '获奖描述，多个描述用逗号分隔，需与奖项数量对应',
+                '剧目名称，多个剧名用逗号分隔，需与奖项数量对应，用于无视频的获奖记录'
             ]
         }
         

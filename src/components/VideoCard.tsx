@@ -5,9 +5,10 @@ import { useState, useRef, useEffect } from 'react'
 interface VideoCardProps {
   video: Video
   onClick?: () => void
+  dramaName?: string // 可选的剧名，用于覆盖视频标题
 }
 
-function VideoCard({ video, onClick }: VideoCardProps) {
+function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [isInView, setIsInView] = useState(false)
@@ -123,7 +124,7 @@ function VideoCard({ video, onClick }: VideoCardProps) {
       <div className="p-4">
         {/* 标题 */}
         <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2 leading-tight">
-          {video.title}
+          {dramaName || video.title}
         </h3>
 
         {/* 描述 */}
