@@ -83,7 +83,8 @@ function CompetitionDetailPage() {
     if (id) {
       setPage(1)
       setHasMore(true)
-      dispatch(fetchCompetitionVideos({ competitionId: id, year: selectedYear || undefined, page: 1, pageSize: 100 }) as any)
+      // 使用更大的pageSize确保获取更多数据，避免筛选时数据不全
+      dispatch(fetchCompetitionVideos({ competitionId: id, year: selectedYear || undefined, page: 1, pageSize: 500 }) as any)
       dispatch(fetchCompetitionAwards(id) as any)
       dispatch(fetchCompetitionAwardRecords({ competitionId: id }) as any)
     }
@@ -379,24 +380,29 @@ function CompetitionDetailPage() {
 
       {/* 比赛头部信息 */}
       <div 
-        className="rounded-2xl text-white p-8 shadow-xl relative overflow-hidden"
+        className={`rounded-2xl text-white shadow-xl relative overflow-hidden ${
+          customConfig.bannerBackground?.type === 'image' ? 'h-96' : 'p-8'
+        }`}
         style={getBannerStyle()}
       >
-        {/* 渐变遮罩层，确保文字可读性 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30"></div>
-        <div className="text-center relative z-10">
-          <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
-            <Trophy className="w-12 h-12 text-white" />
-          </div>
-          
-          <h1 className="text-4xl font-bold mb-4">{competition.name}</h1>
-          
-          <p className="text-xl text-yellow-100 max-w-3xl mx-auto leading-relaxed mb-8">
-            {competition.description}
-          </p>
-
-
-        </div>
+        {/* 只有非图片类型才显示内容 */}
+        {customConfig.bannerBackground?.type !== 'image' && (
+          <>
+            {/* 渐变遮罩层，确保文字可读性 */}
+            {/* <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30"></div> */}
+            <div className="text-center relative z-10">
+              <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <Trophy className="w-12 h-12 text-white" />
+              </div>
+              
+              <h1 className="text-4xl font-bold mb-4">{competition.name}</h1>
+              
+              <p className="text-xl text-yellow-100 max-w-3xl mx-auto leading-relaxed mb-8">
+                {competition.description}
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 筛选器 */}
@@ -522,8 +528,17 @@ function CompetitionDetailPage() {
             </h2>
           </div>
           
-          {/* 遍历所有奖项，合并显示有视频和无视频的记录 */}
-          {sortAwards(competitionAwards).map((award) => {
+          {/* 遍历奖项，根据筛选模式显示 */}
+          {sortAwards(competitionAwards)
+            .filter(award => {
+              // 如果是按奖项筛选，只显示选中的奖项
+              if (viewMode === 'award' && selectedAward) {
+                return award.id === selectedAward
+              }
+              // 其他情况显示所有有内容的奖项
+              return true
+            })
+            .map((award) => {
             const awardInfo = createAwardInfo(award.name)
             const videosForAward = awardedVideos[award.id]?.videos || []
             const recordsForAward = awardRecordsWithoutVideo[award.id]?.records || []

@@ -95,9 +95,9 @@ function GroupsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">社团展示</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">社团信息</h1>
         <p className="text-gray-600 mb-4">
-          探索优秀的cosplay社团，了解他们的作品和活动
+          持续更新中...
         </p>
         
         {/* Search Bar */}

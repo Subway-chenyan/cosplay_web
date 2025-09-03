@@ -227,6 +227,13 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = [
+    'https://data.cosdrama.cn',
+    'https://www.cosdrama.cn',
+    'https://cosdrama.cn',
+]
+
 # 允许自定义请求头
 CORS_ALLOW_HEADERS = [
     'accept',

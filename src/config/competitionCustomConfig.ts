@@ -18,10 +18,10 @@ export interface CompetitionCustomConfig {
 // 比赛自定义配置映射
 export const competitionCustomConfigs: Record<string, CompetitionCustomConfig> = {
   // 中国国际动漫节COSPLAY超级盛典 - 粉色梦幻主题
-  '1': {
+  '35d864f0-f112-4bce-a4ec-a0a1886afc4f': {
     bannerBackground: {
-      type: 'gradient',
-      value: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fad0c4 100%)'
+      type: 'image',
+      value: '/assets/guoman.jpg'
     },
     awardOrder: {
       priorityAwards: [],
@@ -30,14 +30,14 @@ export const competitionCustomConfigs: Record<string, CompetitionCustomConfig> =
   },
   
   // 第二个比赛 - 蓝绿渐变主题
-  '2': {
+  '1ab9ef24-924c-4a71-ae44-f94018671029': {
     bannerBackground: {
-      type: 'gradient',
-      value: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+      type: 'image',
+      value: '/assets/CJ2.png'
     },
     awardOrder: {
       priorityAwards: [],
-      sortRule: 'alphabetical'
+      sortRule: 'default'
     }
   },
   
@@ -70,18 +70,14 @@ export const getAwardSortWeight = (awardName: string): number => {
   
   // 团体规模权重基数
   let baseWeight = 0
-  if (name.includes('十五人以上')) {
+  if (name.includes('十五人以上') || name.includes('最佳团体组')) {
     baseWeight = 6000
-  } else if (name.includes('十五人以下')) {
+  } else if (name.includes('十五人以下') || name.includes('最佳小团体组')) {
     baseWeight = 5000
-  } else if (name.includes('盛龙')) {
+  } else if (name.includes('盛龙') || name.includes('双人')) {
     baseWeight = 4000
-  } else if (name.includes('大团体')) {
+  } else if (name.includes('单项') || name.includes('最佳') || name.includes('中国原创风格奖'))  {
     baseWeight = 3000
-  } else if (name.includes('小团体')) {
-    baseWeight = 2000
-  } else if (name.includes('单项')) {
-    baseWeight = 500
   } else if (name.includes('才艺组')) {
     baseWeight = 1000
   } else if (name.includes('剑网')) {

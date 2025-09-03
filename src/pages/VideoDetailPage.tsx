@@ -104,13 +104,13 @@ function VideoDetailPage() {
     <div className="space-y-6">
       {/* 返回按钮 */}
       <div className="flex items-center">
-        <Link
-          to="/"
+        <button
+          onClick={() => navigate(-1)}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>返回主页</span>
-        </Link>
+          <span>返回上一页</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

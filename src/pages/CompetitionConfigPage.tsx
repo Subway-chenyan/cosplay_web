@@ -5,7 +5,6 @@ import { RootState } from '../store/store'
 import { fetchCompetitions } from '../store/slices/competitionsSlice'
 import { fetchCompetitionAwards } from '../store/slices/awardsSlice'
 import { 
-  competitionCustomConfigs, 
   CompetitionCustomConfig,
   getCompetitionCustomConfig 
 } from '../config/competitionCustomConfig'

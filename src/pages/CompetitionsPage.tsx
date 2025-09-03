@@ -59,9 +59,9 @@ function CompetitionsPage() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* 页面标题 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">比赛活动</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">赛事</h1>
         <p className="text-gray-600">
-          探索各类精彩的Cosplay比赛活动
+          获奖信息均来自于龙翔大地整理收集，持续更新中...
         </p>
       </div>
 

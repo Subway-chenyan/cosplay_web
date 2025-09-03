@@ -214,7 +214,15 @@ const videosSlice = createSlice({
       })
       .addCase(fetchCompetitionVideos.fulfilled, (state, action) => {
         state.loading = false
-        state.videos = action.payload.results
+        if (action.payload.append) {
+          // 追加模式：将新数据添加到现有数据后面，并去重
+          const existingIds = new Set(state.videos.map(video => video.id))
+          const newVideos = action.payload.results.filter(video => !existingIds.has(video.id))
+          state.videos = [...state.videos, ...newVideos]
+        } else {
+          // 替换模式：直接替换所有数据
+          state.videos = action.payload.results
+        }
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,

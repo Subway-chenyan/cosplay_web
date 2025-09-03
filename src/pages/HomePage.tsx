@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchVideos, setSearchQuery, clearSearch, setCurrentPage } from '../store/slices/videosSlice'
 import VideoCard from '../components/VideoCard'
-import VideoFilters from '../components/VideoFilters'
+// import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
 import { Loader, Tv } from 'lucide-react'
 
@@ -166,7 +166,7 @@ function HomePage() {
             Cosplay舞台剧视频数据库
           </h1>
           <p className="text-xl text-primary-100 mb-6">
-            探索精彩的cosplay舞台剧表演，发现优秀的社团作品
+            各大Cosplay舞台剧赛事数据汇总，持续更新中...
           </p>
           </div>
       </div>
@@ -179,23 +179,23 @@ function HomePage() {
           onChange={handleInputChange}
           onClear={handleClearSearch}
           onSearch={handleSearch}
-          placeholder="搜索视频标题、描述、BV号、社团、比赛或标签..."
+          placeholder="搜索视频标题、描述、社团、比赛或标签..."
           className="max-w-2xl"
         />
       </div>
 
       {/* Filters */}
-      <VideoFilters />
+      {/* <VideoFilters /> */}
 
       {/* 筛选加载指示器 */}
-      {isFilterLoading && (
+      {/* {isFilterLoading && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-center space-x-2">
             <Loader className="w-4 h-4 animate-spin text-blue-600" />
             <span className="text-blue-600 text-sm">正在筛选...</span>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Video Grid */}
       <div>
