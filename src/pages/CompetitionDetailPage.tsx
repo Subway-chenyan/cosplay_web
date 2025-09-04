@@ -7,6 +7,7 @@ import { fetchCompetitionVideos } from '../store/slices/videosSlice'
 import { fetchCompetitionAwards, fetchCompetitionAwardRecords } from '../store/slices/awardsSlice'
 import { fetchGroups } from '../store/slices/groupsSlice'
 import VideoCard from '../components/VideoCard'
+import NoVideoAwardCard from '../components/NoVideoAwardCard'
 import { 
   getCompetitionCustomConfig, 
   getDefaultBannerBackground, 
@@ -601,68 +602,17 @@ function CompetitionDetailPage() {
                     })}
                     
                     {/* 无视频的记录 */}
-                    {recordsForAward.map((record) => (
-                      <div key={record.id} className="relative">
-                        {/* 模拟VideoCard的样式结构 */}
-                        <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden cursor-pointer group">
-                          {/* 缩略图区域 */}
-                          <div className="relative aspect-video bg-gray-100">
-                            <img
-                              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFpQ3dX8RyOjaIX0B2_JKjs6Glgg8pvanLCw&s"
-                              alt="无视频"
-                              className="w-full h-full object-cover"
-                            />
-                            {/* 无视频标识 */}
-                            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                              <div className="text-white text-center">
-                                <X className="w-8 h-8 mx-auto mb-2" />
-                                <span className="text-sm font-medium">暂无视频</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* 内容区域 */}
-                          <div className="p-4">
-                            {/* 剧名 */}
-                            {record.drama_name && (
-                              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                                {record.drama_name}
-                              </h3>
-                            )}
-                            
-                            {/* 社团名称 */}
-                            {record.group_name && (
-                              <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
-                                <Users className="w-4 h-4" />
-                                <span>{record.group_name}</span>
-                              </div>
-                            )}
-                            
-                            {/* 描述 */}
-                            {record.description && (
-                              <p className="text-sm text-gray-600 line-clamp-2">
-                                {record.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* 奖项标识 */}
-                        <div className={`absolute top-2 right-2 ${awardInfo.color} rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm backdrop-blur-sm`}>
-                          {awardInfo.icon}
-                          <span className={`text-xs font-medium ${awardInfo.textColor}`}>
-                            {awardInfo.label}
-                          </span>
-                        </div>
-                        
-                        {/* 年份标识 */}
-                        {record.competition_year_detail?.year && (
-                          <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white rounded px-2 py-1 text-xs">
-                            {record.competition_year_detail.year}年
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {recordsForAward.map((record) => {
+                      const awardInfo = createAwardInfo(award.name)
+                      
+                      return (
+                        <NoVideoAwardCard
+                          key={record.id}
+                          awardRecord={record}
+                          awardInfo={awardInfo}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
               </div>

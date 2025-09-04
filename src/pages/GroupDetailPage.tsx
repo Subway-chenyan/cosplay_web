@@ -6,6 +6,7 @@ import { fetchGroupVideos } from '../store/slices/videosSlice'
 import { fetchAwardRecords } from '../store/slices/awardsSlice'
 import { groupService } from '../services/groupService'
 import VideoCard from '../components/VideoCard'
+import NoVideoAwardCard from '../components/NoVideoAwardCard'
 import { 
   ArrowLeft, 
   MapPin, 
@@ -60,11 +61,9 @@ function GroupDetailPage() {
   useEffect(() => {
     if (id) {
       dispatch(fetchGroupVideos({ groupId: id }) as any)
+      dispatch(fetchAwardRecords({ group: id, page_size: 100 }) as any)
     }
-    if (awardRecords.length === 0) {
-      dispatch(fetchAwardRecords() as any)
-    }
-  }, [dispatch, id, awardRecords.length])
+  }, [dispatch, id])
 
   const group = currentGroup
   
@@ -77,17 +76,21 @@ function GroupDetailPage() {
   console.log('社团视频数量:', groupVideos.length)
   console.log('社团视频:', groupVideos.map(v => ({ id: v.id, title: v.title, group: v.group, group_name: v.group_name })))
 
-  // 获取该社团获得的奖项
-  const groupAwards = awardRecords.filter(awardRecord => 
-    awardRecord.group === id
-  )
+  // 获取该社团获得的奖项，按年份从小到大排序
+  const groupAwards = awardRecords
+    .filter(awardRecord => awardRecord.group === id)
+    .sort((a, b) => {
+      const yearA = parseInt(String(a.competition_year || '0'), 10)
+      const yearB = parseInt(String(b.competition_year || '0'), 10)
+      return yearA - yearB
+    })
 
   // 获取获奖视频
   const awardedVideos = groupVideos.filter(video => 
     groupAwards.some(awardRecord => awardRecord.video === video.id)
   )
 
-  // 获取无视频的获奖记录
+  // 获取无视频的获奖记录（已排序）
   const awardRecordsWithoutVideo = groupAwards.filter(awardRecord => 
     !awardRecord.video
   )
@@ -343,7 +346,7 @@ function GroupDetailPage() {
                             {awardRecord.competition_name || ''}
                           </span>
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {awardVideo?.year || '未知年份'}年
+                            {awardRecord.competition_year || '未知年份'}年
                           </span>
                         </div>
                       </div>
@@ -400,7 +403,7 @@ function GroupDetailPage() {
                             {awardRecord.competition_name || ''}
                           </span>
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {awardRecord.competition_year_detail?.year || '未知年份'}年
+                            {awardRecord.competition_year || '未知年份'}年
                           </span>
                         </div>
                       </div>
@@ -410,66 +413,10 @@ function GroupDetailPage() {
                       )}
                       
                       <div className={`bg-white rounded-lg p-3 border ${awardInfo.borderColor}`}>
-                        <div className="max-w-sm relative">
-                          {/* 模拟VideoCard的样式结构 */}
-                          <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden cursor-pointer group">
-                            {/* 缩略图区域 */}
-                            <div className="relative aspect-video bg-gray-100">
-                              <img
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFpQ3dX8RyOjaIX0B2_JKjs6Glgg8pvanLCw&s"
-                                alt="无视频"
-                                className="w-full h-full object-cover"
-                              />
-                              {/* 无视频标识 */}
-                              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                                <div className="text-white text-center">
-                                  <X className="w-8 h-8 mx-auto mb-2" />
-                                  <span className="text-sm font-medium">暂无视频</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* 内容区域 */}
-                            <div className="p-4">
-                              {/* 剧名 */}
-                              {awardRecord.drama_name && (
-                                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                                  {awardRecord.drama_name}
-                                </h3>
-                              )}
-                              
-                              {/* 社团名称 */}
-                              {awardRecord.group_name && (
-                                <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
-                                  <Users className="w-4 h-4" />
-                                  <span>{awardRecord.group_name}</span>
-                                </div>
-                              )}
-                              
-                              {/* 描述 */}
-                              {awardRecord.description && (
-                                <p className="text-sm text-gray-600 line-clamp-2">
-                                  {awardRecord.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* 奖项标识 */}
-                          <div className={`absolute top-2 right-2 ${awardInfo.color} rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm backdrop-blur-sm border ${awardInfo.borderColor}`}>
-                            {awardInfo.icon}
-                            <span className={`text-xs font-medium ${awardInfo.textColor}`}>
-                              {awardInfo.label}
-                            </span>
-                          </div>
-                          
-                          {/* 年份标识 */}
-                          {awardRecord.competition_year_detail?.year && (
-                            <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white rounded px-2 py-1 text-xs">
-                              {awardRecord.competition_year_detail.year}年
-                            </div>
-                          )}
-                        </div>
+                        <NoVideoAwardCard
+                          awardRecord={awardRecord}
+                          awardInfo={awardInfo}
+                        />
                       </div>
                     </div>
                   </div>

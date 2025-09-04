@@ -40,7 +40,7 @@ export const fetchCompetitionAwards = createAsyncThunk(
 // 获取获奖记录
 export const fetchAwardRecords = createAsyncThunk(
   'awards/fetchAwardRecords',
-  async (params?: { video?: string; group?: string; year?: number }) => {
+  async (params?: { video?: string; group?: string; year?: number; page?: number; page_size?: number }) => {
     const response = await awardService.getAwardRecords(params)
     return response.results
   }

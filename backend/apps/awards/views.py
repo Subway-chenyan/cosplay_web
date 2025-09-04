@@ -1,10 +1,13 @@
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Q
 from django.db import transaction
 from .models import Award, AwardRecord
 from .serializers import AwardSerializer, AwardRecordSerializer, AwardRecordDetailSerializer
+from .filters import AwardRecordFilter
 from apps.groups.models import Group
 from apps.videos.models import Video
 from apps.videos.serializers import VideoSerializer
@@ -45,8 +48,13 @@ class AwardRecordViewSet(viewsets.ModelViewSet):
     """
     获奖记录视图集
     """
-    queryset = AwardRecord.objects.all()
+    queryset = AwardRecord.objects.all().select_related('award', 'video', 'group', 'competition_year')
     serializer_class = AwardRecordSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = AwardRecordFilter
+    search_fields = ['drama_name', 'description']
+    ordering_fields = ['created_at', 'competition_year__year']
+    ordering = ['-competition_year__year', '-created_at']
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
