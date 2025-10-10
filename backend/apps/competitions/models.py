@@ -56,3 +56,33 @@ class CompetitionYear(models.Model):
     
     def __str__(self):
         return f"{self.competition.name} - {self.year}年"
+
+
+class Event(models.Model):
+    """
+    赛事信息模型
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = models.DateField(verbose_name='赛事日期')
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, 
+                                   related_name='events', verbose_name='关联比赛')
+    title = models.CharField(max_length=200, verbose_name='赛事标题')
+    description = models.TextField(blank=True, verbose_name='赛事描述')
+    contact = models.CharField(max_length=200, blank=True, verbose_name='联系方式')
+    website = models.URLField(blank=True, verbose_name='官网链接')
+    promotional_image = models.URLField(blank=True, verbose_name='宣传图链接')
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    
+    class Meta:
+        verbose_name = '赛事信息'
+        verbose_name_plural = '赛事信息'
+        ordering = ['-date']
+        indexes = [
+            models.Index(fields=['date']),
+            models.Index(fields=['competition', 'date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} - {self.date}"

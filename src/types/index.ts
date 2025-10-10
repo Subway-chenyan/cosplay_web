@@ -133,3 +133,17 @@ export interface PaginatedResponse<T> {
   previous?: string
   results: T[]
 }
+
+export interface Event {
+  id: string
+  date: string
+  competition: string
+  competition_name: string
+  title: string
+  description: string
+  contact: string
+  website: string
+  promotional_image: string
+  created_at: string
+  updated_at: string
+}

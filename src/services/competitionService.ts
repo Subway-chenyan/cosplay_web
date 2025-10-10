@@ -19,27 +19,27 @@ class CompetitionService {
     }
     
     const queryString = api.buildQueryParams(queryParams)
-    return api.get<PaginatedResponse<Competition>>(`/competitions/${queryString}`)
+    return api.get<PaginatedResponse<Competition>>(`/competitions/competitions/${queryString}`)
   }
 
   // 获取比赛详情
   async getCompetitionById(id: string): Promise<Competition> {
-    return api.get<Competition>(`/competitions/${id}/`)
+    return api.get<Competition>(`/competitions/competitions/${id}/`)
   }
 
   // 创建比赛
   async createCompetition(data: Partial<Competition>): Promise<Competition> {
-    return api.post<Competition>('/competitions/', data)
+    return api.post<Competition>('/competitions/competitions/', data)
   }
 
   // 更新比赛
   async updateCompetition(id: string, data: Partial<Competition>): Promise<Competition> {
-    return api.patch<Competition>(`/competitions/${id}/`, data)
+    return api.patch<Competition>(`/competitions/competitions/${id}/`, data)
   }
 
   // 删除比赛
   async deleteCompetition(id: string): Promise<void> {
-    return api.delete(`/competitions/${id}/`)
+    return api.delete(`/competitions/competitions/${id}/`)
   }
 
   // 搜索比赛
@@ -76,38 +76,38 @@ class CompetitionService {
       page,
       page_size: pageSize,
     })
-    return api.get(`/competitions/${competitionId}/years/${year}/videos/${queryParams}`)
+    return api.get(`/competitions/competitions/${competitionId}/years/${year}/videos/${queryParams}`)
   }
 
   // 获取比赛的所有年份
   async getCompetitionYears(competitionId: string) {
-    return api.get(`/competitions/${competitionId}/years/`)
+    return api.get(`/competitions/competitions/${competitionId}/years/`)
   }
 
   // 获取比赛的获奖记录
   async getCompetitionAwards(competitionId: string) {
-    return api.get(`/competitions/${competitionId}/awards/`)
+    return api.get(`/competitions/competitions/${competitionId}/awards/`)
   }
 
   // 获取比赛的参赛社团
   async getCompetitionGroups(competitionId: string) {
-    return api.get(`/competitions/${competitionId}/groups/`)
+    return api.get(`/competitions/competitions/${competitionId}/groups/`)
   }
 
   // 获取年份列表
   async getYearList(): Promise<number[]> {
-    const response = await api.get<number[]>('/competitions/years/')
+    const response = await api.get<number[]>('/competitions/competitions/years/')
     return response
   }
 
   // 获取比赛配置
   async getCompetitionConfig(competitionId: string) {
-    return api.get(`/competitions/${competitionId}/config/`)
+    return api.get(`/competitions/competitions/${competitionId}/config/`)
   }
 
   // 更新比赛配置
   async updateCompetitionConfig(competitionId: string, config: any) {
-    return api.patch(`/competitions/${competitionId}/update_config/`, { config })
+    return api.patch(`/competitions/competitions/${competitionId}/update_config/`, { config })
   }
 }
 

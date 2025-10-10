@@ -3,9 +3,10 @@ import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock } from 'lucide
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
 import { videoService } from '../services/videoService'
+import { eventService } from '../services/eventService'
 import { authService } from '../services/authService'
 import { api } from '../services/api'
-import { Group } from '../types'
+import { Group, Event } from '../types'
 
 interface SearchableSelectProps {
   placeholder: string
@@ -14,6 +15,125 @@ interface SearchableSelectProps {
   displayField: string
   valueField: string
   disabled?: boolean
+}
+
+interface DropdownSelectProps {
+  placeholder: string
+  onChange: (value: string, item?: any) => void
+  loadOptions: () => Promise<any>
+  displayField: string
+  valueField: string
+  disabled?: boolean
+  value?: string
+}
+
+const DropdownSelect: React.FC<DropdownSelectProps> = ({
+  placeholder,
+  onChange,
+  loadOptions,
+  displayField,
+  valueField,
+  disabled = false,
+  value
+}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [options, setOptions] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<any>(null)
+
+  useEffect(() => {
+    setLoading(true)
+    loadOptions()
+      .then(response => {
+        const optionsList = response.results || []
+        setOptions(optionsList)
+        
+        // 如果有预设值，找到对应的选项
+        if (value) {
+          const foundItem = optionsList.find((item: any) => item[valueField] === value)
+          if (foundItem) {
+            setSelectedItem(foundItem)
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Load options error:', error)
+        setOptions([])
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [loadOptions, value, valueField])
+
+  const handleSelect = (item: any) => {
+    setSelectedItem(item)
+    onChange(item[valueField], item)
+    setIsOpen(false)
+  }
+
+  const handleClear = () => {
+    setSelectedItem(null)
+    onChange('', null)
+  }
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed bg-white"
+        >
+          <span className={selectedItem ? 'text-gray-900' : 'text-gray-500'}>
+            {selectedItem ? selectedItem[displayField] : placeholder}
+          </span>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <svg className="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </button>
+        
+        {selectedItem && !disabled && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-8 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
+          >
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
+      </div>
+      
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+          {loading ? (
+            <div className="px-3 py-2 text-gray-500">加载中...</div>
+          ) : options.length > 0 ? (
+            options.map((item) => (
+              <div
+                key={item[valueField]}
+                onClick={() => handleSelect(item)}
+                className={`px-3 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                  selectedItem && selectedItem[valueField] === item[valueField] ? 'bg-blue-50 text-blue-600' : ''
+                }`}
+              >
+                <div className="font-medium">{item[displayField]}</div>
+                {item.description && (
+                  <div className="text-sm text-gray-500 truncate">{item.description}</div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="px-3 py-2 text-gray-500">暂无选项</div>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -101,8 +221,9 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 }
 
 const ManagementPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'video' | 'group'>('video')
+  const [activeTab, setActiveTab] = useState<'video' | 'group' | 'event'>('video')
   const [groupMode, setGroupMode] = useState<'create' | 'edit'>('create')
+  const [eventMode, setEventMode] = useState<'create' | 'edit'>('create')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -142,6 +263,20 @@ const ManagementPage: React.FC = () => {
   })
 
   const [selectedGroupForEdit, setSelectedGroupForEdit] = useState<Group | null>(null)
+
+  // 赛事表单状态
+  const [eventForm, setEventForm] = useState<Partial<Event>>({
+    id: '',
+    date: '',
+    competition: '',
+    title: '',
+    description: '',
+    contact: '',
+    website: '',
+    promotional_image: ''
+  })
+
+  const [selectedEventForEdit, setSelectedEventForEdit] = useState<Event | null>(null)
 
   // 检查认证状态
   useEffect(() => {
@@ -218,6 +353,73 @@ const ManagementPage: React.FC = () => {
       bilibili: ''
     })
     setSelectedGroupForEdit(null)
+  }
+
+  const resetEventForm = () => {
+    setEventForm({
+      id: '',
+      date: '',
+      competition: '',
+      title: '',
+      description: '',
+      contact: '',
+      website: '',
+      promotional_image: ''
+    })
+    setSelectedEventForEdit(null)
+  }
+
+  // 处理赛事选择（用于编辑）
+  const handleEventSelect = (_eventId: string, event: Event) => {
+    setSelectedEventForEdit(event)
+    setEventForm({
+      id: event.id,
+      date: event.date,
+      competition: event.competition,
+      title: event.title,
+      description: event.description || '',
+      contact: event.contact || '',
+      website: event.website || '',
+      promotional_image: event.promotional_image || ''
+    })
+    setEventMode('edit')
+  }
+
+  // 处理赛事提交
+  const handleEventSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!eventForm.date || !eventForm.competition || !eventForm.title) {
+      showMessage('error', '请填写必填字段：日期、比赛和标题')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const eventData = {
+        date: eventForm.date,
+        competition: eventForm.competition,
+        title: eventForm.title,
+        description: eventForm.description || '',
+        contact: eventForm.contact || '',
+        website: eventForm.website || '',
+        promotional_image: eventForm.promotional_image || ''
+      }
+
+      if (eventMode === 'create') {
+        await eventService.createEvent(eventData)
+        showMessage('success', '赛事创建成功')
+      } else if (eventMode === 'edit' && selectedEventForEdit) {
+        await eventService.updateEvent(selectedEventForEdit.id, eventData)
+        showMessage('success', '赛事更新成功')
+      }
+      
+      resetEventForm()
+      setEventMode('create')
+    } catch (error: any) {
+      showMessage('error', `操作失败: ${error.message || '未知错误'}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // 处理社团选择（用于编辑）
@@ -475,6 +677,16 @@ const ManagementPage: React.FC = () => {
                   }`}
                 >
                   社团信息管理
+                </button>
+                <button
+                  onClick={() => setActiveTab('event')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'event'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  赛事信息管理
                 </button>
               </nav>
             </div>
@@ -923,6 +1135,184 @@ const ManagementPage: React.FC = () => {
                         <>
                           <Save className="h-4 w-4 mr-2" />
                           {groupMode === 'create' ? '创建社团' : '更新社团'}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {activeTab === 'event' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-medium text-gray-900">
+                    {eventMode === 'create' ? '添加新赛事' : '编辑赛事信息'}
+                  </h2>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEventMode('create')
+                        resetEventForm()
+                      }}
+                      className={`px-3 py-1 text-sm rounded-md ${
+                        eventMode === 'create'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <Plus className="h-4 w-4 inline mr-1" />
+                      新建
+                    </button>
+                    <button
+                      onClick={() => setEventMode('edit')}
+                      className={`px-3 py-1 text-sm rounded-md ${
+                        eventMode === 'edit'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <Edit className="h-4 w-4 inline mr-1" />
+                      编辑
+                    </button>
+                  </div>
+                </div>
+
+                {eventMode === 'edit' && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      选择要编辑的赛事
+                    </label>
+                    <SearchableSelect
+                       placeholder="搜索赛事..."
+                       onChange={handleEventSelect}
+                       searchFunction={() => eventService.getEvents()}
+                       displayField="title"
+                       valueField="id"
+                     />
+                  </div>
+                )}
+
+                <form onSubmit={handleEventSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        赛事日期 *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={eventForm.date}
+                        onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        关联比赛 *
+                      </label>
+                      <DropdownSelect
+                        placeholder="选择比赛..."
+                        value={eventForm.competition}
+                        onChange={(value) => setEventForm({ ...eventForm, competition: value })}
+                        loadOptions={() => competitionService.getCompetitions({ page_size: 100 })}
+                        displayField="name"
+                        valueField="id"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      赛事标题 *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={eventForm.title}
+                      onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="赛事标题"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      赛事描述
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={eventForm.description}
+                      onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="赛事详细描述..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        联系方式
+                      </label>
+                      <input
+                        type="text"
+                        value={eventForm.contact}
+                        onChange={(e) => setEventForm({ ...eventForm, contact: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="联系电话或邮箱"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        官网链接
+                      </label>
+                      <input
+                        type="url"
+                        value={eventForm.website}
+                        onChange={(e) => setEventForm({ ...eventForm, website: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      宣传图片链接
+                    </label>
+                    <input
+                      type="url"
+                      value={eventForm.promotional_image}
+                      onChange={(e) => setEventForm({ ...eventForm, promotional_image: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="https://..."
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={resetEventForm}
+                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      重置
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading || (eventMode === 'edit' && !selectedEventForEdit)}
+                      className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          {eventMode === 'create' ? '创建中...' : '更新中...'}
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2" />
+                          {eventMode === 'create' ? '创建赛事' : '更新赛事'}
                         </>
                       )}
                     </button>

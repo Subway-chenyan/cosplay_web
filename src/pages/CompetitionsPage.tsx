@@ -5,6 +5,7 @@ import { RootState, AppDispatch } from '../store/store'
 import { fetchCompetitions, setCurrentPage } from '../store/slices/competitionsSlice'
 import { Trophy, Calendar, Loader } from 'lucide-react'
 import { Competition } from '../types'
+import EventCalendar from '../components/EventCalendar'
 
 function CompetitionsPage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -147,6 +148,17 @@ function CompetitionsPage() {
           已显示 {competitions.length} / {pagination.count} 个比赛
         </div>
       )}
+
+      {/* Event Calendar Section */}
+      <div className="mt-12">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">赛事日历</h2>
+          <p className="text-gray-600">
+            查看本月的赛事安排和重要时间节点
+          </p>
+        </div>
+        <EventCalendar />
+      </div>
     </div>
   )
 }

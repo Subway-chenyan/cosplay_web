@@ -2,8 +2,10 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import Competition, CompetitionYear
-from .serializers import CompetitionSerializer, CompetitionYearSerializer
+from django.db.models import Q
+from datetime import datetime
+from .models import Competition, CompetitionYear, Event
+from .serializers import CompetitionSerializer, CompetitionYearSerializer, EventSerializer
 from apps.videos.serializers import VideoSerializer
 from apps.videos.models import Video
 from rest_framework.pagination import PageNumberPagination
@@ -18,6 +20,10 @@ class CompetitionViewSet(viewsets.ModelViewSet):
     serializer_class = CompetitionSerializer
     
     def get_permissions(self):
+        """
+        根据操作类型设置权限
+        读取操作允许匿名访问，写入操作需要认证
+        """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             permission_classes = [permissions.IsAuthenticated]
         else:
@@ -106,3 +112,75 @@ class CompetitionYearVideosView(generics.ListAPIView):
             competition_id=competition_id,
             year=year
         ).select_related('group', 'competition').prefetch_related('tags')
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    赛事信息视图集
+    """
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [permissions.IsAuthenticated]
+        else:
+            permission_classes = [permissions.AllowAny]
+        return [permission() for permission in permission_classes]
+    
+    @action(detail=False, methods=['get'])
+    def by_month(self, request):
+        """按月份获取赛事信息"""
+        year = request.query_params.get('year')
+        month = request.query_params.get('month')
+        
+        if not year or not month:
+            return Response(
+                {'error': '需要提供year和month参数'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            year = int(year)
+            month = int(month)
+        except ValueError:
+            return Response(
+                {'error': 'year和month必须是数字'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        events = Event.objects.filter(
+            date__year=year,
+            date__month=month
+        ).select_related('competition').order_by('date')
+        
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def by_date_range(self, request):
+        """按日期范围获取赛事信息"""
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        
+        if not start_date or not end_date:
+            return Response(
+                {'error': '需要提供start_date和end_date参数'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except ValueError:
+            return Response(
+                {'error': '日期格式错误，应为YYYY-MM-DD'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        events = Event.objects.filter(
+            date__range=[start_date, end_date]
+        ).select_related('competition').order_by('date')
+        
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
