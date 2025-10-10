@@ -8,21 +8,29 @@ services:
       POSTGRES_DB: cosplay_db
       POSTGRES_USER: cosplay_user
       POSTGRES_PASSWORD: cosplay_password_2024
-      POSTGRES_HOST_AUTH_METHOD: trust
+      # 移除 POSTGRES_HOST_AUTH_METHOD: trust，使用密码认证更安全
     ports:
-      - "5432:5432"
+      # 绑定到所有接口，允许外部访问
+      - "0.0.0.0:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
     networks:
       - cosplay_network
+    # 添加 PostgreSQL 配置以允许远程连接
+    command: >
+      postgres
+      -c listen_addresses='*'
+      -c max_connections=200
+      -c shared_buffers=256MB
  
   redis:
     image: redis:7-alpine
     container_name: cosplay_redis
     ports:
-      - "6379:6379"
+      # 如果也需要开放 Redis，同样修改端口绑定
+      - "0.0.0.0:6379:6379"
     restart: unless-stopped
     networks:
       - cosplay_network
@@ -32,4 +40,4 @@ volumes:
 
 networks:
   cosplay_network:
-    driver: bridge 
+    driver: bridge

@@ -42,10 +42,10 @@ export const competitionCustomConfigs: Record<string, CompetitionCustomConfig> =
   },
   
   // 第三个比赛 - 动漫主题背景图片
-  '3': {
+  '07f39591-83c9-4ce6-bd97-ee732b258976': {
     bannerBackground: {
       type: 'image',
-      value: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=400&fit=crop&q=80'
+      value: '/assets/JL2.png'
     },
     awardOrder: {
       priorityAwards: [],

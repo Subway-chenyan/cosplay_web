@@ -18,7 +18,7 @@ import {
   Globe,
   Medal,
   Star,
-  X
+  // X
 } from 'lucide-react'
 
 function GroupDetailPage() {

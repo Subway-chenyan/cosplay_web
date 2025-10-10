@@ -18,6 +18,9 @@ function NoVideoAwardCard({ awardRecord, awardInfo }: NoVideoAwardCardProps) {
     if (competitionName?.includes('ChinaJoy') || competitionName?.includes('超级联赛')) {
       return '/assets/CJ.png'
     }
+    if (competitionName?.includes('金龙')) {
+      return '/assets/JL.png'
+    }
     // 默认背景图片
     return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFpQ3dX8RyOjaIX0B2_JKjs6Glgg8pvanLCw&s'
   }
