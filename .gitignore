@@ -122,3 +122,5 @@ cython_debug/
 nohup.out
 logs/
 *.db
+
+database/
