@@ -7,6 +7,7 @@ import VideoCard from '../components/VideoCard'
 // import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
 import { Loader, Tv } from 'lucide-react'
+import { videoService } from '../services/videoService'
 
 function HomePage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -17,6 +18,23 @@ function HomePage() {
   const scrollPositionRef = useRef<number>(0)
   const filtersRef = useRef(filters)
   const searchQueryRef = useRef(searchQuery)
+
+  const [stats, setStats] = useState<{ total_videos: number; weekly_new_videos: number } | null>(null)
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const s = await videoService.getVideoStats()
+      setStats(s)
+    } catch (e) {
+      // ignore
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchStats()
+    const interval = setInterval(fetchStats, 60000)
+    return () => clearInterval(interval)
+  }, [fetchStats])
 
   // 防抖函数
   const debounce = useCallback((func: Function, delay: number) => {
@@ -184,6 +202,21 @@ function HomePage() {
         />
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+          <div>
+            <div className="text-sm text-gray-600">总视频数</div>
+            <div className="text-2xl font-bold text-gray-900">{stats?.total_videos ?? pagination.count}</div>
+          </div>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+          <div>
+            <div className="text-sm text-gray-600">近7天新增</div>
+            <div className="text-2xl font-bold text-primary-600">{stats?.weekly_new_videos ?? 0}</div>
+          </div>
+        </div>
+      </div>
       {/* Filters */}
       {/* <VideoFilters /> */}
 

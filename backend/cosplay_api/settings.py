@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'django_filters',
     'drf_spectacular',
+    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
@@ -258,6 +259,22 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Shanghai'
+
+# Celery Beat 调度器配置
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'crawl-bilibili-videos-weekly': {
+        'task': 'apps.videos.tasks.crawl_bilibili_videos_weekly',
+        'schedule': crontab(hour=2, minute=0, day_of_week=1),  # 每周一凌晨2点执行
+        'options': {
+            'expires': 3600,  # 任务1小时后过期
+        }
+    },
+}
+
+# 使用默认调度器以读取 CELERY_BEAT_SCHEDULE 配置
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Logging
 LOGGING = {

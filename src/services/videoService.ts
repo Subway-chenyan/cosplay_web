@@ -195,6 +195,11 @@ class VideoService {
     })
     return api.get(`/videos/search-groups/${queryParams}`)
   }
+
+  // 获取视频统计
+  async getVideoStats(): Promise<{ total_videos: number; weekly_new_videos: number }> {
+    return api.get<{ total_videos: number; weekly_new_videos: number }>(`/videos/stats/`)
+  }
 }
 
 export const videoService = new VideoService()

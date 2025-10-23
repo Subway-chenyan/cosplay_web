@@ -15,7 +15,8 @@ import json
 import os
 import tempfile
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -402,6 +403,21 @@ class VideoViewSet(viewsets.ModelViewSet):
         查询导入任务状态
         """
 
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.AllowAny],
+        url_path='stats'
+    )
+    def stats(self, request):
+        now = timezone.now()
+        week_ago = now - timedelta(days=7)
+        weekly_new = self.queryset.filter(created_at__gte=week_ago).count()
+        total_count = self.queryset.count()
+        return Response({
+            'total_videos': total_count,
+            'weekly_new_videos': weekly_new
+        })
     @action(
         detail=False,
         methods=['get'],
