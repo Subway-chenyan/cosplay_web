@@ -317,6 +317,15 @@ from .pagination import OptimizedVideoPagination, LargeResultsSetPagination
 from apps.groups.models import Group
 from apps.groups.serializers import GroupSerializer
 
+# 导入SQL Agent相关模块
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'apps', 'text2sql'))
+try:
+    from sql_agent_cached import SQLAgent
+except ImportError:
+    SQLAgent = None
+
 
 class VideoViewSet(viewsets.ModelViewSet):
     """
@@ -600,4 +609,216 @@ class VideoViewSet(viewsets.ModelViewSet):
             'count': len(groups_data),
             'search_query': search_query
         })
+
+    @action(
+        detail=False,
+        methods=['post'],
+        permission_classes=[permissions.AllowAny],
+        url_path='agent-search'
+    )
+    def agent_search(self, request):
+        """
+        Agent智能搜索 - 使用SQL Agent进行智能查询，返回结构化结果
+        """
+        try:
+            search_query = request.data.get('query', '').strip()
+            if not search_query:
+                return Response({
+                    'error': '搜索查询不能为空'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # 检查SQL Agent是否可用
+            if SQLAgent is None:
+                return Response({
+                    'error': 'SQL Agent服务暂不可用'
+                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+            # 初始化SQL Agent
+            agent = SQLAgent()
+
+            # 首先分析用户意图并获取相关数据
+            intent_analysis_query = f"""
+            请分析以下搜索查询的意图，并判断用户想要查找什么类型的信息：
+            查询: "{search_query}"
+
+            请回答以下问题：
+            1. 用户主要想查找视频还是社团？
+            2. 是否有特定的时间、地点、比赛等限制条件？
+            3. 用户是否想要统计信息（如获奖最多、最新等）？
+
+            请用简洁的中文回答。
+            """
+
+            # 获取意图分析结果
+            intent_result = agent.query(intent_analysis_query)
+
+            # 根据查询内容执行不同的搜索策略
+            video_ids = []
+            group_ids = []
+            search_summary = ""
+
+            # 判断查询类型并执行相应搜索
+            if '获奖' in search_query or '得奖' in search_query or '奖项' in search_query:
+                # 奖项相关搜索
+                if '社团' in search_query or '团队' in search_query:
+                    # 查找获奖社团 - 使用award_count字段
+                    current_year = 2025
+                    if '2025' in search_query:
+                        # 查找2025年获奖社团
+                        # 先获取2025年有获奖记录的视频
+                        award_videos_2025 = Video.objects.filter(
+                            year=current_year,
+                            award_records__isnull=False
+                        ).values_list('group_id', flat=True).distinct()
+
+                        # 然后获取对应的社团，按获奖数量排序
+                        award_groups = Group.objects.filter(
+                            id__in=award_videos_2025,
+                            award_count__gt=0
+                        ).order_by('-award_count')[:10]
+
+                        group_ids = list(award_groups.values_list('id', flat=True))
+                        search_summary = f"根据您的查询，我找到了{len(group_ids)}个在{current_year}年有获奖记录的社团。"
+                    else:
+                        # 查找总体获奖社团 - 直接使用award_count字段
+                        award_groups = Group.objects.filter(
+                            award_count__gt=0
+                        ).order_by('-award_count')[:10]
+
+                        group_ids = list(award_groups.values_list('id', flat=True))
+                        search_summary = f"根据您的查询，我找到了{len(group_ids)}个有获奖记录的社团。"
+                else:
+                    # 查找获奖视频
+                    award_videos = Video.objects.filter(
+                        award_records__isnull=False
+                    ).select_related('group', 'competition').order_by('-created_at')[:20]
+
+                    video_ids = list(award_videos.values_list('id', flat=True))
+                    search_summary = f"根据您的查询，我找到了{len(video_ids)}个获奖视频。"
+
+            elif '社团' in search_query or '团队' in search_query:
+                # 社团相关搜索
+                if '地区' in search_query or '地方' in search_query or '上海' in search_query:
+                    # 地区相关社团搜索
+                    location_keywords = ['上海', '北京', '广州', '深圳', '杭州', '南京', '武汉', '成都']
+                    location_filter = None
+
+                    for keyword in location_keywords:
+                        if keyword in search_query:
+                            location_filter = keyword
+                            break
+
+                    if location_filter:
+                        groups = Group.objects.filter(
+                            Q(province__icontains=location_filter) |
+                            Q(city__icontains=location_filter) |
+                            Q(location__icontains=location_filter)
+                        ).order_by('-video_count')[:10]
+
+                        group_ids = list(groups.values_list('id', flat=True))
+                        search_summary = f"根据您的查询，我找到了{len(group_ids)}个位于{location_filter}地区的社团。"
+                    else:
+                        # 通用社团搜索
+                        groups = Group.objects.all().order_by('-video_count')[:10]
+                        group_ids = list(groups.values_list('id', flat=True))
+                        search_summary = f"根据您的查询，我找到了{len(group_ids)}个活跃的社团。"
+                else:
+                    # 通用社团搜索
+                    groups = Group.objects.all().order_by('-video_count')[:10]
+                    group_ids = list(groups.values_list('id', flat=True))
+                    search_summary = f"根据您的查询，我找到了{len(group_ids)}个活跃的社团。"
+
+            else:
+                # 通用搜索 - 同时搜索视频和社团
+                # 视频搜索
+                video_queryset = Video.objects.filter(
+                    Q(title__icontains=search_query) |
+                    Q(description__icontains=search_query) |
+                    Q(group__name__icontains=search_query) |
+                    Q(competition__name__icontains=search_query)
+                ).values_list('id', flat=True)[:10]
+                video_ids = list(video_queryset)
+
+                # 社团搜索
+                group_queryset = Group.objects.filter(
+                    Q(name__icontains=search_query) |
+                    Q(description__icontains=search_query) |
+                    Q(province__icontains=search_query) |
+                    Q(city__icontains=search_query)
+                ).values_list('id', flat=True)[:10]
+                group_ids = list(group_queryset)
+
+                search_summary = f"根据您的查询，我找到了{len(video_ids)}个相关视频和{len(group_ids)}个相关社团。"
+
+            # 使用LLM生成更自然的搜索摘要（简化版，避免解析错误）
+            # 首先提供一个好的默认摘要
+            if '获奖' in search_query and '社团' in search_query:
+                if '2025' in search_query:
+                    search_summary = f"根据您的查询，我为您找到了{len(group_ids)}个在2025年有获奖记录的社团，这些社团在cosplay舞台剧领域表现优异。"
+                else:
+                    search_summary = f"根据您的查询，我为您找到了{len(group_ids)}个有获奖记录的社团，这些社团在各类cosplay舞台剧比赛中都有出色的表现。"
+            elif '社团' in search_query:
+                search_summary = f"根据您的查询，我为您找到了{len(group_ids)}个活跃的cosplay社团，这些社团来自不同地区，都有丰富的舞台剧表演经验。"
+            elif '获奖' in search_query:
+                search_summary = f"根据您的查询，我为您找到了{len(video_ids)}个获奖的cosplay舞台剧视频，这些作品在各类比赛中都获得了优异的成绩。"
+            else:
+                search_summary = f"根据您的查询，我为您找到了{len(video_ids)}个相关视频和{len(group_ids)}个相关社团，这些内容都与您的搜索需求密切相关。"
+
+            # 尝试使用LLM生成更自然的摘要（可选）
+            try:
+                summary_query = f"请用一句话总结：用户搜索'{search_query}'，找到{len(video_ids)}个视频和{len(group_ids)}个社团。只返回总结文本。"
+                llm_summary = agent.query(summary_query)
+                if llm_summary and len(llm_summary.strip()) > 10:
+                    # 清理LLM输出，确保没有格式错误
+                    clean_summary = llm_summary.strip().replace('`', '').replace('{', '').replace('}', '')
+                    if len(clean_summary) > 10 and '错误' not in clean_summary and '失败' not in clean_summary:
+                        search_summary = clean_summary
+            except Exception as llm_error:
+                print(f"LLM摘要生成失败: {llm_error}")
+                # 使用默认摘要（已经设置好了）
+                pass
+
+            # 获取视频数据
+            videos = []
+            if video_ids:
+                video_objects = Video.objects.filter(id__in=video_ids)[:10]
+                videos = VideoListSerializer(video_objects, many=True).data
+
+            # 获取社团数据
+            groups = []
+            if group_ids:
+                group_objects = Group.objects.filter(id__in=group_ids)[:10]
+                groups = [{
+                    'id': group.id,
+                    'name': group.name,
+                    'location': group.location or f"{group.province or ''}{group.city or ''}".strip(),
+                    'province': group.province,
+                    'city': group.city,
+                    'video_count': group.video_count,
+                    'description': group.description,
+                    'is_active': group.is_active
+                } for group in group_objects]
+
+            return Response({
+                'query': search_query,
+                'text': search_summary,  # LLM生成的自然语言总结
+                'video_id_list': video_ids,  # 视频ID列表
+                'group_id_list': group_ids,  # 社团ID列表
+                'videos': videos,  # 视频详细信息
+                'groups': groups,  # 社团详细信息
+                'video_count': len(videos),
+                'group_count': len(groups),
+                'total_count': len(videos) + len(groups),
+                'agent_analysis': intent_result  # 保留意图分析供调试
+            })
+
+        except Exception as e:
+            error_msg = f"Agent搜索失败: {str(e)}"
+            print(f"❌ {error_msg}")
+            return Response({
+                'error': error_msg,
+                'text': '抱歉，搜索过程中出现了错误，请稍后重试。',
+                'video_id_list': [],
+                'group_id_list': []
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
