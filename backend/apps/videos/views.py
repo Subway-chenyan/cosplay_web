@@ -628,9 +628,10 @@ class VideoViewSet(viewsets.ModelViewSet):
 
         # 检查SQL Agent是否可用
         if SQLAgent is None:
+            logger.warning("agent_search SQLAgent is None; service unavailable")
             return Response({'error': 'SQL Agent服务暂不可用'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        logger.info("agent_search query=%s", search_query)
+        logger.info("agent_search start query_len=%d query=%r", len(search_query), search_query[:200])
         try:
             # 初始化并调用SQL Agent，确保返回结构与AgentOutput一致
             agent = SQLAgent()
@@ -638,12 +639,27 @@ class VideoViewSet(viewsets.ModelViewSet):
 
             # 兼容BaseModel或dict两种返回形态
             payload = structured.dict() if hasattr(structured, 'dict') else dict(structured)
+            logger.debug("agent_search structured_type=%s payload_keys=%s", type(structured).__name__, list(payload.keys()))
+
+            # 原始ID列表
+            raw_video_ids = payload.get('video_id_list', []) or []
+            raw_group_ids = payload.get('group_id_list', []) or []
+            overview = payload.get('natural_language_overview', '') or ''
+
+            # 规范化为字符串并去除空值
+            video_ids = [str(v) for v in raw_video_ids if v]
+            group_ids = [str(g) for g in raw_group_ids if g]
+
+            logger.info(
+                "agent_search payload overview_len=%d videos_count=%d groups_count=%d sample_videos=%s sample_groups=%s",
+                len(overview), len(video_ids), len(group_ids), video_ids[:3], group_ids[:3]
+            )
 
             # 只返回与AgentOutput一致的字段
             return Response({
-                'natural_language_overview': payload.get('natural_language_overview', ''),
-                'video_id_list': payload.get('video_id_list', []),
-                'group_id_list': payload.get('group_id_list', []),
+                'natural_language_overview': overview,
+                'video_id_list': video_ids,
+                'group_id_list': group_ids,
             })
         except Exception as e:
             logger.exception("agent_search failed: %s", e)

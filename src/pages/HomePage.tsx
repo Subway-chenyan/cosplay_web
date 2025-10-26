@@ -7,7 +7,7 @@ import VideoCard from '../components/VideoCard'
 import ClubCard from '../components/ClubCard'
 // import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
-import { Loader, Tv, Sparkles, List } from 'lucide-react'
+import { Loader, Tv, Sparkles, List, Info, AlertTriangle } from 'lucide-react'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
 import type { Video, Group } from '../types'
@@ -32,6 +32,7 @@ function HomePage() {
     groups: Group[]
   } | null>(null)
   const [isAgentLoading, setIsAgentLoading] = useState(false)
+  const [showAgentDebug, setShowAgentDebug] = useState(false)
 
   const fetchStats = useCallback(async () => {
     try {
@@ -289,20 +290,22 @@ function HomePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-          <div>
-            <div className="text-sm text-gray-600">总视频数</div>
-            <div className="text-2xl font-bold text-gray-900">{stats?.total_videos ?? pagination.count}</div>
+      {!isAgentMode && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+            <div>
+              <div className="text-sm text-gray-600">总视频数</div>
+              <div className="text-2xl font-bold text-gray-900">{stats?.total_videos ?? pagination.count}</div>
+            </div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+            <div>
+              <div className="text-sm text-gray-600">近7天新增</div>
+              <div className="text-2xl font-bold text-primary-600">{stats?.weekly_new_videos ?? 0}</div>
+            </div>
           </div>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-          <div>
-            <div className="text-sm text-gray-600">近7天新增</div>
-            <div className="text-2xl font-bold text-primary-600">{stats?.weekly_new_videos ?? 0}</div>
-          </div>
-        </div>
-      </div>
+      )}
       {/* Filters */}
       {/* <VideoFilters /> */}
 
@@ -311,7 +314,7 @@ function HomePage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-center space-x-2">
             <Loader className="w-4 h-4 animate-spin text-blue-600" />
-            <span className="text-blue-600 text-sm">正在筛选...</span>
+            <span className="text蓝-600 text-sm">正在筛选...</span>
           </div>
         </div>
       )} */}
@@ -328,11 +331,88 @@ function HomePage() {
             <div className="text-purple-900">
               <p className="text-sm leading-relaxed">{agentResults.text}</p>
             </div>
+
             {(agentResults.video_id_list.length > 0 || agentResults.group_id_list.length > 0) && (
               <div className="mt-4 pt-4 border-t border-purple-200">
                 <p className="text-purple-700 text-sm">
                   找到 {agentResults.video_id_list.length} 个相关视频和 {agentResults.group_id_list.length} 个相关社团
                 </p>
+                {/* 轻量状态标签 */}
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
+                    视频ID数: {agentResults.video_id_list.length}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
+                    已解析视频: {agentResults.videos.length}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
+                    社团ID数: {agentResults.group_id_list.length}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
+                    已解析社团: {agentResults.groups.length}
+                  </span>
+                  {(agentResults.videos.length < agentResults.video_id_list.length || agentResults.groups.length < agentResults.group_id_list.length) && (
+                    <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+                      <AlertTriangle className="w-3 h-3 mr-1" />存在未解析的ID
+                    </span>
+                  )}
+                </div>
+
+                {/* 调试信息面板 */}
+                {showAgentDebug && (
+                  <div className="mt-3 p-3 rounded-md bg-gray-50 border border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <h4 className="text-xs font-semibold text-gray-700">视频ID样例</h4>
+                        <div className="mt-1 text-xs text-gray-600 break-all">
+                          {agentResults.video_id_list.slice(0, 5).join(', ')}
+                          {agentResults.video_id_list.length > 5 && ' ...'}
+                        </div>
+                        <h4 className="mt-2 text-xs font-semibold text-gray-700">已解析视频</h4>
+                        <ul className="mt-1 space-y-1">
+                          {agentResults.videos.slice(0, 5).map((v) => (
+                            <li key={v.id} className="text-xs text-gray-600">
+                              {v.title} <span className="text-gray-400">({v.id})</span>
+                            </li>
+                          ))}
+                          {agentResults.videos.length === 0 && (
+                            <li className="text-xs text-gray-500">无</li>
+                          )}
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold text-gray-700">社团ID样例</h4>
+                        <div className="mt-1 text-xs text-gray-600 break-all">
+                          {agentResults.group_id_list.slice(0, 5).join(', ')}
+                          {agentResults.group_id_list.length > 5 && ' ...'}
+                        </div>
+                        <h4 className="mt-2 text-xs font-semibold text-gray-700">已解析社团</h4>
+                        <ul className="mt-1 space-y-1">
+                          {agentResults.groups.slice(0, 5).map((g) => (
+                            <li key={g.id} className="text-xs text-gray-600">
+                              {g.name} <span className="text-gray-400">({g.id})</span>
+                            </li>
+                          ))}
+                          {agentResults.groups.length === 0 && (
+                            <li className="text-xs text-gray-500">无</li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 调试开关按钮 */}
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowAgentDebug((v) => !v)}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-xs rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  >
+                    <Info className="w-4 h-4" />
+                    <span>{showAgentDebug ? '隐藏调试信息' : '显示调试信息'}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -434,7 +514,7 @@ function HomePage() {
       )}
 
       {/* Load More */}
-      {pagination.next && (
+      {!isAgentMode && pagination.next && (
         <div className="text-center">
           <button
             onClick={() => {

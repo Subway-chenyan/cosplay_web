@@ -111,8 +111,8 @@ class SQLAgent:
         
         # 创建SQL工具包
         tools = SQLDatabaseToolkit(db=self.db, llm=self.llm).get_tools()
-        for tool in tools:
-            print(f"{tool.name}: {tool.description}\n")
+        # for tool in tools:
+        #     print(f"{tool.name}: {tool.description}\n")
         # breakpoint()
         # 使用create_agent创建agent
         self.agent = create_agent(

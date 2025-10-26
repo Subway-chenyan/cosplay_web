@@ -24,10 +24,6 @@ function SearchBar({ value, onChange, onClear, onSearch, placeholder = "搜索..
     onClear()
   }
 
-  const handleSearchClick = () => {
-    onSearch()
-  }
-
   return (
     <div className={`relative ${className}`}>
       <form onSubmit={handleSubmit} className="relative flex items-center">
@@ -51,7 +47,6 @@ function SearchBar({ value, onChange, onClear, onSearch, placeholder = "搜索..
         )}
         <button
           type="submit"
-          onClick={handleSearchClick}
           className="absolute right-2 top-2 h-8 px-4 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors text-sm"
         >
           搜索

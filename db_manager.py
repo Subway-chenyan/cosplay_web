@@ -51,6 +51,52 @@ class DatabaseManager:
         except subprocess.CalledProcessError:
             return False
 
+    def terminate_connections(self, db_name=None):
+        """终止指定数据库的所有活动连接"""
+        db = db_name or self.db_name
+        cmd = self._docker_cmd() + [
+            "exec", self.container_name,
+            "psql", "-U", self.db_user, "-d", "postgres",
+            "-c", f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='{db}' AND pid <> pg_backend_pid();"
+        ]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return result.returncode == 0
+
+    def recreate_database(self, db_name=None, owner=None):
+        """重建数据库：DROP DATABASE + CREATE DATABASE"""
+        db = db_name or self.db_name
+        db_owner = owner or self.db_user
+
+        # 终止连接
+        if not self.terminate_connections(db):
+            print(f"❌ 无法终止数据库连接: {db}")
+            return False
+
+        # 删除数据库
+        drop_cmd = self._docker_cmd() + [
+            "exec", self.container_name,
+            "psql", "-U", self.db_user, "-d", "postgres",
+            "-c", f"DROP DATABASE IF EXISTS {db}"
+        ]
+        drop_res = subprocess.run(drop_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if drop_res.returncode != 0:
+            err = drop_res.stderr.decode('utf-8', errors='ignore') if isinstance(drop_res.stderr, (bytes, bytearray)) else str(drop_res.stderr)
+            print(f"❌ 删除数据库失败: {err}")
+            return False
+
+        # 创建数据库
+        create_cmd = self._docker_cmd() + [
+            "exec", self.container_name,
+            "psql", "-U", self.db_user, "-d", "postgres",
+            "-c", f"CREATE DATABASE {db} OWNER {db_owner}"
+        ]
+        create_res = subprocess.run(create_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if create_res.returncode != 0:
+            err = create_res.stderr.decode('utf-8', errors='ignore') if isinstance(create_res.stderr, (bytes, bytearray)) else str(create_res.stderr)
+            print(f"❌ 创建数据库失败: {err}")
+            return False
+        return True
+
     def backup_database(self, custom_name=None):
         """备份数据库到./database目录"""
         if not self.check_docker_container():
@@ -127,7 +173,7 @@ class DatabaseManager:
         
         return backup_files
 
-    def restore_database(self, backup_file=None, interactive=True):
+    def restore_database(self, backup_file=None, interactive=True, force=False):
         """从指定的备份文件恢复数据库"""
         if not self.check_docker_container():
             print(f"❌ 错误: Docker容器 '{self.container_name}' 未运行")
@@ -173,26 +219,39 @@ class DatabaseManager:
             if confirm != 'y':
                 print("操作已取消")
                 return False
+
+        # 在强制模式下，先重建数据库以避免结构冲突
+        if force:
+            print("🧹 强制模式: 正在重建目标数据库以确保干净恢复...")
+            if not self.recreate_database():
+                print("❌ 重建数据库失败，停止恢复")
+                return False
         
         try:
             print("🔄 正在恢复数据库...")
             
-            # 使用psql通过Docker容器恢复数据库
+            # 使用psql通过Docker容器恢复数据库，开启严格模式
             cmd = self._docker_cmd() + [
                 "exec", "-i", self.container_name,
-                "psql", "-U", self.db_user, "-d", self.db_name
+                "psql", "-U", self.db_user, "-d", self.db_name,
+                "-v", "ON_ERROR_STOP=1", "--single-transaction", "--echo-errors"
             ]
             
             # 以二进制方式读取备份文件并写入到 psql stdin，避免编码问题
             with open(backup_file, 'rb') as f:
-                result = subprocess.run(cmd, stdin=f, stderr=subprocess.PIPE)
+                result = subprocess.run(cmd, stdin=f, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             
             if result.returncode == 0:
                 print("✅ 数据库恢复成功!")
                 return True
             else:
+                out = result.stdout.decode('utf-8', errors='ignore') if isinstance(result.stdout, (bytes, bytearray)) else str(result.stdout)
                 err = result.stderr.decode('utf-8', errors='ignore') if isinstance(result.stderr, (bytes, bytearray)) else str(result.stderr)
-                print(f"❌ 恢复失败: {err}")
+                print("❌ 恢复失败: ")
+                if out:
+                    print(out)
+                if err:
+                    print(err)
                 return False
                 
         except Exception as e:
@@ -228,6 +287,7 @@ def main():
     parser.add_argument("--name", "-n", help="自定义备份文件名前缀")
     parser.add_argument("--keep", "-k", type=int, default=10, help="清理时保留的备份文件数量 (默认: 10)")
     parser.add_argument("--no-interactive", action="store_true", help="非交互模式")
+    parser.add_argument("--force", action="store_true", help="强制模式：重建数据库后恢复，避免结构冲突")
     
     args = parser.parse_args()
     
@@ -239,7 +299,7 @@ def main():
         
     elif args.action == "restore":
         interactive = not args.no_interactive
-        success = db_manager.restore_database(backup_file=args.file, interactive=interactive)
+        success = db_manager.restore_database(backup_file=args.file, interactive=interactive, force=args.force)
         sys.exit(0 if success else 1)
         
     elif args.action == "list":
