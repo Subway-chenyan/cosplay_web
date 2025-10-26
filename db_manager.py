@@ -11,6 +11,7 @@ import argparse
 import datetime
 import glob
 from pathlib import Path
+import platform
 
 class DatabaseManager:
     def __init__(self):
@@ -25,20 +26,31 @@ class DatabaseManager:
         # 备份目录
         self.backup_dir = Path("./database")
         self.backup_dir.mkdir(exist_ok=True)
-        
+
+    def _docker_cmd(self):
+        """跨平台 Docker 命令: Windows 不使用 sudo；Linux 可通过 USE_SUDO=1 开启。"""
+        base = ["docker"]
+        if platform.system() != "Windows" and os.getenv("USE_SUDO", "").lower() in ("1", "true", "yes"):  # 可选启用 sudo
+            return ["sudo"] + base
+        return base
+
     def check_docker_container(self):
         """检查Docker容器是否运行"""
         try:
             result = subprocess.run(
-                ["sudo", "docker", "ps", "--filter", f"name={self.container_name}", "--format", "{{.Names}}"],
+                self._docker_cmd() + [
+                    "ps", "--filter", f"name={self.container_name}", "--format", "{{.Names}}"
+                ],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="ignore",
                 check=True
             )
             return self.container_name in result.stdout
         except subprocess.CalledProcessError:
             return False
-    
+
     def backup_database(self, custom_name=None):
         """备份数据库到./database目录"""
         if not self.check_docker_container():
@@ -59,13 +71,14 @@ class DatabaseManager:
         
         try:
             # 使用pg_dump通过Docker容器备份数据库
-            cmd = [
-                "sudo", "docker", "exec", self.container_name,
+            cmd = self._docker_cmd() + [
+                "exec", self.container_name,
                 "pg_dump", "-U", self.db_user, "-d", self.db_name
             ]
             
-            with open(backup_path, 'w') as f:
-                result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE, text=True)
+            # 以二进制方式写入，避免编码问题
+            with open(backup_path, 'wb') as f:
+                result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE)
             
             if result.returncode == 0:
                 # 检查备份文件大小
@@ -80,7 +93,8 @@ class DatabaseManager:
                     backup_path.unlink()  # 删除空文件
                     return False
             else:
-                print(f"❌ 备份失败: {result.stderr}")
+                err = result.stderr.decode('utf-8', errors='ignore') if isinstance(result.stderr, (bytes, bytearray)) else str(result.stderr)
+                print(f"❌ 备份失败: {err}")
                 if backup_path.exists():
                     backup_path.unlink()  # 删除失败的文件
                 return False
@@ -90,7 +104,7 @@ class DatabaseManager:
             if backup_path.exists():
                 backup_path.unlink()
             return False
-    
+
     def list_backups(self):
         """列出所有可用的备份文件"""
         backup_files = list(self.backup_dir.glob("*.sql"))
@@ -112,7 +126,7 @@ class DatabaseManager:
             print()
         
         return backup_files
-    
+
     def restore_database(self, backup_file=None, interactive=True):
         """从指定的备份文件恢复数据库"""
         if not self.check_docker_container():
@@ -164,25 +178,27 @@ class DatabaseManager:
             print("🔄 正在恢复数据库...")
             
             # 使用psql通过Docker容器恢复数据库
-            cmd = [
-                "sudo", "docker", "exec", "-i", self.container_name,
+            cmd = self._docker_cmd() + [
+                "exec", "-i", self.container_name,
                 "psql", "-U", self.db_user, "-d", self.db_name
             ]
             
-            with open(backup_file, 'r') as f:
-                result = subprocess.run(cmd, stdin=f, stderr=subprocess.PIPE, text=True)
+            # 以二进制方式读取备份文件并写入到 psql stdin，避免编码问题
+            with open(backup_file, 'rb') as f:
+                result = subprocess.run(cmd, stdin=f, stderr=subprocess.PIPE)
             
             if result.returncode == 0:
                 print("✅ 数据库恢复成功!")
                 return True
             else:
-                print(f"❌ 恢复失败: {result.stderr}")
+                err = result.stderr.decode('utf-8', errors='ignore') if isinstance(result.stderr, (bytes, bytearray)) else str(result.stderr)
+                print(f"❌ 恢复失败: {err}")
                 return False
                 
         except Exception as e:
             print(f"❌ 恢复过程中发生错误: {e}")
             return False
-    
+
     def cleanup_old_backups(self, keep_count=10):
         """清理旧的备份文件，保留最新的指定数量"""
         backup_files = list(self.backup_dir.glob("*.sql"))

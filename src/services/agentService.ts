@@ -1,36 +1,61 @@
 import { api } from './api'
+import { videoService } from './videoService'
+import { groupService } from './groupService'
+import type { Video, Group } from '../types'
+
+// 后端原始返回结构
+interface RawAgentResponse {
+  natural_language_overview: string
+  video_id_list: Array<string | number>
+  group_id_list: Array<string | number>
+}
 
 export interface AgentSearchResponse {
-  query: string
-  text: string  // LLM生成的自然语言总结
-  video_id_list: number[]  // 视频ID列表
-  group_id_list: number[]  // 社团ID列表
-  videos: any[]
-  groups: any[]
-  video_count: number
-  group_count: number
-  total_count: number
-  agent_analysis?: string  // 意图分析（调试用）
+  text: string // LLM生成的自然语言总结（映射自 natural_language_overview）
+  video_id_list: string[] // 视频ID列表
+  group_id_list: string[] // 社团ID列表
+  videos: Video[]
+  groups: Group[]
 }
 
 class AgentService {
   /**
    * Agent智能搜索
    * @param query 搜索查询
-   * @returns 搜索结果
+   * @returns 搜索结果（包含详情）
    */
   async search(query: string): Promise<AgentSearchResponse> {
     try {
-      const response = await api.post<AgentSearchResponse>('/videos/agent-search/', {
+      const raw = await api.post<RawAgentResponse>('/videos/agent-search/', {
         query: query.trim()
       })
 
-      // 检查响应是否包含错误信息
-      if ('error' in response && response.error) {
-        throw new Error(response.error as string)
-      }
+      const videoIds = (raw.video_id_list || []).map((id) => String(id))
+      const groupIds = (raw.group_id_list || []).map((id) => String(id))
 
-      return response
+      // 并发获取详情，容错处理
+      const videoSettled = await Promise.allSettled(
+        videoIds.map((id) => videoService.getVideoById(id))
+      )
+      const groupSettled = await Promise.allSettled(
+        groupIds.map((id) => groupService.getGroupById(id))
+      )
+
+      const videos: Video[] = videoSettled
+        .filter((r): r is PromiseFulfilledResult<Video> => r.status === 'fulfilled')
+        .map((r) => r.value)
+
+      const groups: Group[] = groupSettled
+        .filter((r): r is PromiseFulfilledResult<Group> => r.status === 'fulfilled')
+        .map((r) => r.value)
+
+      return {
+        text: raw.natural_language_overview || '',
+        video_id_list: videoIds,
+        group_id_list: groupIds,
+        videos,
+        groups,
+      }
     } catch (error: any) {
       if (error.response?.status === 503) {
         throw new Error('AI搜索服务暂不可用，请稍后重试')

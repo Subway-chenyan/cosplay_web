@@ -10,6 +10,7 @@ import SearchBar from '../components/SearchBar'
 import { Loader, Tv, Sparkles, List } from 'lucide-react'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
+import type { Video, Group } from '../types'
 
 function HomePage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -25,10 +26,10 @@ function HomePage() {
   const [isAgentMode, setIsAgentMode] = useState(false)
   const [agentResults, setAgentResults] = useState<{
     text: string
-    video_id_list: number[]
-    group_id_list: number[]
-    videos: any[],
-    groups: any[]
+    video_id_list: string[]
+    group_id_list: string[]
+    videos: Video[]
+    groups: Group[]
   } | null>(null)
   const [isAgentLoading, setIsAgentLoading] = useState(false)
 
