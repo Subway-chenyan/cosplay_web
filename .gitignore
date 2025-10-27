@@ -26,7 +26,7 @@ wheels/
 MANIFEST
 
 # Django
-*.log
+backend/*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -124,4 +124,4 @@ logs/
 *.db
 
 database/
-*.log
+backend/*.log

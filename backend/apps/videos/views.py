@@ -321,12 +321,41 @@ import logging
 # 导入SQL Agent相关模块
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'apps', 'text2sql'))
+
+# 多种路径尝试，确保能找到SQLAgent
+base_dir = None
+possible_paths = [
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'apps', 'text2sql'),  # 从apps/videos向上
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'apps', 'text2sql'),  # 从apps/videos向上两层
+    '/home/ubuntu/cosplay_web/backend/apps/text2sql',  # 绝对路径
+    './apps/text2sql',  # 相对路径
+]
+
+for path in possible_paths:
+    if path not in sys.path:
+        sys.path.append(path)
+    if os.path.exists(os.path.join(path, 'sql_agent_cached.py')):
+        base_dir = path
+        break
+
+SQLAgent = None
+logger = logging.getLogger(__name__)
+
 try:
     from sql_agent_cached import SQLAgent
-except ImportError:
+    logger.info(f"SQLAgent imported successfully from path: {base_dir}")
+except ImportError as e:
     SQLAgent = None
-logger = logging.getLogger(__name__)
+    logger.error(f"Failed to import SQLAgent: {e}")
+    logger.error(f"Attempted paths: {possible_paths}")
+    logger.error(f"Current working directory: {os.getcwd()}")
+    logger.error(f"Python path: {sys.path[:3]}...")  # 只显示前3个路径
+    # 尝试提供更多调试信息
+    try:
+        import traceback
+        logger.error(f"Import error traceback: {traceback.format_exc()}")
+    except:
+        pass
 
 
 class VideoViewSet(viewsets.ModelViewSet):
