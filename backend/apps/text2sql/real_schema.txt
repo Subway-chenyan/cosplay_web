@@ -1,0 +1,131 @@
+
+CREATE TABLE awards_award (
+	id UUID NOT NULL, 
+	name VARCHAR(100) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	competition_id UUID NOT NULL, 
+	CONSTRAINT awards_award_pkey PRIMARY KEY (id), 
+	CONSTRAINT awards_award_competition_id_074b6f91_fk_competiti FOREIGN KEY(competition_id) REFERENCES competitions_competition (id) DEFERRABLE INITIALLY DEFERRED
+)
+
+/*
+3 rows from awards_award table:
+id	name	created_at	updated_at	competition_id
+1414de38-2e19-459b-be9d-f9dd4a76eded	剑网3-铜奖	2025-08-22 03:10:13.263726+00:00	2025-08-22 03:10:13.263738+00:00	35d864f0-f112-4bce-a4ec-a0a1886afc4f
+1f5bd6eb-1d69-4905-bf54-0d9b6a6bae7f	倩女幽魂-金奖	2025-08-22 03:10:13.276674+00:00	2025-08-22 03:10:13.276689+00:00	35d864f0-f112-4bce-a4ec-a0a1886afc4f
+e2ef2552-36fc-4eec-b11c-bf068246cbe6	倩女幽魂-银奖	2025-08-22 03:10:13.290187+00:00	2025-08-22 03:10:13.290211+00:00	35d864f0-f112-4bce-a4ec-a0a1886afc4f
+*/
+
+
+CREATE TABLE awards_awardrecord (
+	id UUID NOT NULL, 
+	description TEXT NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	award_id UUID NOT NULL, 
+	group_id UUID, 
+	video_id UUID, 
+	competition_year_id UUID NOT NULL, 
+	drama_name VARCHAR(200) NOT NULL, 
+	CONSTRAINT awards_awardrecord_pkey PRIMARY KEY (id), 
+	CONSTRAINT awards_awardrecord_award_id_05d04388_fk_awards_award_id FOREIGN KEY(award_id) REFERENCES awards_award (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT awards_awardrecord_competition_year_id_2ac094bf_fk_competiti FOREIGN KEY(competition_year_id) REFERENCES competitions_competitionyear (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT awards_awardrecord_group_id_39de014a_fk_groups_group_id FOREIGN KEY(group_id) REFERENCES groups_group (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT awards_awardrecord_video_id_62b7e68b_fk_videos_video_id FOREIGN KEY(video_id) REFERENCES videos_video (id) DEFERRABLE INITIALLY DEFERRED
+)
+
+/*
+3 rows from awards_awardrecord table:
+id	description	created_at	updated_at	award_id	group_id	video_id	competition_year_id	drama_name
+5d23dada-ac1f-43b9-a72a-4af7eda78b6f		2025-08-22 03:58:10.493390+00:00	2025-08-22 03:58:10.493406+00:00	25965f1a-5517-4fd1-90bb-bd29205156e8	10ae5c94-439e-4d38-91a7-10747a0a3343	5eed2c6d-5284-4d7a-a4f5-89f2fc73ff73	658cb5ae-b885-4ca2-ab2c-0f7cc92f5dc8	剑网3
+7d371339-5d8a-4a1e-8236-045b5155a609		2025-08-22 03:58:10.511466+00:00	2025-08-22 03:58:10.511496+00:00	c2421192-e314-4a40-837d-4be7b6371c75	a32e5fc1-c568-412f-8d23-132099b9a9b6	4eeccc47-2e20-4ea5-92b1-36ada8f73969	658cb5ae-b885-4ca2-ab2c-0f7cc92f5dc8	剑网3
+416ae554-3a3c-4232-9d8d-2a6e211430f5		2025-08-22 03:58:10.519789+00:00	2025-08-22 03:58:10.519808+00:00	1414de38-2e19-459b-be9d-f9dd4a76eded	b5ff3f24-b819-4d9a-9b7c-9eebf45a2c62	None	658cb5ae-b885-4ca2-ab2c-0f7cc92f5dc8	剑网3
+*/
+
+
+CREATE TABLE competitions_competitionyear (
+	id UUID NOT NULL, 
+	year INTEGER NOT NULL, 
+	description TEXT NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	competition_id UUID NOT NULL, 
+	CONSTRAINT competitions_competitionyear_pkey PRIMARY KEY (id), 
+	CONSTRAINT competitions_competi_competition_id_1ff58e93_fk_competiti FOREIGN KEY(competition_id) REFERENCES competitions_competition (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT competitions_competitionyear_competition_id_year_1e26685b_uniq UNIQUE NULLS DISTINCT (competition_id, year)
+)
+
+/*
+3 rows from competitions_competitionyear table:
+id	year	description	created_at	updated_at	competition_id
+276956a5-5a58-4d77-8366-bb8e8cffe00f	2025		2025-08-21 16:13:13.846566+00:00	2025-08-21 16:13:13.846584+00:00	1ab9ef24-924c-4a71-ae44-f94018671029
+2f493931-4b65-48ed-beab-53cadccfe6e8	2015		2025-08-22 01:53:05.547906+00:00	2025-08-22 01:53:05.547922+00:00	1ab9ef24-924c-4a71-ae44-f94018671029
+658cb5ae-b885-4ca2-ab2c-0f7cc92f5dc8	2025	中国国际动漫节COSPLAY超级盛典 2025年比赛	2025-08-22 03:10:13.266021+00:00	2025-08-22 03:10:13.266032+00:00	35d864f0-f112-4bce-a4ec-a0a1886afc4f
+*/
+
+
+CREATE TABLE videos_video (
+	id UUID NOT NULL, 
+	bv_number VARCHAR(20) NOT NULL, 
+	title VARCHAR(255) NOT NULL, 
+	description TEXT NOT NULL, 
+	url VARCHAR(200) NOT NULL, 
+	thumbnail VARCHAR(200) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	competition_id UUID, 
+	group_id UUID, 
+	uploaded_by_id BIGINT, 
+	year INTEGER, 
+	CONSTRAINT videos_video_pkey PRIMARY KEY (id), 
+	CONSTRAINT videos_video_competition_id_c4e5175a_fk_competiti FOREIGN KEY(competition_id) REFERENCES competitions_competition (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT videos_video_group_id_4449411b_fk_groups_group_id FOREIGN KEY(group_id) REFERENCES groups_group (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT videos_video_uploaded_by_id_1fbbd16c_fk_users_user_id FOREIGN KEY(uploaded_by_id) REFERENCES users_user (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT videos_video_bv_number_key UNIQUE NULLS DISTINCT (bv_number)
+)
+
+/*
+3 rows from videos_video table:
+id	bv_number	title	description	url	thumbnail	created_at	updated_at	competition_id	group_id	uploaded_by_id	year
+64da8aa6-344f-48de-aa6d-7a430107aff6	BV1GGt5zUEAH	【上海赛区】八十一禁动漫社--永远的任天堂2 玩家之心（2025ChinaJoy Cosplay超级联赛总决赛）	【上海赛区】八十一禁动漫社--永远的任天堂2 玩家之心（2025ChinaJoy Cosplay超级联赛总决赛）	https://www.bilibili.com/video/BV1GGt5zUEAH	http://i2.hdslb.com/bfs/archive/e2546b110859b48d99450ebbb98317839a8b0f8a.jpg	2025-08-30 15:24:44.441581+00:00	2025-08-30 15:24:44.441598+00:00	1ab9ef24-924c-4a71-ae44-f94018671029	1e3872c9-797d-47b8-ba5c-ff5d9de880a6	None	2025
+f7341ad7-5a24-40fb-8b9c-a273052a73d5	BV1hLt5z2Ey1	【华东中赛区】SHADOW26--赛博朋克2077——记忆回路（2025ChinaJoy Cosplay超级联赛总决赛）	【华东中赛区】SHADOW26--赛博朋克2077——记忆回路（2025ChinaJoy Cosplay超级联赛总决赛）	https://www.bilibili.com/video/BV1hLt5z2Ey1	http://i0.hdslb.com/bfs/archive/490830b4f75e215754db37d1ff92070185a6f5f6.jpg	2025-08-30 15:24:44.458001+00:00	2025-08-30 15:24:44.458012+00:00	1ab9ef24-924c-4a71-ae44-f94018671029	cb21f09c-7941-43dd-80e8-0ada1da58ddc	None	2025
+8c117cb4-cfb0-487f-a109-1d094c92a03f	BV1int3z1EFB	【东北赛区】N剧团--细胞很忙（2025ChinaJoy Cosplay超级联赛总决赛）	【东北赛区】N剧团--细胞很忙（2025ChinaJoy Cosplay超级联赛总决赛）	https://www.bilibili.com/video/BV1int3z1EFB	http://i2.hdslb.com/bfs/archive/3475d96833a889c2ae7388b2018cdf9954982a3c.jpg	2025-08-30 15:24:44.467862+00:00	2025-08-30 15:24:44.467873+00:00	1ab9ef24-924c-4a71-ae44-f94018671029	9a520209-b074-49b6-a5b3-5d99d3c894fd	None	2025
+*/
+
+
+CREATE TABLE groups_group (
+	id UUID NOT NULL, 
+	name VARCHAR(100) NOT NULL, 
+	description TEXT NOT NULL, 
+	logo VARCHAR(100), 
+	founded_date DATE, 
+	location VARCHAR(100) NOT NULL, 
+	website VARCHAR(200) NOT NULL, 
+	email VARCHAR(254) NOT NULL, 
+	phone VARCHAR(20) NOT NULL, 
+	weibo VARCHAR(200) NOT NULL, 
+	wechat VARCHAR(50) NOT NULL, 
+	qq_group VARCHAR(20) NOT NULL, 
+	bilibili VARCHAR(200) NOT NULL, 
+	is_active BOOLEAN NOT NULL, 
+	video_count INTEGER NOT NULL, 
+	award_count INTEGER NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	created_by_id BIGINT, 
+	city VARCHAR(50) NOT NULL, 
+	province VARCHAR(50) NOT NULL, 
+	CONSTRAINT groups_group_pkey PRIMARY KEY (id), 
+	CONSTRAINT groups_group_created_by_id_498c8e85_fk_users_user_id FOREIGN KEY(created_by_id) REFERENCES users_user (id) DEFERRABLE INITIALLY DEFERRED, 
+	CONSTRAINT groups_group_name_key UNIQUE NULLS DISTINCT (name)
+)
+
+/*
+3 rows from groups_group table:
+id	name	description	logo	founded_date	location	website	email	phone	weibo	wechat	qq_group	bilibili	is_active	video_count	award_count	created_at	updated_at	created_by_id	city	province
+b0971ec8-a250-4bca-bfcb-bd136c661078	幻夜工作室			None	西北赛区								True	1	0	2025-08-30 14:47:58.177556+00:00	2025-08-30 14:47:58.177568+00:00	None		
+cb80d8e7-76cf-4673-8982-4c1eebb3dadc	SO ME COS军团			None	华南赛区								True	0	1	2025-09-01 07:58:10.418024+00:00	2025-09-01 07:58:10.418051+00:00	None		
+5c8b48ca-dd36-45e8-bd3d-44326ada1cd5	集英SeniorClub			None	山东赛区								True	3	2	2025-08-30 14:47:58.247009+00:00	2025-08-30 14:47:58.247024+00:00	None		
+*/
+

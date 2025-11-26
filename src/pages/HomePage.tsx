@@ -277,7 +277,7 @@ function HomePage() {
           onSearch={handleSearch}
           placeholder={
             isAgentMode
-              ? '输入您的搜索需求，例如：查找上海地区的优秀社团'
+              ? '输入您的搜索需求，例如：查找2025年获得ChinaJoy金奖的团队'
               : '搜索视频标题、描述、社团、比赛或标签...'
           }
           className="max-w-2xl"

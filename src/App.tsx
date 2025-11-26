@@ -8,6 +8,7 @@ import CompetitionDetailPage from './pages/CompetitionDetailPage'
 import VideoDetailPage from './pages/VideoDetailPage'
 import DataImportPage from './pages/DataImportPage'
 import ManagementPage from './pages/ManagementPage'
+import ChoreoMasterPage from './pages/ChoreoMasterPage'
 
 function App() {
   return (
@@ -19,9 +20,10 @@ function App() {
           <Route path="/groups" element={<GroupsPage />} />
           <Route path="/group/:id" element={<GroupDetailPage />} />
           <Route path="/competitions" element={<CompetitionsPage />} />
-          <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
-          <Route path="/data-import" element={<DataImportPage />} />
-          <Route path="/management" element={<ManagementPage />} />
+        <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
+        <Route path="/data-import" element={<DataImportPage />} />
+        <Route path="/management" element={<ManagementPage />} />
+        <Route path="/choreo" element={<ChoreoMasterPage />} />
         </Route>
       </Routes>
     </div>
