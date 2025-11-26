@@ -14,6 +14,14 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     allowedHosts: ['www.cosdrama.cn', 'localhost'],
+    cors: true,
+    headers: {
+      'X-Frame-Options': 'ALLOWALL',
+      'Content-Security-Policy': 'frame-ancestors *',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
@@ -27,6 +35,14 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 4173,
     allowedHosts: ['www.cosdrama.cn', 'localhost'],
+    cors: true,
+    headers: {
+      'X-Frame-Options': 'ALLOWALL',
+      'Content-Security-Policy': 'frame-ancestors *',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
     proxy: {
       '/api': {
         target: 'https://data.cosdrama.cn',

@@ -12,6 +12,7 @@ function Header() {
     { name: '比赛', href: '/competitions' },
     { name: '数据导入', href: '/data-import' },
     { name: '数据管理', href: '/management' },
+    { name: '队形编排', href: '/choreo' },
   ]
 
   const isActive = (path: string) => location.pathname === path
