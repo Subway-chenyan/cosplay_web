@@ -47,8 +47,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
       .then(response => {
         const optionsList = response.results || []
         setOptions(optionsList)
-        
-        // 如果有预设值，找到对应的选项
+
         if (value) {
           const foundItem = optionsList.find((item: any) => item[valueField] === value)
           if (foundItem) {
@@ -83,52 +82,54 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
-          className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed bg-white"
+          className={`w-full p-4 text-left font-black uppercase italic transition-colors flex items-center justify-between ${disabled ? 'bg-gray-200 cursor-not-allowed opacity-50' : 'bg-gray-50 hover:bg-gray-100'
+            }`}
         >
-          <span className={selectedItem ? 'text-gray-900' : 'text-gray-500'}>
+          <span className={selectedItem ? 'text-black' : 'text-gray-400'}>
             {selectedItem ? selectedItem[displayField] : placeholder}
           </span>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-            <svg className="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+          <div className="flex items-center">
+            <svg className={`w-6 h-6 text-black transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </div>
         </button>
-        
+
         {selectedItem && !disabled && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-8 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
+            className="absolute right-12 top-1/2 -translate-y-1/2 h-6 w-6 text-p5-red hover:scale-110 transition-transform"
           >
             <svg viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
           </button>
         )}
       </div>
-      
+
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-2 bg-white border-4 border-black shadow-[8px_8px_0_0_black] max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
           {loading ? (
-            <div className="px-3 py-2 text-gray-500">加载中...</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">LOADING / 加载中...</div>
           ) : options.length > 0 ? (
             options.map((item) => (
               <div
                 key={item[valueField]}
                 onClick={() => handleSelect(item)}
-                className={`px-3 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                  selectedItem && selectedItem[valueField] === item[valueField] ? 'bg-blue-50 text-blue-600' : ''
-                }`}
+                className={`px-4 py-3 hover:bg-black hover:text-white cursor-pointer border-b-2 border-gray-100 last:border-b-0 transition-colors ${selectedItem && selectedItem[valueField] === item[valueField] ? 'bg-p5-red text-white' : ''
+                  }`}
               >
-                <div className="font-medium">{item[displayField]}</div>
+                <div className="font-black italic uppercase tracking-tighter">{item[displayField]}</div>
                 {item.description && (
-                  <div className="text-sm text-gray-500 truncate">{item.description}</div>
+                  <div className={`text-xs mt-1 truncate ${selectedItem && selectedItem[valueField] === item[valueField] ? 'text-white/80' : 'text-gray-500'}`}>
+                    {item.description}
+                  </div>
                 )}
               </div>
             ))
           ) : (
-            <div className="px-3 py-2 text-gray-500">暂无选项</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic">NO DATA / 暂无选项</div>
           )}
         </div>
       )}
@@ -189,30 +190,36 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           }}
           onFocus={() => setIsOpen(true)}
           disabled={disabled}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="w-full p-4 border-0 focus:ring-0 font-black uppercase italic tracking-tighter bg-gray-50 placeholder-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        <Search className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
-      </div>
-      
-      {isOpen && searchQuery.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2">
           {loading ? (
-            <div className="px-3 py-2 text-gray-500">搜索中...</div>
+            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <Search className="h-6 w-6 text-black" />
+          )}
+        </div>
+      </div>
+
+      {isOpen && searchQuery.length > 0 && (
+        <div className="absolute z-50 w-full mt-2 bg-white border-4 border-black shadow-[8px_8px_0_0_black] max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+          {loading ? (
+            <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">SEARCHING / 搜索中...</div>
           ) : options.length > 0 ? (
             options.map((item) => (
               <div
                 key={item[valueField]}
                 onClick={() => handleSelect(item)}
-                className="px-3 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                className="px-4 py-3 hover:bg-black hover:text-white cursor-pointer border-b-2 border-gray-100 last:border-b-0 transition-colors"
               >
-                <div className="font-medium">{item[displayField]}</div>
+                <div className="font-black italic uppercase tracking-tighter">{item[displayField]}</div>
                 {item.description && (
-                  <div className="text-sm text-gray-500 truncate">{item.description}</div>
+                  <div className="text-xs text-gray-500 mt-1 truncate group-hover:text-white/80">{item.description}</div>
                 )}
               </div>
             ))
           ) : (
-            <div className="px-3 py-2 text-gray-500">未找到相关结果</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic">NO RESULTS / 未找到相关结果</div>
           )}
         </div>
       )}
@@ -286,7 +293,7 @@ const ManagementPage: React.FC = () => {
   // 处理管理密钥验证
   const handleVerifyManagementKey = async () => {
     if (!loginForm.username.trim()) return
-    
+
     setIsLoggingIn(true)
     try {
       const result = await api.verifyManagementKey(loginForm.username.trim())
@@ -412,7 +419,7 @@ const ManagementPage: React.FC = () => {
         await eventService.updateEvent(selectedEventForEdit.id, eventData)
         showMessage('success', '赛事更新成功')
       }
-      
+
       resetEventForm()
       setEventMode('create')
     } catch (error: any) {
@@ -448,7 +455,7 @@ const ManagementPage: React.FC = () => {
   const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       // 准备提交数据，确保格式正确
       const submitData = {
@@ -462,7 +469,7 @@ const ManagementPage: React.FC = () => {
         competition: videoForm.competition || undefined, // 比赛ID
         // 不传递uploaded_by_username，让后端处理
       }
-      
+
       await videoService.createVideo(submitData)
       showMessage('success', '视频信息添加成功！')
       resetVideoForm()
@@ -477,15 +484,15 @@ const ManagementPage: React.FC = () => {
   // 提交社团表单
   const handleGroupSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // 前端验证
     if (!groupForm.name?.trim()) {
       showMessage('error', '社团名称是必填项，请填写社团名称')
       return
     }
-    
+
     setLoading(true)
-    
+
     try {
       if (groupMode === 'create') {
         // 准备创建数据，移除id字段和空字符串字段
@@ -535,10 +542,10 @@ const ManagementPage: React.FC = () => {
       resetGroupForm()
     } catch (error: any) {
       console.error('Error with group operation:', error)
-      
+
       // 更详细的错误处理
       let errorMessage = `社团${groupMode === 'create' ? '创建' : '更新'}失败`
-      
+
       if (error?.response?.data) {
         const errorData = error.response.data
         if (errorData.name && errorData.name.includes('already exists')) {
@@ -553,7 +560,7 @@ const ManagementPage: React.FC = () => {
       } else if (error?.message) {
         errorMessage = error.message
       }
-      
+
       showMessage('error', errorMessage)
     } finally {
       setLoading(false)
@@ -563,70 +570,71 @@ const ManagementPage: React.FC = () => {
   // 如果未认证，显示权限验证界面
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-center mb-6">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                <Lock className="h-6 w-6 text-blue-600" />
+      <div className="min-h-screen bg-transparent py-16">
+        <div className="max-w-md mx-auto px-4 relative group">
+          <div className="absolute inset-0 bg-black transform -rotate-2 translate-x-3 translate-y-3 z-0"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-8 transform rotate-1">
+            <div className="text-center mb-10 transform -rotate-1">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 bg-black transform rotate-12 border-4 border-p5-red shadow-[4px_4px_0_0_#d90614] mb-6">
+                <Lock className="h-8 w-8 text-p5-red transform -rotate-12" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">管理权限验证</h2>
-              <p className="text-sm text-gray-600">请输入管理密钥以访问数据管理功能</p>
+              <h2 className="text-3xl font-black text-black uppercase italic mb-2 leading-none">ADMIN OVERRIDE / 管理验证</h2>
+              <p className="text-sm text-gray-500 font-bold border-b-2 border-p5-red inline-block pb-1">IDENTIFICATION REQUIRED FOR SYSTEM ACCESS</p>
             </div>
-            
+
             {/* 错误信息显示 */}
             {message && (
-              <div className={`mb-4 p-4 rounded-md ${
-                message.type === 'error' 
-                  ? 'bg-red-50 border border-red-200' 
-                  : 'bg-green-50 border border-green-200'
-              }`}>
-                <div className="flex items-center">
+              <div className={`mb-8 p-4 border-l-8 transform -skew-x-3 ${message.type === 'error'
+                ? 'bg-black border-p5-red text-p5-red'
+                : 'bg-black border-green-500 text-green-500'
+                }`}>
+                <div className="flex items-center transform skew-x-3">
                   {message.type === 'error' ? (
-                    <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
+                    <AlertCircle className="h-6 w-6 mr-3" />
                   ) : (
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
+                    <CheckCircle className="h-6 w-6 mr-3" />
                   )}
-                  <p className={`text-sm ${
-                    message.type === 'error' ? 'text-red-800' : 'text-green-800'
-                  }`}>
+                  <p className="text-sm font-black uppercase italic tracking-tighter">
                     {message.text}
                   </p>
                 </div>
               </div>
             )}
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  管理密钥
+
+            <div className="space-y-8 transform -rotate-1">
+              <div className="relative">
+                <label className="block text-xs font-black text-white bg-p5-red px-2 py-0.5 absolute -top-3 left-4 transform rotate-2 uppercase">
+                  Management Key
                 </label>
                 <input
                   type="password"
                   value={loginForm.username}
                   onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
                   onKeyPress={(e) => e.key === 'Enter' && handleVerifyManagementKey()}
-                  placeholder="请输入管理密钥"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="ENTER ACCESS CODE..."
+                  className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50"
                 />
               </div>
-              
+
               <button
                 onClick={handleVerifyManagementKey}
                 disabled={!loginForm.username.trim() || isLoggingIn}
-                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="group relative w-full overflow-hidden"
               >
-                {isLoggingIn ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    验证中...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="mr-2 h-4 w-4" />
-                    验证权限
-                  </>
-                )}
+                <div className="absolute inset-0 bg-black transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                <div className="relative z-10 flex items-center justify-center px-4 py-4 bg-p5-red text-white font-black uppercase italic text-2xl border-2 border-transparent group-hover:border-black transition-all disabled:bg-gray-400">
+                  {isLoggingIn ? (
+                    <>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                      VERIFYING...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="mr-3 h-6 w-6" />
+                      SYSTEM LOGIN / 验证权限
+                    </>
+                  )}
+                </div>
               </button>
             </div>
           </div>
@@ -636,690 +644,747 @@ const ManagementPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow">
-          {/* 头部 */}
-          <div className="border-b border-gray-200">
-            <div className="px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-transparent py-12">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="relative group mb-12">
+          <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-y-1 z-0 shadow-2xl"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-8 md:p-12 transform -skew-y-1 overflow-hidden">
+            <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 transform skew-y-1">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">数据管理</h1>
-                <p className="mt-1 text-sm text-gray-600">管理视频信息和社团信息</p>
+                <h1 className="text-5xl font-black text-black uppercase italic tracking-tighter mb-2 p5-text-shadow-red">
+                  CORE OVERRIDE / 数据管理
+                </h1>
+                <p className="bg-black text-white px-4 py-1 inline-block font-black italic transform -skew-x-12">
+                  SYSTEM COMMAND CENTER / 进行视频和社团信息的高度度管控
+                </p>
               </div>
+
               <button
                 onClick={handleLogout}
-                className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                className="bg-p5-red text-white px-8 py-3 font-black uppercase italic border-4 border-black hover:bg-black hover:border-p5-red hover:shadow-[8px_8px_0_0_#d90614] transition-all transform -skew-x-12 active:translate-y-1"
               >
-                <Lock className="h-4 w-4 mr-1" />
-                退出登录
+                <span className="flex items-center transform skew-x-12">
+                  <Lock className="h-6 w-6 mr-3" />
+                  ABORT SESSION / 退出登录
+                </span>
               </button>
             </div>
-            
-            {/* 标签页 */}
-            <div className="px-6">
-              <nav className="flex space-x-8">
-                <button
-                  onClick={() => setActiveTab('video')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'video'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  视频信息管理
-                </button>
-                <button
-                  onClick={() => setActiveTab('group')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'group'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  社团信息管理
-                </button>
-                <button
-                  onClick={() => setActiveTab('event')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'event'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  赛事信息管理
-                </button>
-              </nav>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+          {/* Side Navigation Tabs */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="bg-black p-4 transform -skew-x-6 border-2 border-white shadow-[4px_4px_0_0_#d90614] mb-8">
+              <span className="text-white font-black italic uppercase tracking-widest text-xs">Menu Select / 功能选择</span>
             </div>
+
+            {[
+              { id: 'video', label: '视频管理', sub: 'VIDEO INTEL' },
+              { id: 'group', label: '社团管理', sub: 'ALLIANCE DATA' },
+              { id: 'event', label: '赛事管理', sub: 'BATTLE ARCHIVE' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`w-full text-left p-6 transition-all transform -skew-x-6 border-4 relative overflow-hidden group ${activeTab === tab.id
+                  ? 'bg-p5-red border-white text-white translate-x-4 shadow-[8px_8px_0_0_black]'
+                  : 'bg-white border-black text-black hover:border-p5-red hover:translate-x-2'
+                  }`}
+              >
+                {activeTab === tab.id && (
+                  <div className="absolute right-0 top-0 bottom-0 w-2 bg-white transform skew-x-12 translate-x-1"></div>
+                )}
+                <div className="relative z-10">
+                  <p className={`text-[10px] font-black uppercase italic mb-1 ${activeTab === tab.id ? 'text-black' : 'text-p5-red'}`}>{tab.sub}</p>
+                  <p className="text-2xl font-black italic uppercase tracking-tighter">{tab.label}</p>
+                </div>
+              </button>
+            ))}
           </div>
 
-          {/* 消息提示 */}
-          {message && (
-            <div className={`mx-6 mt-4 p-4 rounded-md flex items-center ${
-              message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-            }`}>
-              {message.type === 'success' ? (
-                <CheckCircle className="h-5 w-5 mr-2" />
-              ) : (
-                <AlertCircle className="h-5 w-5 mr-2" />
-              )}
-              {message.text}
+          {/* Content Area */}
+          <div className="lg:col-span-3">
+            {/* 消息提示 */}
+            {message && (
+              <div className={`mb-8 p-6 transform -skew-x-2 border-l-8 shadow-xl ${message.type === 'success'
+                ? 'bg-black border-green-500 text-green-500'
+                : 'bg-black border-p5-red text-p5-red'
+                }`}>
+                <div className="flex items-center transform skew-x-2">
+                  {message.type === 'success' ? (
+                    <CheckCircle className="h-8 w-8 mr-4" />
+                  ) : (
+                    <AlertCircle className="h-8 w-8 mr-4" />
+                  )}
+                  <p className="text-lg font-black uppercase italic tracking-tighter">{message.text}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white border-2 border-black p-8 md:p-12 transform -skew-x-1 relative overflow-hidden min-h-[600px]">
+              <div className="p5-halftone absolute inset-0 opacity-5 pointer-events-none"></div>
+              <div className="relative z-10 transform skew-x-1">
+                {activeTab === 'video' && (
+                  <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+                    <div className="flex items-center space-x-4 mb-10 border-b-8 border-p5-red pb-2">
+                      <div className="bg-black p-3 transform rotate-12 border-2 border-white">
+                        <Plus className="w-8 h-8 text-white transform -rotate-12" />
+                      </div>
+                      <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
+                        DATA ENTRY / 添加新视频
+                      </h2>
+                    </div>
+
+                    <form onSubmit={handleVideoSubmit} className="space-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            BV Number / BV号 *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={videoForm.bv_number}
+                            onChange={(e) => setVideoForm({ ...videoForm, bv_number: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="BV1234567890"
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Calendar Year / 年份 *
+                          </label>
+                          <input
+                            type="number"
+                            required
+                            min="2000"
+                            max="2030"
+                            value={videoForm.year}
+                            onChange={(e) => setVideoForm({ ...videoForm, year: parseInt(e.target.value) })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Intel Title / 视频标题 *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={videoForm.title}
+                          onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="ENTER VIDEO TITLE..."
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Description / 视频描述
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={videoForm.description}
+                          onChange={(e) => setVideoForm({ ...videoForm, description: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="ENTER INTEL DESCRIPTION..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Source Link / 视频链接
+                          </label>
+                          <input
+                            type="url"
+                            value={videoForm.url}
+                            onChange={(e) => setVideoForm({ ...videoForm, url: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="https://..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Thumbnail / 缩略图链接
+                          </label>
+                          <input
+                            type="url"
+                            value={videoForm.thumbnail}
+                            onChange={(e) => setVideoForm({ ...videoForm, thumbnail: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="https://..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Uploader / 上传者用户名
+                        </label>
+                        <input
+                          type="text"
+                          value={videoForm.uploaded_by_username}
+                          onChange={(e) => setVideoForm({ ...videoForm, uploaded_by_username: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="ENTER USERNAME..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Alliance / 社团 *
+                          </label>
+                          <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
+                            <SearchableSelect
+                              placeholder="SEARCH ALLIANCE..."
+                              onChange={(value) => setVideoForm({ ...videoForm, group: value })}
+                              searchFunction={videoService.searchGroups.bind(videoService)}
+                              displayField="name"
+                              valueField="id"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Battle / 比赛 *
+                          </label>
+                          <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
+                            <SearchableSelect
+                              placeholder="SEARCH BATTLE..."
+                              onChange={(value) => setVideoForm({ ...videoForm, competition: value })}
+                              searchFunction={competitionService.searchCompetitions.bind(competitionService)}
+                              displayField="name"
+                              valueField="id"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-6 pt-6">
+                        <button
+                          type="button"
+                          onClick={resetVideoForm}
+                          className="px-6 py-2 border-4 border-black text-black font-black uppercase italic hover:bg-black hover:text-white transition-all transform -skew-x-12"
+                        >
+                          <span className="transform skew-x-12 inline-block">RESET / 重置</span>
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="px-8 py-3 bg-p5-red text-white font-black uppercase italic border-4 border-black hover:bg-black hover:shadow-[8px_8px_0_0_#d90614] transition-all transform -skew-x-12 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-[4px_4px_0_0_black]"
+                        >
+                          <span className="flex items-center transform skew-x-12">
+                            {loading ? (
+                              <>
+                                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                                DEPLOYING...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-5 w-5 mr-3" />
+                                EXECUTE / 添加视频
+                              </>
+                            )}
+                          </span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {activeTab === 'group' && (
+                  <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 border-b-8 border-black pb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="bg-p5-red p-3 transform -rotate-6 border-4 border-black shadow-[4px_4px_0_0_black]">
+                          <Users className="w-8 h-8 text-white transform rotate-6" />
+                        </div>
+                        <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow-red">
+                          ALLIANCE / 社团信息管理
+                        </h2>
+                      </div>
+                      <div className="flex space-x-4 mt-6 md:mt-0">
+                        <button
+                          onClick={() => {
+                            setGroupMode('create')
+                            resetGroupForm()
+                          }}
+                          className={`px-6 py-2 font-black uppercase italic transform -skew-x-12 transition-all border-4 border-black ${groupMode === 'create'
+                            ? 'bg-black text-white shadow-[4px_4px_0_0_#d90614]'
+                            : 'bg-white text-black hover:bg-gray-100 shadow-[4px_4px_0_0_black]'
+                            }`}
+                        >
+                          <span className="transform skew-x-12 flex items-center">
+                            <Plus className="h-5 w-5 mr-2" />
+                            NEW / 新增社团
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setGroupMode('edit')
+                            resetGroupForm()
+                          }}
+                          className={`px-6 py-2 font-black uppercase italic transform -skew-x-12 transition-all border-4 border-black ${groupMode === 'edit'
+                            ? 'bg-black text-white shadow-[4px_4px_0_0_#d90614]'
+                            : 'bg-white text-black hover:bg-gray-100 shadow-[4px_4px_0_0_black]'
+                            }`}
+                        >
+                          <span className="transform skew-x-12 flex items-center">
+                            <Edit className="h-5 w-5 mr-2" />
+                            MODIFY / 修改社团
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {groupMode === 'edit' && (
+                      <div className="mb-10 p-6 bg-black transform -skew-x-2 border-l-8 border-p5-red shadow-xl">
+                        <div className="transform skew-x-2">
+                          <label className="block text-sm font-black text-p5-red uppercase mb-3 tracking-widest">
+                            TARGET SELECTION / 选择要编辑的社团
+                          </label>
+                          <div className="border-4 border-white shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]">
+                            <SearchableSelect
+                              placeholder="SEARCH ALLIANCE TO REPROGRAM..."
+                              onChange={handleGroupSelect}
+                              searchFunction={groupService.searchGroups.bind(groupService)}
+                              displayField="name"
+                              valueField="id"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleGroupSubmit} className="space-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Alliance Name / 社团名称 *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={groupForm.name || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, name: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="NAME OF THE COVEN..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Founded Date / 成立日期
+                          </label>
+                          <input
+                            type="date"
+                            value={groupForm.founded_date || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, founded_date: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Alliance Intel / 社团描述
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={groupForm.description || ''}
+                          onChange={(e) => setGroupForm({ ...groupForm, description: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="BRIEFLY DESCRIBE THIS ALLIANCE..."
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Emblem URL / 社团Logo链接
+                        </label>
+                        <input
+                          type="url"
+                          value={groupForm.logo || ''}
+                          onChange={(e) => setGroupForm({ ...groupForm, logo: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="https://..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Province / 省份
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.province || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, province: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="REGION..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            City / 城市
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.city || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, city: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4_0_0_black]"
+                            placeholder="CITY..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Base Address / 详细地址
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.location || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, location: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="STREET ADDRESS..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Official Site / 官方网站
+                          </label>
+                          <input
+                            type="url"
+                            value={groupForm.website || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, website: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="https://..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Secure Mail / 邮箱
+                          </label>
+                          <input
+                            type="email"
+                            value={groupForm.email || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, email: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="contact@hq.com"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Hotline / 联系电话
+                          </label>
+                          <input
+                            type="tel"
+                            value={groupForm.phone || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, phone: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="PHONE NUMBER..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Weibo / 微博账号
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.weibo || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, weibo: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="WEIBO DOMAIN..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            WeChat / 微信号
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.wechat || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, wechat: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="WECHAT ID..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            QQ Group / QQ群
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.qq_group || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, qq_group: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="QQ GROUP NUMBER..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Bilibili / 哔哩哔哩
+                          </label>
+                          <input
+                            type="text"
+                            value={groupForm.bilibili || ''}
+                            onChange={(e) => setGroupForm({ ...groupForm, bilibili: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="BILI SPACE..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-6 pt-6">
+                        <button
+                          type="button"
+                          onClick={resetGroupForm}
+                          className="px-6 py-2 border-4 border-black text-black font-black uppercase italic hover:bg-black hover:text-white transition-all transform -skew-x-12"
+                        >
+                          <span className="transform skew-x-12 inline-block">ABORT / 重置</span>
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={loading || (groupMode === 'edit' && !selectedGroupForEdit)}
+                          className="px-8 py-3 bg-p5-red text-white font-black uppercase italic border-4 border-black hover:bg-black hover:shadow-[8px_8px_0_0_#d90614] transition-all transform -skew-x-12 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-[4px_4px_0_0_black]"
+                        >
+                          <span className="flex items-center transform skew-x-12">
+                            {loading ? (
+                              <>
+                                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                                PROCESSING...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-5 w-5 mr-3" />
+                                {groupMode === 'create' ? 'INITIATE / 创建社团' : 'OVERWRITE / 更新社团'}
+                              </>
+                            )}
+                          </span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {activeTab === 'event' && (
+                  <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 border-b-8 border-p5-red pb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="bg-black p-3 transform rotate-6 border-4 border-white shadow-[4px_4px_0_0_black]">
+                          <Calendar className="w-8 h-8 text-white transform -rotate-6" />
+                        </div>
+                        <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
+                          {eventMode === 'create' ? 'BATTLE ENTRY / 添加新赛事' : 'ARCHIVE EDIT / 编辑赛事信息'}
+                        </h2>
+                      </div>
+                      <div className="flex space-x-4 mt-6 md:mt-0">
+                        <button
+                          onClick={() => {
+                            setEventMode('create')
+                            resetEventForm()
+                          }}
+                          className={`px-6 py-2 font-black uppercase italic transform -skew-x-12 transition-all border-4 border-black ${eventMode === 'create'
+                            ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
+                            : 'bg-white text-black hover:bg-gray-100 shadow-[4px_4px_0_0_black]'
+                            }`}
+                        >
+                          <span className="transform skew-x-12 flex items-center">
+                            <Plus className="h-5 w-5 mr-2" />
+                            NEW / 新建
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => setEventMode('edit')}
+                          className={`px-6 py-2 font-black uppercase italic transform -skew-x-12 transition-all border-4 border-black ${eventMode === 'edit'
+                            ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
+                            : 'bg-white text-black hover:bg-gray-100 shadow-[4px_4px_0_0_black]'
+                            }`}
+                        >
+                          <span className="transform skew-x-12 flex items-center">
+                            <Edit className="h-5 w-5 mr-2" />
+                            EDIT / 编辑
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {eventMode === 'edit' && (
+                      <div className="mb-10 p-6 bg-p5-red transform skew-x-2 border-r-8 border-black shadow-xl">
+                        <div className="transform -skew-x-2">
+                          <label className="block text-sm font-black text-white uppercase mb-3 tracking-widest">
+                            SELECT ARCHIVE / 选择要编辑的赛事
+                          </label>
+                          <div className="border-4 border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]">
+                            <SearchableSelect
+                              placeholder="SEARCH BATTLE ARCHIVE..."
+                              onChange={handleEventSelect}
+                              searchFunction={() => eventService.getEvents()}
+                              displayField="title"
+                              valueField="id"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleEventSubmit} className="space-y-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Battle Date / 赛事日期 *
+                          </label>
+                          <input
+                            type="date"
+                            required
+                            value={eventForm.date}
+                            onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Linked Competition / 关联比赛 *
+                          </label>
+                          <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
+                            <DropdownSelect
+                              placeholder="SELECT COMPETITION..."
+                              value={eventForm.competition}
+                              onChange={(value) => setEventForm({ ...eventForm, competition: value })}
+                              loadOptions={() => competitionService.getCompetitions({ page_size: 100 })}
+                              displayField="name"
+                              valueField="id"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Archive Title / 赛事标题 *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={eventForm.title}
+                          onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="ENTER BATTLE TITLE..."
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Battle Intel / 赛事描述
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={eventForm.description}
+                          onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="DETAILED INTEL ON THIS EVENT..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            Contact Info / 联系方式
+                          </label>
+                          <input
+                            type="text"
+                            value={eventForm.contact}
+                            onChange={(e) => setEventForm({ ...eventForm, contact: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="COMMUNICATIONS CHANNEL..."
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            HQ Website / 官网链接
+                          </label>
+                          <input
+                            type="url"
+                            value={eventForm.website}
+                            onChange={(e) => setEventForm({ ...eventForm, website: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                            placeholder="https://..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                          Promo Visual / 宣传图片链接
+                        </label>
+                        <input
+                          type="url"
+                          value={eventForm.promotional_image}
+                          onChange={(e) => setEventForm({ ...eventForm, promotional_image: e.target.value })}
+                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          placeholder="https://..."
+                        />
+                      </div>
+
+                      <div className="flex justify-end space-x-6 pt-6">
+                        <button
+                          type="button"
+                          onClick={resetEventForm}
+                          className="px-6 py-2 border-4 border-black text-black font-black uppercase italic hover:bg-black hover:text-white transition-all transform -skew-x-12"
+                        >
+                          <span className="transform skew-x-12 inline-block">ABORT / 重置</span>
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={loading || (eventMode === 'edit' && !selectedEventForEdit)}
+                          className="px-8 py-3 bg-p5-red text-white font-black uppercase italic border-4 border-black hover:bg-black hover:shadow-[8px_8px_0_0_#d90614] transition-all transform -skew-x-12 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-[4px_4px_0_0_black]"
+                        >
+                          <span className="flex items-center transform skew-x-12">
+                            {loading ? (
+                              <>
+                                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                                SYNCING...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-5 w-5 mr-3" />
+                                {eventMode === 'create' ? 'FILE ENTRY / 创建赛事' : 'UPDATE FILE / 更新赛事'}
+                              </>
+                            )}
+                          </span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-
-          {/* 内容区域 */}
-          <div className="p-6">
-            {activeTab === 'video' && (
-              <div>
-                <h2 className="text-lg font-medium text-gray-900 mb-6">添加新视频</h2>
-                <form onSubmit={handleVideoSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        BV号 *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={videoForm.bv_number}
-                        onChange={(e) => setVideoForm({ ...videoForm, bv_number: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="例如：BV1234567890"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        年份 *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="2000"
-                        max="2030"
-                        value={videoForm.year}
-                        onChange={(e) => setVideoForm({ ...videoForm, year: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      视频标题 *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={videoForm.title}
-                      onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="输入视频标题"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      视频描述
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={videoForm.description}
-                      onChange={(e) => setVideoForm({ ...videoForm, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="输入视频描述"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        视频链接
-                      </label>
-                      <input
-                        type="url"
-                        value={videoForm.url}
-                        onChange={(e) => setVideoForm({ ...videoForm, url: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="https://..."
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        缩略图链接
-                      </label>
-                      <input
-                        type="url"
-                        value={videoForm.thumbnail}
-                        onChange={(e) => setVideoForm({ ...videoForm, thumbnail: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="https://..."
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      上传者用户名
-                    </label>
-                    <input
-                      type="text"
-                      value={videoForm.uploaded_by_username}
-                      onChange={(e) => setVideoForm({ ...videoForm, uploaded_by_username: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="输入上传者用户名"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        社团 *
-                      </label>
-                      <SearchableSelect
-                        placeholder="搜索并选择社团"
-                        onChange={(value) => setVideoForm({ ...videoForm, group: value })}
-                        searchFunction={videoService.searchGroups.bind(videoService)}
-                        displayField="name"
-                        valueField="id"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        比赛 *
-                      </label>
-                      <SearchableSelect
-                        placeholder="搜索并选择比赛"
-                        onChange={(value) => setVideoForm({ ...videoForm, competition: value })}
-                        searchFunction={competitionService.searchCompetitions.bind(competitionService)}
-                        displayField="name"
-                        valueField="id"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      type="button"
-                      onClick={resetVideoForm}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      重置
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          提交中...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          添加视频
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {activeTab === 'group' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-medium text-gray-900">社团信息管理</h2>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        setGroupMode('create')
-                        resetGroupForm()
-                      }}
-                      className={`px-3 py-1 rounded-md text-sm font-medium ${
-                        groupMode === 'create'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      <Plus className="h-4 w-4 inline mr-1" />
-                      新增社团
-                    </button>
-                    <button
-                      onClick={() => {
-                        setGroupMode('edit')
-                        resetGroupForm()
-                      }}
-                      className={`px-3 py-1 rounded-md text-sm font-medium ${
-                        groupMode === 'edit'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      <Edit className="h-4 w-4 inline mr-1" />
-                      修改社团
-                    </button>
-                  </div>
-                </div>
-
-                {groupMode === 'edit' && (
-                  <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      选择要编辑的社团
-                    </label>
-                    <SearchableSelect
-                      placeholder="搜索并选择要编辑的社团"
-                      onChange={handleGroupSelect}
-                      searchFunction={groupService.searchGroups.bind(groupService)}
-                      displayField="name"
-                      valueField="id"
-                    />
-                  </div>
-                )}
-
-                <form onSubmit={handleGroupSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        社团名称 *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={groupForm.name || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="输入社团名称"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        成立日期
-                      </label>
-                      <input
-                        type="date"
-                        value={groupForm.founded_date || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, founded_date: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      社团描述
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={groupForm.description || ''}
-                      onChange={(e) => setGroupForm({ ...groupForm, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="输入社团描述"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      社团Logo链接
-                    </label>
-                    <input
-                      type="url"
-                      value={groupForm.logo || ''}
-                      onChange={(e) => setGroupForm({ ...groupForm, logo: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="https://..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        省份
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.province || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, province: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="例如：北京市"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        城市
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.city || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, city: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="例如：朝阳区"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        详细地址
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.location || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, location: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="详细地址"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        官方网站
-                      </label>
-                      <input
-                        type="url"
-                        value={groupForm.website || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, website: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="https://..."
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        邮箱
-                      </label>
-                      <input
-                        type="email"
-                        value={groupForm.email || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="contact@example.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        联系电话
-                      </label>
-                      <input
-                        type="tel"
-                        value={groupForm.phone || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="联系电话"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        微博账号
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.weibo || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, weibo: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="微博用户名或链接"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        微信号
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.wechat || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, wechat: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="微信号"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        QQ群
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.qq_group || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, qq_group: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="QQ群号"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        哔哩哔哩
-                      </label>
-                      <input
-                        type="text"
-                        value={groupForm.bilibili || ''}
-                        onChange={(e) => setGroupForm({ ...groupForm, bilibili: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="B站用户名或链接"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      type="button"
-                      onClick={resetGroupForm}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      重置
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading || (groupMode === 'edit' && !selectedGroupForEdit)}
-                      className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {groupMode === 'create' ? '创建中...' : '更新中...'}
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          {groupMode === 'create' ? '创建社团' : '更新社团'}
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {activeTab === 'event' && (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-medium text-gray-900">
-                    {eventMode === 'create' ? '添加新赛事' : '编辑赛事信息'}
-                  </h2>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        setEventMode('create')
-                        resetEventForm()
-                      }}
-                      className={`px-3 py-1 text-sm rounded-md ${
-                        eventMode === 'create'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      <Plus className="h-4 w-4 inline mr-1" />
-                      新建
-                    </button>
-                    <button
-                      onClick={() => setEventMode('edit')}
-                      className={`px-3 py-1 text-sm rounded-md ${
-                        eventMode === 'edit'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      <Edit className="h-4 w-4 inline mr-1" />
-                      编辑
-                    </button>
-                  </div>
-                </div>
-
-                {eventMode === 'edit' && (
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      选择要编辑的赛事
-                    </label>
-                    <SearchableSelect
-                       placeholder="搜索赛事..."
-                       onChange={handleEventSelect}
-                       searchFunction={() => eventService.getEvents()}
-                       displayField="title"
-                       valueField="id"
-                     />
-                  </div>
-                )}
-
-                <form onSubmit={handleEventSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        赛事日期 *
-                      </label>
-                      <input
-                        type="date"
-                        required
-                        value={eventForm.date}
-                        onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        关联比赛 *
-                      </label>
-                      <DropdownSelect
-                        placeholder="选择比赛..."
-                        value={eventForm.competition}
-                        onChange={(value) => setEventForm({ ...eventForm, competition: value })}
-                        loadOptions={() => competitionService.getCompetitions({ page_size: 100 })}
-                        displayField="name"
-                        valueField="id"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      赛事标题 *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={eventForm.title}
-                      onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="赛事标题"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      赛事描述
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={eventForm.description}
-                      onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="赛事详细描述..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        联系方式
-                      </label>
-                      <input
-                        type="text"
-                        value={eventForm.contact}
-                        onChange={(e) => setEventForm({ ...eventForm, contact: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="联系电话或邮箱"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        官网链接
-                      </label>
-                      <input
-                        type="url"
-                        value={eventForm.website}
-                        onChange={(e) => setEventForm({ ...eventForm, website: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="https://..."
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      宣传图片链接
-                    </label>
-                    <input
-                      type="url"
-                      value={eventForm.promotional_image}
-                      onChange={(e) => setEventForm({ ...eventForm, promotional_image: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="https://..."
-                    />
-                  </div>
-
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      type="button"
-                      onClick={resetEventForm}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      重置
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading || (eventMode === 'edit' && !selectedEventForEdit)}
-                      className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          {eventMode === 'create' ? '创建中...' : '更新中...'}
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          {eventMode === 'create' ? '创建赛事' : '更新赛事'}
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
           </div>
         </div>
       </div>

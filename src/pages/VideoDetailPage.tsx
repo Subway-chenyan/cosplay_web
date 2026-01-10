@@ -5,11 +5,11 @@ import { RootState, AppDispatch } from '../store/store'
 import { fetchVideoDetail } from '../store/slices/videosSlice'
 import { groupService } from '../services/groupService'
 import { Group } from '../types'
-import { 
-  ArrowLeft, 
-  Calendar, 
-  MapPin, 
-  ExternalLink, 
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  ExternalLink,
   Play,
   Globe,
   Loader
@@ -45,7 +45,7 @@ function VideoDetailPage() {
         }
       }
     }
-    
+
     fetchRelatedData()
   }, [currentVideo, id])
 
@@ -59,7 +59,7 @@ function VideoDetailPage() {
   const getBilibiliVideoInfo = (url: string) => {
     const bvMatch = url.match(/(?:bilibili\.com\/video\/)?(BV[a-zA-Z0-9]+)/i)
     const pageMatch = url.match(/[?&]p=(\d+)/i)
-    
+
     return {
       bvNumber: bvMatch ? bvMatch[1] : null,
       page: pageMatch ? parseInt(pageMatch[1]) : 1
@@ -106,18 +106,20 @@ function VideoDetailPage() {
       <div className="flex items-center">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="group flex items-center bg-black text-white px-4 py-2 transform -skew-x-12 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>返回上一页</span>
+          <span className="flex items-center transform skew-x-12">
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            <span className="font-black uppercase italic">Go Back / 返回上一页</span>
+          </span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* 左侧视频播放区域 */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-8">
           {/* 视频播放器 */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white border-4 border-black p-2 shadow-[8px_8px_0_0_black] overflow-hidden">
             <div className="aspect-video bg-gray-900 relative">
               {bvNumber ? (
                 <>
@@ -156,163 +158,180 @@ function VideoDetailPage() {
                 </div>
               )}
             </div>
-            
+
             {/* 跳转原视频模块 */}
-            <div className="p-4 bg-gray-50 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">B</span>
+            <div className="p-6 bg-black text-white border-t-4 border-p5-red transform skew-x-1">
+              <div className="flex items-center justify-between transform -skew-x-1">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transform rotate-12 border-2 border-p5-red">
+                    <span className="text-p5-red font-black text-xl">B</span>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-900">在B站观看完整视频</div>
-                    <div className="text-xs text-gray-500">获得更好的观看体验</div>
+                    <div className="text-xl font-black italic uppercase">Bilibili Recording / 原片档案</div>
+                    <div className="text-xs font-bold text-gray-400">ACCESSING ORIGINAL DATA / 获得更好的观看体验</div>
                   </div>
                 </div>
-                
+
                 <a
                   href={video.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-p5-red hover:bg-white hover:text-black text-white px-6 py-2 font-black uppercase italic transform -skew-x-12 transition-all shadow-[4px_4px_0_0_black]"
                 >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>前往B站</span>
+                  <span className="transform skew-x-12 flex items-center">
+                    <ExternalLink className="w-5 h-5 mr-2" />
+                    <span>Watch / 前往B站</span>
+                  </span>
                 </a>
               </div>
             </div>
           </div>
 
           {/* 视频信息 */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">{video.title}</h1>
-            
-            <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-5 h-5 text-gray-500" />
-                <span>{video.year}</span>
-              </div>
-              
-              <div className="flex items-center space-x-1">
-                <span>BV号: {video.bv_number}</span>
-              </div>
-            </div>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-1 z-0"></div>
+            <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-x-1">
+              <div className="transform skew-x-1">
+                <h1 className="text-3xl font-black text-black mb-6 uppercase italic border-b-8 border-p5-red inline-block" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                  {video.title}
+                </h1>
 
-            {/* 标签 */}
-            {video.tags.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">标签</h3>
-                <div className="flex flex-wrap gap-2">
-                  {video.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="inline-block px-3 py-1 text-sm rounded-full text-white"
-                      style={{ backgroundColor: tag.color }}
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
+                <div className="flex items-center space-x-8 text-sm font-black uppercase italic mb-8">
+                  <div className="flex items-center space-x-2 bg-black text-white px-3 py-1 transform -skew-x-12">
+                    <div className="transform skew-x-12 flex items-center">
+                      <Calendar className="w-5 h-5 text-p5-red mr-2" />
+                      <span>{video.year}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2 border-2 border-black px-3 py-1 transform -skew-x-12">
+                    <div className="transform skew-x-12">
+                      <span className="text-gray-500 mr-2">BV:</span>
+                      <span className="text-black">{video.bv_number}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 标签 */}
+                {video.tags.length > 0 && (
+                  <div className="mb-8 p-4 bg-gray-50 border-l-8 border-black">
+                    <h3 className="text-xs font-black text-black uppercase italic mb-3 tracking-widest border-b border-p5-red inline-block">标签情报 / INTEL TAGS</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {video.tags.map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="px-3 py-1 text-xs font-black uppercase italic transform -skew-x-12 border-2 transition-all hover:scale-105 active:bg-black active:text-white"
+                          style={{ backgroundColor: 'white', borderColor: 'black', color: 'black' }}
+                        >
+                          <span className="transform skew-x-12 inline-block">#{tag.name} / {tag.category}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 描述 */}
+                <div className="relative">
+                  <h3 className="text-lg font-black text-black uppercase italic mb-3 border-b-2 border-black inline-block p5-text-shadow">详情介绍 / DESCRIPTION</h3>
+                  <p className="text-black font-bold leading-relaxed italic border-l-4 border-p5-red pl-6 py-4 bg-white shadow-[4px_4px_0_0_black] border-2 border-black">
+                    {video.description}
+                  </p>
                 </div>
               </div>
-            )}
-
-            {/* 比赛信息 - 暂时隐藏，需要通过awards关联获取 */}
-
-            {/* 描述 */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">视频描述</h3>
-              <p className="text-gray-600 leading-relaxed">{video.description}</p>
             </div>
           </div>
         </div>
 
         {/* 右侧社团信息 */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* 社团详细信息 */}
           {groupDetails && (
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">社团信息</h2>
-              
-              {/* 社团头部 */}
-              <div className="flex items-center space-x-4 mb-4">
-                <button
-                  onClick={handleGroupClick}
-                  className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 hover:ring-2 hover:ring-primary-300 transition-all duration-200 hover:scale-105 cursor-pointer"
-                  title="点击查看社团详情"
-                >
-                  {groupDetails.logo ? (
-                    <img
-                      src={groupDetails.logo}
-                      alt={groupDetails.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                      <span className="text-white font-bold text-xl">
-                        {groupDetails.name.charAt(0)}
-                      </span>
-                    </div>
-                  )}
-                </button>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 z-0 shadow-lg"></div>
+              <div className="relative z-10 bg-white border-4 border-black p-8 overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-10 -rotate-45 translate-x-16 -translate-y-16"></div>
+
+                <h2 className="text-2xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block p5-text-shadow-red">
+                  所属社团 / ALLIANCE
+                </h2>
+
+                {/* 社团头部 */}
+                <div className="flex items-center space-x-4 mb-8">
+                  <button
+                    onClick={handleGroupClick}
+                    className="w-20 h-20 bg-p5-red transform -rotate-6 border-4 border-black shadow-[4px_4px_0_0_black] overflow-hidden flex-shrink-0 hover:rotate-0 transition-transform cursor-pointer"
+                  >
+                    {groupDetails.logo ? (
+                      <img
+                        src={groupDetails.logo}
+                        alt={groupDetails.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-white font-black text-3xl italic">
+                          {groupDetails.name.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+
+                  <div className="flex-1 min-w-0">
                     <button
                       onClick={handleGroupClick}
-                      className="text-lg font-semibold text-gray-900 truncate hover:text-primary-600 transition-colors cursor-pointer"
-                      title="点击查看社团详情"
+                      className="text-2xl font-black text-black uppercase italic leading-none hover:text-p5-red transition-colors cursor-pointer block text-left"
                     >
                       {groupDetails.name}
                     </button>
+
+                    {groupDetails.location && (
+                      <div className="flex items-center text-black font-black italic text-xs mt-2 uppercase bg-gray-100 px-2 py-1 transform -skew-x-12 border-l-4 border-p5-red">
+                        <MapPin className="w-4 h-4 mr-1 text-p5-red transform skew-x-12" />
+                        <span className="transform skew-x-12 inline-block">驻地: {groupDetails.location} / BASE</span>
+                      </div>
+                    )}
                   </div>
-                  
-                  {groupDetails.location && (
-                    <div className="flex items-center text-gray-500 text-sm">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      <span>{groupDetails.location}</span>
-                    </div>
+                </div>
+
+                {/* 社团描述 */}
+                <div className="mb-8 p-4 bg-gray-100 italic font-bold text-sm border-2 border-black border-dashed">
+                  {groupDetails.description}
+                </div>
+
+                {/* 社交链接 */}
+                <div className="space-y-3">
+                  {groupDetails.website && (
+                    <a
+                      href={groupDetails.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center bg-black text-white px-4 py-2 transform -skew-x-12 hover:bg-white hover:text-black hover:border-2 hover:border-black transition-all group/link"
+                    >
+                      <Globe className="w-5 h-5 mr-3 group-hover/link:text-p5-red" />
+                      <span className="transform skew-x-12 font-black uppercase italic text-sm">Official Website / 官方网站</span>
+                    </a>
+                  )}
+
+                  {groupDetails.bilibili && (
+                    <a
+                      href={groupDetails.bilibili}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center bg-p5-red text-white px-4 py-2 transform -skew-x-12 hover:bg-black transition-all group/link"
+                    >
+                      <div className="w-5 h-5 mr-3 bg-white rounded flex items-center justify-center transform skew-x-12">
+                        <span className="text-p5-red font-black text-xs">B</span>
+                      </div>
+                      <span className="transform skew-x-12 font-black uppercase italic text-sm">Bilibili / 哔哩哔哩</span>
+                    </a>
                   )}
                 </div>
               </div>
-
-              {/* 社团描述 */}
-              <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                {groupDetails.description}
-              </p>
-
-              {/* 社交链接 */}
-              <div className="space-y-2">
-                {groupDetails.website && (
-                  <a
-                    href={groupDetails.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-sm text-primary-600 hover:text-primary-700"
-                  >
-                    <Globe className="w-4 h-4 mr-2" />
-                    <span>官方网站</span>
-                  </a>
-                )}
-                
-                {groupDetails.bilibili && (
-                  <a
-                    href={groupDetails.bilibili}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-sm text-pink-600 hover:text-pink-700"
-                  >
-                    <div className="w-4 h-4 mr-2 bg-pink-500 rounded text-white text-xs font-bold flex items-center justify-center">
-                      B
-                    </div>
-                    <span>哔哩哔哩</span>
-                  </a>
-                )}
-              </div>
             </div>
           )}
-
-
         </div>
+
+
       </div>
     </div>
   )

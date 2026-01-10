@@ -17,10 +17,17 @@ export default {
           50: '#fdf4ff',
           500: '#a855f7',
           600: '#9333ea',
+        },
+        p5: {
+          red: '#d90614',
+          black: '#000000',
+          white: '#ffffff',
+          gray: '#2b2b2b',
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        comic: ['Bangers', 'system-ui', 'cursive'],
       },
     },
   },

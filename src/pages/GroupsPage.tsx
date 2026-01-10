@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchGroups, searchGroups, setCurrentPage } from '../store/slices/groupsSlice'
 import SearchBar from '../components/SearchBar'
+import Pagination from '../components/Pagination'
+import ClubCard from '../components/ClubCard'
 import ChinaMapModule from '../components/ChinaMapModule'
 import { Users, MapPin, Calendar, ExternalLink, X, Loader } from 'lucide-react'
 import { Group } from '../types'
@@ -54,9 +56,9 @@ function GroupsPage() {
       console.log('GroupsPage - dispatching searchGroups')
       dispatch(searchGroups(inputValue))
     } else {
-        console.log('GroupsPage - dispatching fetchGroups')
-        dispatch(fetchGroups({ page: 1 }))
-      }
+      console.log('GroupsPage - dispatching fetchGroups')
+      dispatch(fetchGroups({ page: 1 }))
+    }
   }, [dispatch, inputValue])
 
   const handleLoadMore = () => {
@@ -94,212 +96,127 @@ function GroupsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">社团信息</h1>
-        <p className="text-gray-600 mb-4">
-          持续更新中...
-        </p>
-        
-        {/* Search Bar */}
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">搜索社团</h2>
-          <SearchBar
-            value={inputValue}
-            onChange={handleInputChange}
-            onClear={handleClearSearch}
-            onSearch={handleSearch}
-            placeholder="搜索社团名称、描述或地区..."
-            className="max-w-xl"
-          />
+      <div className="relative group">
+        <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
+        <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-x-2">
+          <div className="transform skew-x-2">
+            <h1 className="text-5xl font-black text-black mb-4 uppercase italic border-b-8 border-p5-red inline-block" style={{ textShadow: '4px 4px 0px #d90614' }}>
+              社团档案 / ALLIANCE RECORD
+            </h1>
+            <p className="block text-xl font-black italic bg-black text-white px-4 py-1 transform -skew-x-12 w-fit mb-8">
+              搜集同步中 / DATABASE RECORDING
+            </p>
+
+            {/* Search Bar */}
+            <div className="mt-8 max-w-3xl border-t-4 border-black border-dashed pt-8">
+              <h2 className="text-xl font-black text-black uppercase italic mb-4">查找盟友 / SEARCH ALLY</h2>
+              <SearchBar
+                value={inputValue}
+                onChange={handleInputChange}
+                onClear={handleClearSearch}
+                onSearch={handleSearch}
+                placeholder="搜索名称、描述、地区... / SEARCH..."
+                className="max-w-2xl"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* China Map Module */}
-      <ChinaMapModule className="mb-6" onProvinceSelect={handleProvinceSelect} />
+      {/* China Map Module with P5 Frame */}
+      <div className="relative p-6 bg-white border-4 border-black shadow-[12px_12px_0_0_black] overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 p5-halftone opacity-10 -rotate-45 translate-x-32 -translate-y-32"></div>
+        <div className="relative z-10">
+          <h2 className="text-2xl font-black text-black uppercase italic mb-6 border-l-8 border-p5-red pl-4">
+            势力范围 / OPERATIONAL MAP
+          </h2>
+          <ChinaMapModule className="mb-0" onProvinceSelect={handleProvinceSelect} />
+        </div>
+      </div>
 
       {/* Province Filter Status */}
       {selectedProvince && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-600" />
-              <span className="text-blue-800 font-medium">
-                当前显示：{selectedProvince} 地区社团 ({filteredGroups.length} 个)
-              </span>
+        <div className="relative mb-12 group">
+          <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-y-1 z-0 shadow-[8px_8px_0_0_black]"></div>
+          <div className="relative z-10 bg-black border-4 border-white p-6 md:p-8 transform -skew-y-1 overflow-hidden">
+            <div className="p5-halftone absolute inset-0 opacity-20 pointer-events-none"></div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 transform skew-y-1">
+              <div className="flex items-center gap-6">
+                <div className="bg-white p-4 transform rotate-12 border-4 border-p5-red">
+                  <MapPin className="w-10 h-10 text-p5-red animate-bounce" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-black text-p5-red uppercase italic tracking-tighter">已锁定地区 / LOCATION IDENTIFIED :</span>
+                  <h2 className="text-5xl font-black text-white uppercase italic leading-none p5-text-shadow-red">
+                    {selectedProvince} <span className="text-p5-red">/</span> {filteredGroups.length} <span className="text-2xl">个已知社团 / GROUPS FOUND</span>
+                  </h2>
+                </div>
+              </div>
+
+              <button
+                onClick={clearProvinceFilter}
+                className="bg-p5-red text-white px-8 py-3 font-black uppercase italic border-4 border-white hover:bg-white hover:text-black transition-all transform -skew-x-12 shadow-[4px_4px_0_0_rgba(0,0,0,0.5)] active:translate-y-1"
+              >
+                <span className="transform skew-x-12 inline-block">中止搜寻 / TERMINATE SCAN</span>
+              </button>
             </div>
-            <button
-              onClick={clearProvinceFilter}
-              className="flex items-center gap-1 px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors"
-            >
-              <X className="w-4 h-4" />
-              <span>清除过滤</span>
-            </button>
           </div>
         </div>
       )}
 
       {/* Groups Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayGroups.length > 0 ? (
           displayGroups.map((group: any) => (
-            <div
+            <ClubCard
               key={group.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 card-hover cursor-pointer flex flex-col h-full"
+              club={group}
               onClick={() => handleGroupClick(group.id)}
-            >
-              {/* Group Header */}
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
-                    {group.logo ? (
-                      <img
-                        src={group.logo}
-                        alt={group.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                        <span className="text-white font-bold text-xl">
-                          {group.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {group.name}
-                      </h3>
-                    </div>
-                    
-                    {group.location && (
-                      <div className="flex items-center text-gray-500 text-sm mt-1">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        <span>{group.location}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="flex-1 mb-4">
-                  <p className="text-gray-600 text-sm line-clamp-3 h-16">
-                    {group.description}
-                  </p>
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <div className="flex items-center space-x-1">
-                    <div className="w-4 h-4 bg-primary-500 rounded flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">视</span>
-                    </div>
-                    <span>{group.video_count} 视频</span>
-                  </div>
-                </div>
-
-                {/* Founded Date */}
-                {group.founded_date && (
-                  <div className="flex items-center text-sm text-gray-500 mb-4">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span>成立于 {new Date(group.founded_date).getFullYear()}年</span>
-                  </div>
-                )}
-
-                {/* Social Links */}
-                <div className="space-y-2">
-                  {group.website && (
-                    <a
-                      href={group.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-sm text-primary-600 hover:text-primary-700"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      <span>官方网站</span>
-                    </a>
-                  )}
-                  
-                  {group.bilibili && (
-                    <a
-                      href={group.bilibili}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-sm text-pink-600 hover:text-pink-700"
-                    >
-                      <div className="w-4 h-4 mr-1 bg-pink-500 rounded text-white text-xs font-bold flex items-center justify-center">
-                        B
-                      </div>
-                      <span>哔哩哔哩</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Footer */}
-              <div className="px-6 py-4 bg-gray-50 rounded-b-lg">
-                <div className="w-full btn-primary text-sm text-center">
-                  查看详情
-                </div>
-              </div>
-            </div>
+            />
           ))
         ) : (
           <div className="col-span-full">
-            {selectedProvince ? (
-              <div className="text-center py-12">
-                <div className="bg-gray-50 rounded-lg p-8">
-                  <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">{selectedProvince} 地区暂无社团</h3>
-                  <p className="text-gray-600">该地区还没有社团信息</p>
+            <div className="relative p-20 text-center group/no-results overflow-hidden">
+              <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+              <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+                  <Users className="w-20 h-20 text-black transform -rotate-12" />
                 </div>
+                <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+                  无关联社团 / NO ALLIANCE FOUND
+                </h3>
+                <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white">
+                  该区域无匹配情报 / ZERO ASSETS DETECTED
+                </p>
               </div>
-            ) : inputValue ? (
-              <div className="text-center py-12">
-                <div className="bg-gray-50 rounded-lg p-8">
-                  <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">未找到匹配的社团</h3>
-                  <p className="text-gray-600">请尝试调整搜索条件</p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="bg-gray-50 rounded-lg p-8">
-                  <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">暂无社团</h3>
-                  <p className="text-gray-600">目前还没有社团信息</p>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Load More Button */}
-      {pagination.next && !inputValue && (
-        <div className="text-center mt-8">
-          <button
-            onClick={handleLoadMore}
-            className="btn-primary"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader className="w-4 h-4 animate-spin mr-2" />
-                加载中...
-              </>
-            ) : (
-              '加载更多社团'
-            )}
-          </button>
-        </div>
-      )}
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalCount={pagination.count}
+        pageSize={12}
+        onPageChange={(page) => {
+          dispatch(setCurrentPage(page))
+          dispatch(fetchGroups({ page }))
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }}
+      />
 
       {/* Total Count Display */}
       {groups.length > 0 && (
-        <div className="text-center mt-4 text-sm text-gray-500">
-          已显示 {groups.length} / {pagination.count} 个社团
+        <div className="text-center mt-12 mb-8">
+          <div className="inline-block bg-black text-white px-6 py-1 transform -skew-x-12 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
+            <span className="transform skew-x-12 inline-block font-black italic uppercase tracking-tighter">
+              情报扫描完毕: <span className="text-p5-red">{groups.length}</span> / <span className="text-p5-red">{pagination.count}</span> ALLIANCES VIEWED
+            </span>
+          </div>
         </div>
       )}
     </div>

@@ -28,54 +28,49 @@ function ClubCard({ club, onClick }: ClubCardProps) {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+      className="relative group cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
       onClick={handleClick}
     >
-      {/* 社团名称 */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-          {club.name}
-        </h3>
-      </div>
+      <div className="absolute inset-0 bg-black transform translate-x-1 translate-y-1 rotate-1 border-2 border-gray-800 z-0"></div>
 
-      {/* 位置信息 */}
-      <div className="flex items-center text-gray-600 mb-3">
-        <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-        <span className="text-sm">{displayLocation}</span>
-      </div>
+      <div className="relative z-10 bg-white border-2 border-black p-5 h-full flex flex-col overflow-hidden">
+        {/* Decorative corner */}
+        <div className="absolute -top-6 -right-6 w-12 h-12 bg-p5-red transform rotate-45 z-0"></div>
 
-      {/* 视频数量 */}
-      <div className="flex items-center text-gray-600 mb-3">
-        <Video className="w-4 h-4 mr-2 flex-shrink-0" />
-        <span className="text-sm">
-          {club.video_count || 0} 个视频
-        </span>
-      </div>
-
-      {/* 描述 */}
-      {club.description && (
-        <div className="mb-4">
-          <p className="text-sm text-gray-600 line-clamp-3">
-            {club.description}
-          </p>
+        {/* 社团名称 */}
+        <div className="mb-4 relative z-10">
+          <h3 className="text-xl font-black text-black uppercase transform -skew-x-6 border-b-4 border-p5-red inline-block pr-2 mb-1">
+            {club.name}
+          </h3>
         </div>
-      )}
 
-      {/* 状态标签 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <Users className="w-4 h-4 mr-1 text-gray-400" />
-          <span className="text-xs text-gray-500">社团</span>
+        {/* 位置信息 */}
+        <div className="flex items-center text-sm font-bold text-gray-800 mb-2">
+          <MapPin className="w-4 h-4 mr-2 text-p5-red" />
+          <span className="bg-black text-white px-1 transform skew-x-12 inline-block">
+            <span className="transform -skew-x-12 inline-block">{displayLocation}</span>
+          </span>
         </div>
-        {club.is_active ? (
-          <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-            活跃
+
+        {/* 视频数量 */}
+        <div className="flex items-center text-sm font-bold text-gray-800 mb-4">
+          <Video className="w-4 h-4 mr-2 text-p5-red" />
+          <span>
+            {club.video_count || 0} VIDEOS
           </span>
-        ) : (
-          <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-            未激活
-          </span>
+        </div>
+
+        {/* 描述 */}
+        {club.description && (
+          <div className="mb-4 flex-grow">
+            <p className="text-xs text-gray-600 line-clamp-3 font-medium border-l-2 border-gray-300 pl-2 italic">
+              {club.description}
+            </p>
+          </div>
         )}
+
+        {/* Comic dots decoration at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-p5-red opacity-10" style={{ backgroundImage: 'radial-gradient(#000 20%, transparent 20%)', backgroundSize: '4px 4px' }}></div>
       </div>
     </div>
   )

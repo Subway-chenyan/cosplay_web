@@ -18,46 +18,61 @@ function Header() {
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-black border-b-4 border-p5-red sticky top-0 z-50 shadow-[0_4px_0_0_rgba(0,0,0,1)]">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
+            <Link to="/" className="flex items-center group">
+              <div className="w-10 h-10 bg-p5-red transform rotate-12 flex items-center justify-center border-2 border-white shadow-[2px_2px_0_0_white] group-hover:rotate-0 transition-transform">
+                <span className="text-white font-black text-2xl font-comic">C</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Cosplay舞台剧</span>
+              <div className="ml-4 bg-white px-2 py-1 transform -skew-x-12 border-2 border-black">
+                <span className="text-xl font-black text-black uppercase tracking-tighter">Cosplay舞台剧</span>
+              </div>
             </Link>
           </div>
 
           {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+          <nav className="hidden md:flex items-center space-x-1">
+            {navigation.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`relative px-6 py-2 transition-all duration-200 group overflow-hidden ${active ? 'z-10' : ''
+                    }`}
+                >
+                  {/* Skewed background for active/hover */}
+                  <div className={`absolute inset-0 transform -skew-x-12 transition-all duration-200 ${active ? 'bg-p5-red translate-x-0' : 'bg-white -translate-x-full group-hover:translate-x-0'
+                    }`}></div>
+
+                  {/* Text */}
+                  <span className={`relative z-10 text-sm font-black uppercase italic transform skew-x-12 inline-block transition-colors ${active ? 'text-white' : 'text-white group-hover:text-black'
+                    }`}>
+                    {item.name}
+                  </span>
+
+                  {/* Decorative dot for active */}
+                  {active && (
+                    <div className="absolute bottom-1 right-2 w-1.5 h-1.5 bg-white rounded-full"></div>
+                  )}
+                </Link>
+              )
+            })}
           </nav>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-50"
+              className="p-2 bg-p5-red text-white border-2 border-white transform rotate-3"
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 transform -rotate-3" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6 transform -rotate-3" />
               )}
             </button>
           </div>
@@ -65,22 +80,24 @@ function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <nav className="space-y-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    isActive(item.href)
-                      ? 'text-primary-600 bg-primary-50'
-                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
+          <div className="md:hidden py-6 bg-black border-t-2 border-p5-red">
+            <nav className="flex flex-col space-y-3">
+              {navigation.map((item) => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`px-4 py-3 transform -skew-x-6 border-l-8 transition-all ${active ? 'bg-p5-red border-white text-white' : 'border-p5-red text-white hover:bg-gray-900'
+                      }`}
+                  >
+                    <span className="text-lg font-black uppercase italic block transform skew-x-6">
+                      {item.name}
+                    </span>
+                  </Link>
+                )
+              })}
             </nav>
           </div>
         )}

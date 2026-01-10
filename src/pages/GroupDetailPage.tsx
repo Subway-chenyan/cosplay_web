@@ -7,11 +7,11 @@ import { fetchAwardRecords } from '../store/slices/awardsSlice'
 import { groupService } from '../services/groupService'
 import VideoCard from '../components/VideoCard'
 import NoVideoAwardCard from '../components/NoVideoAwardCard'
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Calendar, 
-  ExternalLink, 
+import {
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  ExternalLink,
   Users,
   Trophy,
   Award,
@@ -35,9 +35,9 @@ function GroupDetailPage() {
   useEffect(() => {
     const loadGroup = async () => {
       if (!id) return
-      
+
       setLoading(true)
-      
+
       // 首先尝试从已加载的社团中查找
       const existingGroup = groups.find(g => g.id === id)
       if (existingGroup) {
@@ -51,7 +51,7 @@ function GroupDetailPage() {
           console.error('获取社团详情失败:', error)
         }
       }
-      
+
       setLoading(false)
     }
 
@@ -66,7 +66,7 @@ function GroupDetailPage() {
   }, [dispatch, id])
 
   const group = currentGroup
-  
+
   // 获取该社团的所有视频（使用API直接获取的数据）
   // 由于我们使用了fetchGroupVideos，这些视频已经是该社团的了
   const groupVideos = videos
@@ -86,19 +86,19 @@ function GroupDetailPage() {
     })
 
   // 获取获奖视频
-  const awardedVideos = groupVideos.filter(video => 
+  const awardedVideos = groupVideos.filter(video =>
     groupAwards.some(awardRecord => awardRecord.video === video.id)
   )
 
   // 获取无视频的获奖记录（已排序）
-  const awardRecordsWithoutVideo = groupAwards.filter(awardRecord => 
+  const awardRecordsWithoutVideo = groupAwards.filter(awardRecord =>
     !awardRecord.video
   )
 
   // 根据奖项名称创建奖项信息（动态生成）
   const createAwardInfo = (name: string) => {
     const lowerName = name.toLowerCase()
-    
+
     // 根据奖项名称动态生成样式
     if (lowerName.includes('金') || lowerName.includes('gold') || lowerName.includes('一等奖')) {
       return {
@@ -178,13 +178,22 @@ function GroupDetailPage() {
 
   if (!group) {
     return (
-      <div className="text-center py-12">
-        <div className="bg-gray-50 rounded-lg p-8 max-w-md mx-auto">
-          <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">社团未找到</h3>
-          <p className="text-gray-600 mb-4">请检查社团链接是否正确</p>
-          <Link to="/groups" className="btn-primary">
-            返回社团列表
+      <div className="relative p-20 text-center group/no-results overflow-hidden">
+        <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+        <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+            <Users className="w-20 h-20 text-black transform -rotate-12" />
+          </div>
+          <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+            目标失踪 / TARGET MISSING
+          </h3>
+          <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white mb-8">
+            数据库中不存在该社团 / DATA ERROR
+          </p>
+          <Link to="/groups" className="btn-secondary">
+            返回列表 / BACK TO ALLIANCE
           </Link>
         </div>
       </div>
@@ -197,36 +206,41 @@ function GroupDetailPage() {
       <div className="flex items-center">
         <Link
           to="/groups"
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="group flex items-center bg-black text-white px-4 py-2 transform -skew-x-12 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>返回社团列表</span>
+          <span className="flex items-center transform skew-x-12">
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            <span className="font-black uppercase italic">返回列表 / BACK TO ALLIANCE</span>
+          </span>
         </Link>
       </div>
 
       {/* 社团头部信息 */}
-      <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+      <div className="bg-white border-4 border-black p-6 md:p-10 shadow-[8px_8px_0_0_black] relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-10 -rotate-12 translate-x-16 -translate-y-16"></div>
+
+        <div className="flex flex-col md:flex-row md:items-start space-y-6 md:space-y-0 md:space-x-10 relative z-10">
           {/* 社团Logo和名称 - 移动端水平布局 */}
-          <div className="flex items-center space-x-4 md:flex-col md:space-x-0 md:space-y-2">
-            <div className="w-16 h-16 md:w-24 md:h-24 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+          <div className="flex items-center space-x-6 md:flex-col md:space-x-0 md:space-y-4">
+            <div className="w-20 h-20 md:w-32 md:h-32 bg-p5-red transform rotate-6 border-4 border-black shadow-[4px_4px_0_0_black] overflow-hidden flex-shrink-0">
               {group.logo ? (
                 <img
                   src={group.logo}
                   alt={group.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transform -rotate-6 scale-125"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl md:text-3xl">
+                <div className="w-full h-full flex items-center justify-center transform -rotate-6">
+                  <span className="text-white font-black text-4xl md:text-6xl uppercase italic">
                     {group.name.charAt(0)}
                   </span>
                 </div>
               )}
             </div>
-            
+
             <div className="flex-1 md:text-center">
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl md:text-5xl font-black text-black uppercase italic leading-none transform -skew-x-6 mb-2" style={{ textShadow: '3px 3px 0px #d90614' }}>
                 {group.name}
               </h1>
             </div>
@@ -265,7 +279,7 @@ function GroupDetailPage() {
             {group.founded_date && (
               <div className="flex items-center text-gray-600 mb-4">
                 <Calendar className="w-5 h-5 mr-2" />
-                <span>成立于 {new Date(group.founded_date).getFullYear()}年</span>
+                <span>始建于 {new Date(group.founded_date).getFullYear()}年 / ESTABLISHED</span>
               </div>
             )}
 
@@ -282,7 +296,7 @@ function GroupDetailPage() {
                   <span>官方网站</span>
                 </a>
               )}
-              
+
               {group.bilibili && (
                 <a
                   href={group.bilibili}
@@ -315,146 +329,145 @@ function GroupDetailPage() {
 
       {/* 获奖作品 */}
       {(awardedVideos.length > 0 || awardRecordsWithoutVideo.length > 0) && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center space-x-3 mb-6">
-            <Trophy className="w-6 h-6 text-yellow-500" />
-            <h2 className="text-xl font-bold text-gray-900">获奖作品</h2>
-          </div>
+        <div className="relative group">
+          <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-1 z-0"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-6 md:p-10 transform -skew-x-1">
+            <div className="flex items-center space-x-4 mb-8 transform skew-x-1">
+              <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black shadow-[4px_4px_0_0_black]">
+                <Trophy className="w-8 h-8 text-white transform -rotate-12" />
+              </div>
+              <h2 className="text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
+                历战功绩 / ACCOMPLISHMENTS
+              </h2>
+            </div>
 
-          <div className="space-y-6">
-            {/* 有视频的获奖记录 */}
-            {groupAwards.filter(awardRecord => awardRecord.video).map((awardRecord) => {
-              const awardVideo = awardedVideos.find(v => v.id === awardRecord.video)
-              if (!awardVideo) return null
-              
-              const awardInfo = createAwardInfo(awardRecord.award_name || '获奖记录')
+            <div className="space-y-10 transform skew-x-1">
+              {/* 有视频的获奖记录 */}
+              {groupAwards.filter(awardRecord => awardRecord.video).map((awardRecord) => {
+                const awardVideo = awardedVideos.find(v => v.id === awardRecord.video)
+                if (!awardVideo) return null
 
-              return (
-                <div key={awardRecord.id} className={`border ${awardInfo.borderColor} rounded-lg p-4 ${awardInfo.color}`}>
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className={`w-12 h-12 bg-white rounded-lg flex items-center justify-center border ${awardInfo.borderColor}`}>
-                        {awardInfo.icon}
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-2">
-                        <h3 className={`text-lg font-semibold ${awardInfo.textColor} mb-2`}>{awardRecord.award_name || '获奖记录'}</h3>
-                        <div className="flex flex-wrap gap-2">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${awardInfo.color} ${awardInfo.textColor}`}>
-                            {awardRecord.competition_name || ''}
-                          </span>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {awardRecord.competition_year || '未知年份'}年
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {awardRecord.description && (
-                        <p className={`${awardInfo.textColor} text-sm mb-3`}>{awardRecord.description}</p>
-                      )}
-                      
-                      <div className={`bg-white rounded-lg p-3 border ${awardInfo.borderColor}`}>
-                        <div className="max-w-sm relative">
-                          <VideoCard
-                            video={awardVideo}
-                            onClick={() => handleVideoClick(awardVideo.id)}
-                          />
-                          {/* 奖项标识 */}
-                          <div className={`absolute top-2 right-2 ${awardInfo.color} rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm backdrop-blur-sm border ${awardInfo.borderColor}`}>
-                            {awardInfo.icon}
-                            <span className={`text-xs font-medium ${awardInfo.textColor}`}>
-                              {awardInfo.label}
-                            </span>
-                          </div>
-                          {/* 年份标识 */}
-                          {awardVideo.year && (
-                            <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white rounded px-2 py-1 text-xs">
-                              {awardVideo.year}年
+                const awardInfo = createAwardInfo(awardRecord.award_name || '获奖记录')
+
+                return (
+                  <div key={awardRecord.id} className="relative group/award">
+                    <div className="absolute inset-0 bg-black opacity-5 transform translate-x-1 translate-y-1 -skew-x-2 z-0"></div>
+                    <div className={`relative z-10 border-l-8 ${awardInfo.borderColor.replace('border-', 'border-')} p-6 bg-gray-50 transform -skew-x-2`}>
+                      <div className="flex flex-col md:flex-row items-start md:space-x-8 transform skew-x-2">
+                        <div className="flex-1 min-w-0 mb-6 md:mb-0">
+                          <div className="mb-4">
+                            <h3 className={`text-2xl font-black uppercase italic mb-2`} style={{ color: '#d90614' }}>
+                              {awardRecord.award_name || 'AWARD SECURED'}
+                            </h3>
+                            <div className="flex flex-wrap gap-3">
+                              <span className={`inline-flex items-center px-3 py-1 bg-black text-white font-black text-xs uppercase italic transform -skew-x-12`}>
+                                <span className="transform skew-x-12">{awardRecord.competition_name || ''}</span>
+                              </span>
+                              <span className="inline-flex items-center px-3 py-1 border-2 border-black font-black text-xs uppercase italic transform -skew-x-12">
+                                <span className="transform skew-x-12">{awardRecord.competition_year || 'YEAR'}年</span>
+                              </span>
                             </div>
+                          </div>
+
+                          {awardRecord.description && (
+                            <p className="text-black font-bold italic border-l-4 border-gray-300 pl-4 mb-4">{awardRecord.description}</p>
                           )}
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-            
-            {/* 无视频的获奖记录 */}
-            {awardRecordsWithoutVideo.map((awardRecord) => {
-              const awardInfo = createAwardInfo(awardRecord.award_name || '获奖记录')
-              
-              return (
-                <div key={awardRecord.id} className={`border ${awardInfo.borderColor} rounded-lg p-4 ${awardInfo.color}`}>
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className={`w-12 h-12 bg-white rounded-lg flex items-center justify-center border ${awardInfo.borderColor}`}>
-                        {awardInfo.icon}
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-2">
-                        <h3 className={`text-lg font-semibold ${awardInfo.textColor} mb-2`}>{awardRecord.award_name || '获奖记录'}</h3>
-                        <div className="flex flex-wrap gap-2">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${awardInfo.color} ${awardInfo.textColor}`}>
-                            {awardRecord.competition_name || ''}
-                          </span>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {awardRecord.competition_year || '未知年份'}年
-                          </span>
+
+                        <div className="w-full md:w-80 flex-shrink-0">
+                          <div className="relative group/video">
+                            <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 z-0"></div>
+                            <div className="relative z-10">
+                              <VideoCard
+                                video={awardVideo}
+                                onClick={() => handleVideoClick(awardVideo.id)}
+                              />
+                            </div>
+                            {/* 奖项标识 */}
+                            <div className={`absolute top-0 right-0 z-20 bg-p5-red text-white p-2 transform rotate-12 border-2 border-black shadow-[2px_2px_0_0_black]`}>
+                              {awardInfo.icon}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      
-                      {awardRecord.description && (
-                        <p className={`${awardInfo.textColor} text-sm mb-3`}>{awardRecord.description}</p>
-                      )}
-                      
-                      <div className={`bg-white rounded-lg p-3 border ${awardInfo.borderColor}`}>
-                        <NoVideoAwardCard
-                          awardRecord={awardRecord}
-                          awardInfo={awardInfo}
-                        />
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* 无视频的获奖记录 */}
+              {awardRecordsWithoutVideo.map((awardRecord) => {
+                const awardInfo = createAwardInfo(awardRecord.award_name || '获奖记录')
+
+                return (
+                  <div key={awardRecord.id} className="relative group/award">
+                    <div className="absolute inset-0 bg-black opacity-5 transform translate-x-1 translate-y-1 -skew-x-2 z-0"></div>
+                    <div className={`relative z-10 border-l-8 border-gray-400 p-6 bg-gray-50 transform -skew-x-2`}>
+                      <div className="transform skew-x-2">
+                        <h3 className="text-xl font-black text-black uppercase italic mb-3">
+                          {awardRecord.award_name || 'OFF-SCREEN AWARD'}
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <span className="bg-black text-white px-2 py-1 text-xs font-black uppercase italic transform -skew-x-12">
+                            <span className="transform skew-x-12">{awardRecord.competition_name || ''}</span>
+                          </span>
+                          <span className="border-2 border-black px-2 py-1 text-xs font-black italic transform -skew-x-12">
+                            <span className="transform skew-x-12">{awardRecord.competition_year || 'YEAR'}年</span>
+                          </span>
+                        </div>
+                        <div className="bg-white border-2 border-black p-4 italic font-bold">
+                          <NoVideoAwardCard
+                            awardRecord={awardRecord}
+                            awardInfo={awardInfo}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
 
       {/* 所有舞台剧视频 */}
       {groupVideos.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">
-              舞台剧视频 ({groupVideos.length})
-            </h2>
-          </div>
+        <div className="relative group mt-12">
+          <div className="absolute inset-0 bg-p5-red opacity-10 transform translate-x-2 translate-y-2 -skew-x-1 z-0"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-8 shadow-[8px_8px_0_0_black]">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-black text-black uppercase italic border-b-8 border-black">
+                行动记录 / FIELD LOGS ({groupVideos.length})
+              </h2>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {groupVideos.map((video) => (
-              <VideoCard
-                key={video.id}
-                video={video}
-                onClick={() => handleVideoClick(video.id)}
-              />
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {groupVideos.map((video) => (
+                <VideoCard
+                  key={video.id}
+                  video={video}
+                  onClick={() => handleVideoClick(video.id)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* 空状态 */}
       {groupVideos.length === 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <div className="text-center">
-            <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">暂无视频作品</h3>
-            <p className="text-gray-600">该社团还没有发布任何舞台剧视频</p>
+        <div className="relative p-20 text-center group/no-results overflow-hidden mt-12">
+          <div className="absolute inset-0 bg-white transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-lg"></div>
+          <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+          <div className="relative z-10 flex flex-col items-center">
+            <h3 className="text-4xl font-black text-black uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+              尚无行动记录 / NO DATA CAPTURED
+            </h3>
+            <p className="bg-black text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-p5-red">
+              该社团暂无视频存档 / DATABASE CLEAR
+            </p>
           </div>
         </div>
       )}

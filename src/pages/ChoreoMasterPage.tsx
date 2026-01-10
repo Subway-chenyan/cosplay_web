@@ -5,7 +5,7 @@ const CHOREOMASTER_SRC = '/choreomaster/ChoreoMaster/dist/index.html'
 function ChoreoMasterPage() {
   const [loaded, setLoaded] = useState(false)
 
-  const containerStyle = useMemo(() => ({ top: '64px' }), [])
+  const containerStyle = useMemo(() => ({ top: '80px' }), [])
 
   return (
     <div className="fixed left-0 right-0 bottom-0" style={containerStyle}>

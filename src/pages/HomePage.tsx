@@ -7,7 +7,8 @@ import VideoCard from '../components/VideoCard'
 import ClubCard from '../components/ClubCard'
 // import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
-import { Loader, Tv, Sparkles, List, Info, AlertTriangle } from 'lucide-react'
+import Pagination from '../components/Pagination'
+import { Loader, Tv, Sparkles, List, Info, AlertTriangle, Play } from 'lucide-react'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
 import type { Video, Group } from '../types'
@@ -71,14 +72,14 @@ function HomePage() {
   }, [])
 
   // 获取视频数据
-  const fetchVideosData = useCallback(async (params?: { 
+  const fetchVideosData = useCallback(async (params?: {
     page?: number
     filters?: any
     searchQuery?: string
   }) => {
     const isFilterChange = JSON.stringify(params?.filters) !== JSON.stringify(filtersRef.current) ||
-                          params?.searchQuery !== searchQueryRef.current
-    
+      params?.searchQuery !== searchQueryRef.current
+
     if (isFilterChange) {
       setIsFilterLoading(true)
       saveScrollPosition()
@@ -121,7 +122,7 @@ function HomePage() {
   useEffect(() => {
     const hasFiltersChanged = JSON.stringify(filters) !== JSON.stringify(filtersRef.current)
     const hasSearchChanged = searchQuery !== searchQueryRef.current
-    
+
     if (!hasFiltersChanged && !hasSearchChanged) {
       fetchVideosData({
         page: currentPage,
@@ -231,82 +232,90 @@ function HomePage() {
 
   return (
     <div className="space-y-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-xl text-white p-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">
-            Cosplay舞台剧视频数据库
+      <div className="relative bg-black p-8 overflow-hidden border-b-8 border-p5-red shadow-[8px_8px_0_0_black]">
+        <div className="absolute inset-0 bg-gradient-to-r from-p5-red/80 to-black transform skew-x-12 scale-150 origin-bottom-left -z-0"></div>
+        <div className="relative z-10 text-center">
+          <h1 className="text-6xl font-black mb-4 text-white uppercase italic tracking-tighter" style={{ textShadow: '6px 6px 0px #d90614' }}>
+            COSPLAY / 舞台剧库
           </h1>
-          <p className="text-xl text-primary-100 mb-6">
-            各大Cosplay舞台剧赛事数据汇总，持续更新中...
+          <p className="text-lg text-white font-black bg-black inline-block px-6 py-1 transform skew-x-12 border-2 border-p5-red">
+            <span className="transform -skew-x-12 inline-block italic">各大赛事数据汇总 · THE PHANTOM THIEVES</span>
           </p>
-          </div>
+        </div>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {isAgentMode ? '智能搜索' : '搜索视频'}
-          </h2>
-          <button
-            onClick={() => setIsAgentMode(!isAgentMode)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-              isAgentMode
-                ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {isAgentMode ? (
-              <>
-                <Sparkles className="w-4 h-4" />
-                <span>Agent模式</span>
-              </>
-            ) : (
-              <>
-                <List className="w-4 h-4" />
-                <span>普通模式</span>
-              </>
-            )}
-          </button>
+      <div className="relative group">
+        <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
+        <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-2">
+          <div className="flex items-center justify-between mb-6 transform skew-x-2">
+            <h2 className="text-2xl font-black text-black uppercase italic border-b-4 border-p5-red">
+              {isAgentMode ? 'AI INVESTIGATION / 智能搜索' : 'DATABASE SEARCH / 搜索视频'}
+            </h2>
+            <button
+              onClick={() => setIsAgentMode(!isAgentMode)}
+              className={`flex items-center space-x-2 px-6 py-2 transform -skew-x-12 transition-all font-black uppercase italic ${isAgentMode
+                ? 'bg-purple-600 text-white shadow-[4px_4px_0_0_black]'
+                : 'bg-black text-white hover:bg-p5-red'
+                }`}
+            >
+              <span className="transform skew-x-12 flex items-center">
+                {isAgentMode ? <Sparkles className="w-4 h-4 mr-2" /> : <List className="w-4 h-4 mr-2" />}
+                {isAgentMode ? 'Agent Mode' : 'Standard'}
+              </span>
+            </button>
+          </div>
+          <div className="transform skew-x-2">
+            <SearchBar
+              value={inputValue}
+              onChange={handleInputChange}
+              onClear={handleClearSearch}
+              onSearch={handleSearch}
+              placeholder={
+                isAgentMode
+                  ? 'Tell us what you are looking for... (e.g. 2025 ChinaJoy Gold Winners)'
+                  : 'Title, Group, Competition, Tag...'
+              }
+              className="max-w-2xl"
+            />
+          </div>
+          {isAgentMode && (
+            <p className="text-xs text-gray-500 mt-4 font-bold uppercase tracking-widest bg-gray-100 p-2 transform skew-x-2">
+              💡 Agent mode supports natural language search for both videos and clubs.
+            </p>
+          )}
         </div>
-        <SearchBar
-          value={inputValue}
-          onChange={handleInputChange}
-          onClear={handleClearSearch}
-          onSearch={handleSearch}
-          placeholder={
-            isAgentMode
-              ? '输入您的搜索需求，例如：查找2025年获得ChinaJoy金奖的团队'
-              : '搜索视频标题、描述、社团、比赛或标签...'
-          }
-          className="max-w-2xl"
-        />
-        {isAgentMode && (
-          <p className="text-sm text-gray-500 mt-2">
-            💡 Agent模式支持自然语言搜索，可以同时搜索视频和社团
-          </p>
-        )}
       </div>
 
       {/* Stats Cards */}
       {!isAgentMode && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <div className="text-sm text-gray-600">总视频数</div>
-              <div className="text-2xl font-bold text-gray-900">{stats?.total_videos ?? pagination.count}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 -skew-x-12 z-0"></div>
+            <div className="relative z-10 bg-black p-4 flex items-center justify-between transform -skew-x-12 border-2 border-white">
+              <div className="transform skew-x-12">
+                <div className="text-xs font-black text-p5-red uppercase italic">Total Records / 总视频数</div>
+                <div className="text-3xl font-black text-white italic">{stats?.total_videos ?? pagination.count}</div>
+              </div>
+              <div className="w-12 h-12 bg-p5-red transform rotate-12 flex items-center justify-center border-2 border-white shadow-[2px_2px_0_0_black]">
+                <Play className="text-white w-6 h-6 transform -rotate-12" />
+              </div>
             </div>
           </div>
-          <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <div className="text-sm text-gray-600">近7天新增</div>
-              <div className="text-2xl font-bold text-primary-600">{stats?.weekly_new_videos ?? 0}</div>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-white transform translate-x-1 translate-y-1 -skew-x-12 z-0"></div>
+            <div className="relative z-10 bg-black p-4 flex items-center justify-between transform -skew-x-12 border-2 border-p5-red">
+              <div className="transform skew-x-12">
+                <div className="text-xs font-black text-gray-400 uppercase italic">近七日情报 / NEW ADDITIONS</div>
+                <div className="text-3xl font-black text-p5-red italic">{stats?.recent_videos ?? 0}</div>
+              </div>
+              <div className="w-12 h-12 bg-white transform -rotate-6 flex items-center justify-center border-2 border-black">
+                <Sparkles className="text-p5-red w-6 h-6 transform rotate-6" />
+              </div>
             </div>
           </div>
         </div>
-      )}
-      {/* Filters */}
+      )}{/* Filters */}
       {/* <VideoFilters /> */}
 
       {/* 筛选加载指示器 */}
@@ -323,79 +332,69 @@ function HomePage() {
       {isAgentMode && agentResults && (
         <div className="space-y-8">
           {/* Agent搜索结果头部 - 显示LLM文本总结 */}
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-            <div className="flex items-center space-x-2 mb-3">
-              <Sparkles className="w-5 h-5 text-purple-600" />
-              <span className="text-purple-800 font-medium">AI智能搜索总结</span>
+          <div className="bg-black border-4 border-p5-red p-8 transform -skew-x-2 relative overflow-hidden shadow-[8px_8px_0_0_black]">
+            <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-20 rotate-12 translate-x-12 -translate-y-12"></div>
+            <div className="flex items-center space-x-3 mb-6 transform skew-x-2">
+              <Sparkles className="w-8 h-8 text-p5-red" />
+              <span className="text-2xl font-black text-white italic uppercase tracking-tighter p5-text-shadow-red">搜查报告 / INVESTIGATION REPORT</span>
             </div>
-            <div className="text-purple-900">
-              <p className="text-sm leading-relaxed">{agentResults.text}</p>
+            <div className="text-white transform skew-x-2 relative z-10">
+              <p className="text-lg font-bold leading-relaxed italic border-l-4 border-p5-red pl-6">{agentResults.text}</p>
             </div>
 
             {(agentResults.video_id_list.length > 0 || agentResults.group_id_list.length > 0) && (
-              <div className="mt-4 pt-4 border-t border-purple-200">
-                <p className="text-purple-700 text-sm">
-                  找到 {agentResults.video_id_list.length} 个相关视频和 {agentResults.group_id_list.length} 个相关社团
+              <div className="mt-8 pt-6 border-t-2 border-p5-red border-dashed transform skew-x-2">
+                <p className="text-p5-red font-black italic uppercase text-sm">
+                  已截获 {agentResults.video_id_list.length} 条记录 & {agentResults.group_id_list.length} 个组织情报 / ASSETS CAPTURED
                 </p>
-                {/* 轻量状态标签 */}
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
-                    视频ID数: {agentResults.video_id_list.length}
+                {/* 调试状态标签 */}
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                    影像标记: {agentResults.video_id_list.length}
                   </span>
-                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
-                    已解析视频: {agentResults.videos.length}
+                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                    解析视频: {agentResults.videos.length}
                   </span>
-                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
-                    社团ID数: {agentResults.group_id_list.length}
+                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                    组织标记: {agentResults.group_id_list.length}
                   </span>
-                  <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
-                    已解析社团: {agentResults.groups.length}
+                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                    解析组织: {agentResults.groups.length}
                   </span>
-                  {(agentResults.videos.length < agentResults.video_id_list.length || agentResults.groups.length < agentResults.group_id_list.length) && (
-                    <span className="inline-flex items-center px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
-                      <AlertTriangle className="w-3 h-3 mr-1" />存在未解析的ID
-                    </span>
-                  )}
                 </div>
 
                 {/* 调试信息面板 */}
                 {showAgentDebug && (
-                  <div className="mt-3 p-3 rounded-md bg-gray-50 border border-gray-200">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="mt-6 p-6 bg-white border-4 border-black transform -skew-x-1 shadow-[4px_4px_0_0_#d90614]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 transform skew-x-1">
                       <div>
-                        <h4 className="text-xs font-semibold text-gray-700">视频ID样例</h4>
-                        <div className="mt-1 text-xs text-gray-600 break-all">
+                        <h4 className="text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">影像特征 / VIDEO ID</h4>
+                        <div className="text-xs font-bold text-black break-all leading-tight">
                           {agentResults.video_id_list.slice(0, 5).join(', ')}
                           {agentResults.video_id_list.length > 5 && ' ...'}
                         </div>
-                        <h4 className="mt-2 text-xs font-semibold text-gray-700">已解析视频</h4>
-                        <ul className="mt-1 space-y-1">
+                        <h4 className="mt-6 text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">核心数据 / DECODED VIDEO</h4>
+                        <ul className="space-y-1">
                           {agentResults.videos.slice(0, 5).map((v) => (
-                            <li key={v.id} className="text-xs text-gray-600">
-                              {v.title} <span className="text-gray-400">({v.id})</span>
+                            <li key={v.id} className="text-xs font-bold text-black italic">
+                              - {v.title}
                             </li>
                           ))}
-                          {agentResults.videos.length === 0 && (
-                            <li className="text-xs text-gray-500">无</li>
-                          )}
                         </ul>
                       </div>
                       <div>
-                        <h4 className="text-xs font-semibold text-gray-700">社团ID样例</h4>
-                        <div className="mt-1 text-xs text-gray-600 break-all">
+                        <h4 className="text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">组织特征 / ALLIANCE ID</h4>
+                        <div className="text-xs font-bold text-black break-all leading-tight">
                           {agentResults.group_id_list.slice(0, 5).join(', ')}
                           {agentResults.group_id_list.length > 5 && ' ...'}
                         </div>
-                        <h4 className="mt-2 text-xs font-semibold text-gray-700">已解析社团</h4>
-                        <ul className="mt-1 space-y-1">
+                        <h4 className="mt-6 text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">核心成员 / DECODED ALLIANCE</h4>
+                        <ul className="space-y-1">
                           {agentResults.groups.slice(0, 5).map((g) => (
-                            <li key={g.id} className="text-xs text-gray-600">
-                              {g.name} <span className="text-gray-400">({g.id})</span>
+                            <li key={g.id} className="text-xs font-bold text-black italic">
+                              - {g.name}
                             </li>
                           ))}
-                          {agentResults.groups.length === 0 && (
-                            <li className="text-xs text-gray-500">无</li>
-                          )}
                         </ul>
                       </div>
                     </div>
@@ -403,14 +402,14 @@ function HomePage() {
                 )}
 
                 {/* 调试开关按钮 */}
-                <div className="mt-3">
+                <div className="mt-6">
                   <button
                     type="button"
                     onClick={() => setShowAgentDebug((v) => !v)}
-                    className="flex items-center space-x-2 px-3 py-1.5 text-xs rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700"
+                    className="flex items-center space-x-2 px-4 py-2 bg-p5-red text-white font-black uppercase italic transform -skew-x-12 border-2 border-white hover:bg-white hover:text-black transition-all"
                   >
-                    <Info className="w-4 h-4" />
-                    <span>{showAgentDebug ? '隐藏调试信息' : '显示调试信息'}</span>
+                    <Info className="w-5 h-5 transform skew-x-12" />
+                    <span className="transform skew-x-12">{showAgentDebug ? '隐藏核心数据 / HIDE DEBUG' : '解析核心数据 / DECODE INTEL'}</span>
                   </button>
                 </div>
               </div>
@@ -420,10 +419,10 @@ function HomePage() {
           {/* 视频结果 - 基于video_id_list判断 */}
           {agentResults.video_id_list.length > 0 && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                相关视频
-                <span className="ml-2 text-sm font-normal text-gray-500">
-                  ({agentResults.video_id_list.length} 个)
+              <h2 className="text-3xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block">
+                关联影像 / RELATED VIDEOS
+                <span className="ml-4 text-sm font-black text-gray-400">
+                  ({agentResults.video_id_list.length} 条记录)
                 </span>
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -441,9 +440,9 @@ function HomePage() {
           {/* 社团结果 - 基于group_id_list判断 */}
           {agentResults.group_id_list.length > 0 && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                相关社团
-                <span className="ml-2 text-sm font-normal text-gray-500">
+              <h2 className="text-3xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block">
+                关联组织 / RELATED ALLIANCE
+                <span className="ml-4 text-sm font-black text-gray-400">
                   ({agentResults.group_id_list.length} 个)
                 </span>
               </h2>
@@ -461,11 +460,20 @@ function HomePage() {
 
           {/* 无结果 - 基于ID列表判断 */}
           {agentResults.video_id_list.length === 0 && agentResults.group_id_list.length === 0 && (
-            <div className="text-center py-12">
-              <div className="bg-gray-50 rounded-lg p-8">
-                <Sparkles className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">未找到相关内容</h3>
-                <p className="text-gray-600">请尝试调整搜索关键词</p>
+            <div className="relative p-20 text-center group/no-results overflow-hidden">
+              <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+              <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+                  <Sparkles className="w-20 h-20 text-black transform -rotate-12" />
+                </div>
+                <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+                  未截获记录 / NO RECORDS FOUND
+                </h3>
+                <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white">
+                  尝试调整搜寻关键词 / TRY ANOTHER KEYWORD
+                </p>
               </div>
             </div>
           )}
@@ -474,29 +482,43 @@ function HomePage() {
 
       {/* Regular Video Grid - 只在非Agent模式下显示 */}
       {!isAgentMode && (
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              舞台剧视频
-              <span className="ml-2 text-sm font-normal text-gray-500">
-                ({pagination.count} 个视频)
-              </span>
-            </h2>
+        <div className="mt-12">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 -skew-x-12 z-0 shadow-lg"></div>
+              <div className="relative z-10 bg-black px-6 py-2 transform -skew-x-12 border-2 border-white flex items-baseline space-x-3">
+                <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">
+                  行动记录 / FIELD LOGS
+                </h2>
+                <span className="text-p5-red font-black italic text-sm">
+                  ({pagination.count} 件情报捕获 / RECORDS SECURED)
+                </span>
+              </div>
+            </div>
 
             {loading && !isFilterLoading && (
-              <div className="flex items-center space-x-2 text-gray-500">
-                <Loader className="w-4 h-4 animate-spin" />
-                <span className="text-sm">加载中...</span>
+              <div className="flex items-center space-x-2 bg-black text-white px-4 py-1 transform -skew-x-12 border border-p5-red shadow-[2px_2px_0_0_black]">
+                <Loader className="w-4 h-4 animate-spin text-p5-red" />
+                <span className="text-xs font-black uppercase italic tracking-widest">同步中... / SYNCHRONIZING...</span>
               </div>
             )}
           </div>
 
           {videos.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="bg-gray-50 rounded-lg p-8">
-                <Tv className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">暂无视频</h3>
-                <p className="text-gray-600">请尝试调整筛选条件</p>
+            <div className="relative p-16 text-center group/no-results overflow-hidden">
+              <div className="absolute inset-0 bg-black transform -skew-y-2 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+              <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+                  <Tv className="w-20 h-20 text-black transform -rotate-12" />
+                </div>
+                <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+                  目标丢失 / TARGET ESCAPED
+                </h3>
+                <p className="bg-p5-red text-white px-6 py-1 font-black uppercase italic transform -skew-x-12 border-2 border-white">
+                  无匹配搜索条件的情报 / NO DATA MATCHES
+                </p>
               </div>
             </div>
           ) : (
@@ -513,19 +535,18 @@ function HomePage() {
         </div>
       )}
 
-      {/* Load More */}
-      {!isAgentMode && pagination.next && (
-        <div className="text-center">
-          <button
-            onClick={() => {
-              dispatch(setCurrentPage(currentPage + 1))
-            }}
-            className="btn-primary"
-            disabled={loading}
-          >
-            {loading ? '加载中...' : '加载更多'}
-          </button>
-        </div>
+      {/* Pagination */}
+      {!isAgentMode && (
+        <Pagination
+          currentPage={currentPage}
+          totalCount={pagination.count}
+          pageSize={12}
+          onPageChange={(page) => {
+            dispatch(setCurrentPage(page))
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+        />
       )}
     </div>
   )

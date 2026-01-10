@@ -24,9 +24,9 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'https://data.cosdrama.cn',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },

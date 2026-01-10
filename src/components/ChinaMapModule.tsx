@@ -36,10 +36,10 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
       try {
         setIsLoading(true);
         const response = await groupService.getProvinceStats();
-        
+
         // 转换数据格式
         const transformedData: ClubData = {};
-        
+
         for (const stat of response.province_stats) {
           if (stat.province) {
             // 获取该省份的社团详情，设置较大的page_size以获取所有社团
@@ -52,7 +52,7 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
             };
           }
         }
-        
+
         setClubData(transformedData);
       } catch (err) {
         console.error('获取省份数据失败:', err);
@@ -76,10 +76,10 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
       try {
         // 获取中国地图GeoJSON数据
         const geoData = await fetchChinaGeoJSON();
-        
+
         // 注册中国地图
         echarts.registerMap('china', geoData);
-        
+
         const provinceData = Object.entries(clubData).map(([province, data]) => ({
           name: province, // API返回的已经是完整省份名称，直接使用
           value: data.count,
@@ -89,49 +89,50 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
 
         const option = {
           title: {
-            text: '全国COSPLAY社团分布图',
+            text: '全国社团情报图',
             left: 'center',
             top: '20px',
             textStyle: {
-              color: '#333',
-              fontSize: 18,
-              fontWeight: 'bold'
+              color: '#000',
+              fontSize: 24,
+              fontWeight: '900',
+              fontFamily: 'Bangers, cursive'
             }
           },
           tooltip: {
             trigger: 'item',
-            formatter: function(params: any) {
+            formatter: function (params: any) {
               if (params.data) {
                 return `
-                  <div style="padding: 8px;">
-                    <div style="font-weight: bold; margin-bottom: 4px;">${params.data.name}</div>
-                    <div>社团数量: ${params.data.value}个</div>
-                    <div style="color: #666; font-size: 12px; margin-top: 4px;">点击查看详情</div>
+                  <div style="padding: 12px; background: #000; color: #fff; border: 2px solid #d90614; font-family: sans-serif;">
+                    <div style="font-weight: 900; margin-bottom: 4px; color: #d90614; font-size: 16px; border-bottom: 1px solid #d90614;">${params.data.name}</div>
+                    <div style="font-weight: bold;">社团数量: ${params.data.value}个</div>
+                    <div style="color: #999; font-size: 10px; margin-top: 4px; font-style: italic;">CLICK TO INVESTIGATE / 点击查看详情</div>
                   </div>
                 `;
               }
-              return `${params.name}<br/>暂无社团数据`;
+              return `<div style="padding: 8px; background: #000; color: #fff;">${params.name}<br/>INTEGRITY UNKNOWN / 暂无社团数据</div>`;
             },
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderColor: '#ddd',
-            borderWidth: 1,
-            textStyle: {
-              color: '#333'
-            }
+            backgroundColor: 'transparent',
+            borderColor: 'transparent',
+            borderWidth: 0,
+            padding: 0
           },
           visualMap: {
             type: 'continuous',
-            left: 'left',
+            left: '5%',
+            bottom: '10%',
             min: 0,
             max: maxValue,
-            text: ['多', '少'],
+            text: ['高', '低'],
             realtime: false,
             calculable: true,
             inRange: {
-              color: ['#e5f7ff', '#b3e0ff', '#66c7ff', '#1890ff', '#0066cc']
+              color: ['#ffffff', '#ffccd2', '#ff808f', '#ff334d', '#d90614']
             },
             textStyle: {
-              color: '#333'
+              color: '#000',
+              fontWeight: 'bold'
             }
           },
           series: [
@@ -148,27 +149,31 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
               emphasis: {
                 label: {
                   show: true,
-                  color: '#fff'
+                  color: '#fff',
+                  fontWeight: 'bold'
                 },
                 itemStyle: {
-                  areaColor: '#ff6b35',
-                  borderColor: '#fff',
+                  areaColor: '#000',
+                  borderColor: '#d90614',
                   borderWidth: 2
                 }
               },
               select: {
                 label: {
                   show: true,
-                  color: '#fff'
+                  color: '#fff',
+                  fontWeight: 'bold'
                 },
                 itemStyle: {
-                  areaColor: '#ff6b35'
+                  areaColor: '#d90614',
+                  borderColor: '#000',
+                  borderWidth: 2
                 }
               },
               itemStyle: {
-                borderColor: '#fff',
+                borderColor: '#000',
                 borderWidth: 1,
-                areaColor: '#f0f9ff'
+                areaColor: '#fff'
               },
               data: provinceData
             }
@@ -178,9 +183,9 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
         chart.setOption(option);
 
         // 添加点击事件监听
-        chart.on('click', function(params: any) {
+        chart.on('click', function (params: any) {
           const provinceName = params.name;
-          const data = Object.entries(clubData).find(([key]) => 
+          const data = Object.entries(clubData).find(([key]) =>
             provinceNameMap[key] === provinceName || key === provinceName
           );
           if (data) {
@@ -220,8 +225,8 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
       <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
         <div className="text-center py-8">
           <p className="text-red-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             重新加载
@@ -232,49 +237,77 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
-      <div className="relative">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg">
-            <div className="text-gray-500">地图加载中...</div>
-          </div>
-        )}
-        <div 
-          ref={mapRef} 
-          className="w-full h-96 lg:h-[500px] rounded-lg border border-gray-200"
-          style={{ minHeight: '400px' }}
-        />
-      </div>
-      
-      {/* 地图说明 */}
-      <div className="mt-4 text-sm text-gray-600">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            <span>点击省份查看该地区社团详情</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Search className="w-4 h-4" />
-            <span>支持地图缩放和拖拽</span>
+    <div className={`relative group ${className}`}>
+      {/* 装饰性背景层 */}
+      <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-1 z-0 shadow-lg"></div>
+
+      <div className="relative z-10 bg-white border-4 border-black p-6 md:p-8 transform -skew-x-1 overflow-hidden">
+        {/* 背景装饰 */}
+        <div className="absolute top-0 right-0 w-64 h-64 p5-halftone opacity-5 -rotate-45 translate-x-32 -translate-y-32"></div>
+
+        {/* 头部 */}
+        <div className="flex items-center justify-between mb-8 transform skew-x-1 border-b-4 border-black pb-4">
+          <div className="flex items-center space-x-4">
+            <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
+              <MapPin className="w-8 h-8 text-white transform -rotate-12" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter">OPERATIONAL MAP / 社团分布</h2>
+              <p className="text-xs font-black text-p5-red uppercase italic">DEPLOYMENT STATUS BY REGION / 各地区部署状态</p>
+            </div>
           </div>
         </div>
-      </div>
-      
-      {/* 统计信息 */}
-      <div className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 mb-3">全国统计</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {Object.keys(clubData).length}
+
+        <div className="relative transform skew-x-1">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50/80 backdrop-blur-sm z-20">
+              <div className="text-center">
+                <div className="w-12 h-12 border-4 border-p5-red border-t-black rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="text-lg font-black italic uppercase">Synchronizing... / 正在同步数据...</div>
+              </div>
             </div>
-            <div className="text-gray-600">覆盖省份</div>
+          )}
+          <div
+            ref={mapRef}
+            className="w-full h-96 lg:h-[550px] bg-white border-2 border-black"
+            style={{ minHeight: '400px' }}
+          />
+        </div>
+
+        {/* 地图说明 & 统计 */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 transform skew-x-1">
+          <div className="md:col-span-1 space-y-4">
+            <div className="bg-black text-white p-4 transform -rotate-2 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
+              <div className="flex items-center gap-3 mb-2">
+                <Search className="w-5 h-5 text-p5-red" />
+                <span className="font-black italic uppercase text-xs">Tactical Intel / 使用说明</span>
+              </div>
+              <ul className="text-xs font-bold space-y-1 text-gray-300 italic">
+                <li>• 点击省份查看社团详情 / CLICK FOR INTEL</li>
+                <li>• 支持缩放与拖拽 / NAVIGATIONAL ZOOM</li>
+              </ul>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {Object.values(clubData).reduce((sum, data) => sum + data.count, 0)}
+
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div className="relative group/stat">
+              <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 -skew-x-6 z-0"></div>
+              <div className="relative z-10 bg-black p-4 transform -skew-x-6 border-2 border-white flex flex-col items-center justify-center">
+                <div className="text-3xl font-black text-white italic" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                  {Object.keys(clubData).length}
+                </div>
+                <div className="text-[10px] font-black text-p5-red uppercase italic">Provinces Secured / 覆盖省份</div>
+              </div>
             </div>
-            <div className="text-gray-600">社团总数</div>
+            <div className="relative group/stat">
+              <div className="absolute inset-0 bg-white transform translate-x-1 translate-y-1 -skew-x-6 z-0"></div>
+              <div className="relative z-10 bg-black p-4 transform -skew-x-6 border-2 border-p5-red flex flex-col items-center justify-center">
+                <div className="text-3xl font-black text-white italic" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                  {Object.values(clubData).reduce((sum, data) => sum + data.count, 0)}
+                </div>
+                <div className="text-[10px] font-black text-gray-400 uppercase italic">Active Alliances / 社团总数</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

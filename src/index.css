@@ -1,3 +1,4 @@
+@import './styles/p5-theme.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,7 +7,7 @@
   * {
     @apply border-gray-200;
   }
-  
+
   body {
     @apply bg-gray-50 text-gray-900;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -17,34 +18,46 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
-  
+
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors;
+    @apply bg-black text-white px-6 py-2 border-2 border-black font-black uppercase italic transition-all transform -skew-x-12 hover:bg-p5-red hover:border-white hover:shadow-[4px_4px_0_0_black];
   }
-  
+
   .btn-secondary {
-    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors;
+    @apply bg-white text-black px-6 py-2 border-4 border-black font-black uppercase italic transition-all transform -skew-x-12 hover:bg-black hover:text-white;
   }
-  
+
   .filter-chip {
-    @apply px-3 py-1 text-sm rounded-full border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer;
+    @apply px-4 py-1 text-sm font-black border-2 border-black bg-white transform -skew-x-6 hover:bg-p5-red hover:text-white transition-all cursor-pointer uppercase italic;
   }
-  
+
   .filter-chip.active {
-    @apply bg-primary-600 text-white border-primary-600;
+    @apply bg-p5-red text-white border-black shadow-[2px_2px_0_0_black];
   }
-  
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-} 
+
+  .p5-text-shadow {
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  .p5-text-shadow-red {
+    text-shadow: 2px 2px 0px #d90614;
+  }
+
+  .p5-text-shadow-white {
+    text-shadow: 2px 2px 0px #ffffff;
+  }
+}
