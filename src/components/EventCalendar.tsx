@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Event } from '../types'
 import { eventService } from '../services/eventService'
+import { X as XIcon, ExternalLink, Users } from 'lucide-react'
 
 interface EventCalendarProps {
   className?: string
@@ -12,32 +13,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
   const [loading, setLoading] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
-
-  // 颜色映射函数 - 根据比赛名称生成一致的颜色
-  const getCompetitionColor = (competitionName: string) => {
-    const colors = [
-      { bg: 'bg-blue-100', text: 'text-blue-800', hover: 'hover:bg-blue-200' },
-      { bg: 'bg-green-100', text: 'text-green-800', hover: 'hover:bg-green-200' },
-      { bg: 'bg-purple-100', text: 'text-purple-800', hover: 'hover:bg-purple-200' },
-      { bg: 'bg-red-100', text: 'text-red-800', hover: 'hover:bg-red-200' },
-      { bg: 'bg-yellow-100', text: 'text-yellow-800', hover: 'hover:bg-yellow-200' },
-      { bg: 'bg-indigo-100', text: 'text-indigo-800', hover: 'hover:bg-indigo-200' },
-      { bg: 'bg-pink-100', text: 'text-pink-800', hover: 'hover:bg-pink-200' },
-      { bg: 'bg-teal-100', text: 'text-teal-800', hover: 'hover:bg-teal-200' },
-      { bg: 'bg-orange-100', text: 'text-orange-800', hover: 'hover:bg-orange-200' },
-      { bg: 'bg-cyan-100', text: 'text-cyan-800', hover: 'hover:bg-cyan-200' }
-    ]
-
-    // 使用比赛名称的哈希值来确保相同比赛总是使用相同颜色
-    let hash = 0
-    for (let i = 0; i < competitionName.length; i++) {
-      const char = competitionName.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // 转换为32位整数
-    }
-
-    return colors[Math.abs(hash) % colors.length]
-  }
 
   // 获取当前月份的赛事
   const fetchEvents = async (date: Date) => {
@@ -124,36 +99,21 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
 
     return days
   }
-
-  // 切换月份
-  const changeMonth = (delta: number) => {
-    const newDate = new Date(currentDate)
-    newDate.setMonth(newDate.getMonth() + delta)
-    setCurrentDate(newDate)
-  }
-
-  // 格式化月份年份
-  const formatMonthYear = (date: Date) => {
-    return `${date.getFullYear()}年${date.getMonth() + 1}月`
-  }
-
-  // 格式化日期显示
-  const formatEventDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    const today = new Date()
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-    if (date.toDateString() === today.toDateString()) {
-      return '今天'
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      return '明天'
-    } else {
-      return `${date.getMonth() + 1}月${date.getDate()}日`
+  
+    // 切换月份
+    const changeMonth = (delta: number) => {
+      const newDate = new Date(currentDate)
+      newDate.setMonth(newDate.getMonth() + delta)
+      setCurrentDate(newDate)
     }
-  }
-
-  const calendarDays = generateCalendarDays()
+  
+    // 格式化月份年份
+    const formatMonthYear = (date: Date) => {
+      return `${date.getFullYear()}年${date.getMonth() + 1}月`
+    }
+  
+  
+    const calendarDays = generateCalendarDays()
   const weekDays = ['日', '一', '二', '三', '四', '五', '六']
 
   return (
@@ -371,7 +331,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                       onClick={() => setSelectedEvent(null)}
                       className="bg-black text-white p-2 transform rotate-12 hover:bg-p5-red transition-all border-2 border-black ml-4"
                     >
-                      <X className="w-8 h-8" />
+                      <XIcon className="w-8 h-8" />
                     </button>
                   </div>
 

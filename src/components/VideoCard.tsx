@@ -1,5 +1,5 @@
 import { Video } from '../types'
-import { Play, Calendar, Users, Trophy, ImageIcon } from 'lucide-react'
+import { Play, Users, Trophy, ImageIcon } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 interface VideoCardProps {

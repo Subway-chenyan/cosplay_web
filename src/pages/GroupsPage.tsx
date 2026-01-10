@@ -7,7 +7,7 @@ import SearchBar from '../components/SearchBar'
 import Pagination from '../components/Pagination'
 import ClubCard from '../components/ClubCard'
 import ChinaMapModule from '../components/ChinaMapModule'
-import { Users, MapPin, Calendar, ExternalLink, X, Loader } from 'lucide-react'
+import { Users, MapPin } from 'lucide-react'
 import { Group } from '../types'
 
 function GroupsPage() {
@@ -61,12 +61,6 @@ function GroupsPage() {
     }
   }, [dispatch, inputValue])
 
-  const handleLoadMore = () => {
-    if (pagination.next && !loading) {
-      dispatch(setCurrentPage(currentPage + 1))
-      dispatch(fetchGroups({ page: currentPage + 1 }))
-    }
-  }
 
   const handleGroupClick = (groupId: string) => {
     navigate(`/group/${groupId}`)

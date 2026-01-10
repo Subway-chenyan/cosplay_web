@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchCompetitions, setCurrentPage } from '../store/slices/competitionsSlice'
-import { Trophy, Calendar, Loader } from 'lucide-react'
+import { Trophy, Calendar } from 'lucide-react'
 import { Competition } from '../types'
 import EventCalendar from '../components/EventCalendar'
 import Pagination from '../components/Pagination'
@@ -21,13 +21,6 @@ function CompetitionsPage() {
 
   const handleCompetitionClick = (competition: Competition) => {
     navigate(`/competitions/${competition.id}`)
-  }
-
-  const handleLoadMore = () => {
-    if (pagination.next && !loading) {
-      dispatch(setCurrentPage(currentPage + 1))
-      dispatch(fetchCompetitions({ page: currentPage + 1 }))
-    }
   }
 
   if (loading && competitions.length === 0) {

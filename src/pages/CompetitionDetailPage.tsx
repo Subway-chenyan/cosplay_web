@@ -10,7 +10,6 @@ import VideoCard from '../components/VideoCard'
 import NoVideoAwardCard from '../components/NoVideoAwardCard'
 import {
   getCompetitionCustomConfig,
-  getDefaultBannerBackground,
   getAwardSortWeight
 } from '../config/competitionCustomConfig'
 import {
@@ -46,29 +45,6 @@ function CompetitionDetailPage() {
 
   // 获取当前比赛的自定义配置
   const customConfig = getCompetitionCustomConfig(id || '')
-
-  // 获取banner背景样式
-  const getBannerStyle = () => {
-    const bannerConfig = customConfig.bannerBackground
-    if (!bannerConfig) {
-      return { background: getDefaultBannerBackground() }
-    }
-
-    switch (bannerConfig.type) {
-      case 'gradient':
-      case 'color':
-        return { background: bannerConfig.value }
-      case 'image':
-        return {
-          backgroundImage: `url(${bannerConfig.value})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }
-      default:
-        return { background: getDefaultBannerBackground() }
-    }
-  }
 
   useEffect(() => {
     if (competitions.length === 0) {

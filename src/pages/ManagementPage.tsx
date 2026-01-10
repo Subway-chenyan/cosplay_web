@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock } from 'lucide-react'
+import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar } from 'lucide-react'
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
 import { videoService } from '../services/videoService'

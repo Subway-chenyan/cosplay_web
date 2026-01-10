@@ -12,7 +12,7 @@ import {
   ExternalLink,
   Play,
   Globe,
-  Loader
+  Loader2
 } from 'lucide-react'
 
 function VideoDetailPage() {
@@ -76,7 +76,7 @@ function VideoDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
-          <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-primary-600" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary-600" />
           <p className="text-gray-600">正在加载视频详情...</p>
         </div>
       </div>

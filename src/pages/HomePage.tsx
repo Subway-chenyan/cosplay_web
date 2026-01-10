@@ -8,7 +8,7 @@ import ClubCard from '../components/ClubCard'
 // import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
 import Pagination from '../components/Pagination'
-import { Loader, Tv, Sparkles, List, Info, AlertTriangle, Play } from 'lucide-react'
+import { Loader, Tv, Sparkles, List, Info, Play } from 'lucide-react'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
 import type { Video, Group } from '../types'
@@ -307,7 +307,7 @@ function HomePage() {
             <div className="relative z-10 bg-black p-4 flex items-center justify-between transform -skew-x-12 border-2 border-p5-red">
               <div className="transform skew-x-12">
                 <div className="text-xs font-black text-gray-400 uppercase italic">近七日情报 / NEW ADDITIONS</div>
-                <div className="text-3xl font-black text-p5-red italic">{stats?.recent_videos ?? 0}</div>
+                <div className="text-3xl font-black text-p5-red italic">{stats?.weekly_new_videos ?? 0}</div>
               </div>
               <div className="w-12 h-12 bg-white transform -rotate-6 flex items-center justify-center border-2 border-black">
                 <Sparkles className="text-p5-red w-6 h-6 transform rotate-6" />

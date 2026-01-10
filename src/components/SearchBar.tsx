@@ -10,7 +10,7 @@ interface SearchBarProps {
   className?: string
 }
 
-function SearchBar({ value, onChange, onClear, onSearch, placeholder = "搜索...", className = "" }: SearchBarProps) {
+function SearchBar({ value, onChange, onClear, onSearch, className = "" }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch()

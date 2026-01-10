@@ -1,4 +1,4 @@
-import { Users, MapPin, Video } from 'lucide-react'
+import { MapPin, Video } from 'lucide-react'
 
 interface Club {
   id: string | number
