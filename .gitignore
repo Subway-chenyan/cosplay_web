@@ -125,3 +125,6 @@ logs/
 
 database/
 backend/*.log.worktrees/
+backend/venv/
+django.log
+*.log

@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from '../../store/store'
 import { fetchPostDetail, clearCurrentPost } from '../../store/slices/forumSlice'
 import { forumService } from '../../services/forumService'
 import { MessageSquare, User, Calendar, CornerDownRight, Send } from 'lucide-react'
+import DOMPurify from 'dompurify'
 
 const ForumPostDetail = () => {
   const { id } = useParams<{ id: string }>()
@@ -128,7 +129,7 @@ const ForumPostDetail = () => {
         <div className="bg-white border-4 border-black p-8 md:p-12 shadow-[12px_12px_0_0_rgba(0,0,0,1)] min-h-[400px]">
           <div
             className="prose prose-lg max-w-none prose-p:leading-relaxed prose-headings:font-black prose-headings:italic prose-headings:uppercase prose-img:border-4 prose-img:border-black"
-            dangerouslySetInnerHTML={{ __html: currentPost.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentPost.content) }}
           />
         </div>
 
