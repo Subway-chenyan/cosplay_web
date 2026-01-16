@@ -13,11 +13,12 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ForumCategory.objects.all()
     serializer_class = ForumCategorySerializer
+    pagination_class = None
 
 class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category']
+    filterset_fields = ['category', 'author']
     search_fields = ['title', 'content']
     ordering_fields = ['created_at', 'view_count']
 
@@ -25,7 +26,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return Post.objects.filter(is_active=True).select_related('author', 'category').annotate(comment_count=Count('comments'))
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
+        if self.action in ['retrieve', 'create', 'update', 'partial_update']:
             return PostDetailSerializer
         return PostListSerializer
 
