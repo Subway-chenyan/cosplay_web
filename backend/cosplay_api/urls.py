@@ -53,6 +53,7 @@ urlpatterns = [
     path('api/tags/', include('apps.tags.urls')),
     path('api/awards/', include('apps.awards.urls')),
     path('api/users/', include('apps.users.urls')),
+    path('api/forum/', include('apps.forum.urls')),
     path('api/map/', include('apps.map.urls')),
 ]
 
