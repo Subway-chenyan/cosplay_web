@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Mail, Edit3, Shield, AlertCircle, CheckCircle, Save, Upload, Database, FileText, Users, Video } from 'lucide-react'
+import { User, Edit3, Shield, AlertCircle, CheckCircle, Save, Upload, Database, FileText, MessageSquare } from 'lucide-react'
 import Header from '../components/Header'
 import SearchableMultiSelectModal from '../components/SearchableMultiSelectModal'
 import RoleApprovalPanel from '../components/RoleApprovalPanel'
+import FeedbackPanel from '../components/FeedbackPanel'
 
 interface UserProfile {
   id: string
@@ -681,6 +682,22 @@ function UserCenterPage() {
                 <RoleApprovalPanel
                   token={localStorage.getItem('access_token') || ''}
                   onRefresh={fetchProfile}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 用户反馈管理面板（仅管理员可见） */}
+          {profile.role === 'admin' && (
+            <div className="relative">
+              <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
+              <div className="relative z-10 bg-white border-4 border-black p-8">
+                <h2 className="text-2xl font-black uppercase italic flex items-center mb-6 pb-4 border-b-2 border-black">
+                  <MessageSquare className="w-6 h-6 mr-2" />
+                  用户反馈 / USER FEEDBACK
+                </h2>
+                <FeedbackPanel
+                  token={localStorage.getItem('access_token') || ''}
                 />
               </div>
             </div>

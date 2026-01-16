@@ -276,6 +276,15 @@ CSRF_TRUSTED_ORIGINS = [
     'https://cosdrama.cn',
 ]
 
+# 开发环境添加本地来源
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS.extend([
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+    ])
+
 # 允许自定义请求头
 CORS_ALLOW_HEADERS = [
     'accept',

@@ -92,4 +92,66 @@ class User(AbstractUser):
 
     def can_approve_roles(self):
         """检查是否可以审批角色申请（仅管理员）"""
-        return self.role == 'admin' 
+        return self.role == 'admin'
+
+
+class Feedback(models.Model):
+    """
+    用户反馈模型
+    用于收集站点建议、社团或奖项信息问题反馈
+    """
+    FEEDBACK_TYPE_CHOICES = [
+        ('suggestion', '站点建议'),
+        ('group_info', '社团信息问题'),
+        ('award_info', '奖项信息问题'),
+        ('other', '其他'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', '待处理'),
+        ('processing', '处理中'),
+        ('resolved', '已解决'),
+        ('rejected', '已拒绝'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='feedbacks',
+        verbose_name='提交用户'
+    )
+    feedback_type = models.CharField(
+        max_length=20,
+        choices=FEEDBACK_TYPE_CHOICES,
+        default='suggestion',
+        verbose_name='反馈类型'
+    )
+    content = models.TextField(verbose_name='反馈内容')
+    contact_info = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='联系方式'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name='处理状态'
+    )
+    admin_reply = models.TextField(
+        blank=True,
+        verbose_name='管理员回复'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='提交时间')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+    class Meta:
+        verbose_name = '用户反馈'
+        verbose_name_plural = '用户反馈'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        user_display = self.user.nickname or self.user.username if self.user else '匿名用户'
+        return f"{user_display} - {self.get_feedback_type_display()} - {self.created_at.strftime('%Y-%m-%d')}"

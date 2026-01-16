@@ -4,10 +4,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from .serializers import (
     UserSerializer, UserRegistrationSerializer, ChangePasswordSerializer,
-    UserProfileUpdateSerializer, RoleApplicationSerializer
+    UserProfileUpdateSerializer, RoleApplicationSerializer,
+    FeedbackSerializer, FeedbackCreateSerializer, FeedbackUpdateSerializer
 )
+from .models import Feedback
 
 User = get_user_model()
 
@@ -160,11 +164,101 @@ class RegisterView(APIView):
     用户注册视图
     """
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({'message': '注册成功'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FeedbackViewSet(viewsets.ModelViewSet):
+    """
+    用户反馈视图集
+    """
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
+
+    def get_authenticators(self):
+        """create 操作不需要认证，其他操作需要 JWT 认证"""
+        if self.action == 'create':
+            return []
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+        return [JWTAuthentication()]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            # 允许任何人提交反馈（包括未登录用户）
+            return [permissions.AllowAny()]
+        elif self.action in ['list', 'retrieve', 'update', 'partial_update', 'destroy']:
+            # 只有管理员可以查看和管理反馈
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticated()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.role == 'admin':
+            return Feedback.objects.all()
+        # 非管理员无法查看反馈列表
+        return Feedback.objects.none()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return FeedbackCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            return FeedbackUpdateSerializer
+        return FeedbackSerializer
+
+    def create(self, request, *args, **kwargs):
+        """创建反馈"""
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            # 如果用户已登录，关联用户
+            user = request.user if request.user.is_authenticated else None
+            feedback = serializer.save(user=user)
+            return Response({
+                'detail': '反馈提交成功，感谢您的反馈！',
+                'id': feedback.id
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        """获取反馈列表（仅管理员）"""
+        if not request.user.is_authenticated or request.user.role != 'admin':
+            return Response({'detail': '权限不足'}, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # 支持按状态筛选
+        status_filter = request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='stats')
+    def stats(self, request):
+        """获取反馈统计（仅管理员）"""
+        if not request.user.is_authenticated or request.user.role != 'admin':
+            return Response({'detail': '权限不足'}, status=status.HTTP_403_FORBIDDEN)
+
+        total = Feedback.objects.count()
+        pending = Feedback.objects.filter(status='pending').count()
+        processing = Feedback.objects.filter(status='processing').count()
+        resolved = Feedback.objects.filter(status='resolved').count()
+
+        return Response({
+            'total': total,
+            'pending': pending,
+            'processing': processing,
+            'resolved': resolved
+        })
 

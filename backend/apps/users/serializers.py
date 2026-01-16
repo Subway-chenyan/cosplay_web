@@ -172,4 +172,59 @@ class RoleApplicationSerializer(serializers.Serializer):
             raise serializers.ValidationError("您已有待审核的申请，请勿重复提交")
         if user.role in ['admin', 'editor', 'contributor']:
             raise serializers.ValidationError("您已经是贡献者或更高权限，无需申请")
-        return attrs 
+        return attrs
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    """
+    用户反馈序列化器
+    """
+    user_display = serializers.SerializerMethodField()
+    feedback_type_display = serializers.SerializerMethodField()
+    status_display = serializers.SerializerMethodField()
+
+    class Meta:
+        from .models import Feedback
+        model = Feedback
+        fields = [
+            'id', 'user', 'user_display', 'feedback_type', 'feedback_type_display',
+            'content', 'contact_info', 'status', 'status_display',
+            'admin_reply', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'user', 'user_display', 'created_at', 'updated_at']
+
+    def get_user_display(self, obj):
+        if obj.user:
+            return obj.user.nickname or obj.user.username
+        return '匿名用户'
+
+    def get_feedback_type_display(self, obj):
+        return obj.get_feedback_type_display()
+
+    def get_status_display(self, obj):
+        return obj.get_status_display()
+
+
+class FeedbackCreateSerializer(serializers.ModelSerializer):
+    """
+    用户反馈创建序列化器
+    """
+    class Meta:
+        from .models import Feedback
+        model = Feedback
+        fields = ['feedback_type', 'content', 'contact_info']
+
+    def validate_content(self, value):
+        if len(value.strip()) < 5:
+            raise serializers.ValidationError("反馈内容至少需要5个字符")
+        return value.strip()
+
+
+class FeedbackUpdateSerializer(serializers.ModelSerializer):
+    """
+    管理员更新反馈状态序列化器
+    """
+    class Meta:
+        from .models import Feedback
+        model = Feedback
+        fields = ['status', 'admin_reply']
