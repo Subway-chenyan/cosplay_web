@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import ForumCategory, Post, Comment
-from .serializers import ForumCategorySerializer, PostListSerializer, PostDetailSerializer, CommentSerializer
+from .models import ForumCategory, Post, Comment, ForumAttachment
+from .serializers import ForumCategorySerializer, PostListSerializer, PostDetailSerializer, CommentSerializer, ForumAttachmentSerializer
 from django.db.models import F, Count
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -45,6 +45,14 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Comment.objects.filter(is_active=True).select_related('author', 'post').prefetch_related('replies')
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class AttachmentViewSet(viewsets.ModelViewSet):
+    queryset = ForumAttachment.objects.all()
+    serializer_class = ForumAttachmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

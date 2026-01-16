@@ -47,3 +47,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
         # Only fetch top-level comments
         qs = obj.comments.filter(parent__isnull=True)
         return CommentSerializer(qs, many=True).data
+
+class ForumAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ForumAttachment
+        fields = ['id', 'file', 'created_at']
+        read_only_fields = ['author']

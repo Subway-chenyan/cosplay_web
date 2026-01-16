@@ -7,3 +7,25 @@
 - **前端**: 实现基于 TipTap 的 Persona 5 风格编辑器。
 - **UI**: 完成列表页、详情页、发帖页。
 - **安全**: 集成 DOMPurify 进行 XSS 防御。
+
+cloudflare r2
+令牌值
+OJC_2E8w7Tb4mMKgJN62XD7bzTkrUg1Jx6SaPLkg
+
+为 S3 客户端使用以下凭据：
+访问密钥 ID
+c79fe7cba857b322403cd705affc9dd4
+
+机密访问密钥
+25add5bb2bfeb7217d045bfcf232a8c70504dccdd0faf82ba5c139cee225abba
+
+名称：
+cosdrama
+
+创建时间：
+2026年1月16日
+位置：
+亚太地区 (APAC)
+
+S3 API：
+https://15a6c16650fc2ef46ddeb7c98842d0c7.r2.cloudflarestorage.com/cosdrama

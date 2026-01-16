@@ -45,3 +45,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author} on {self.post}'
+
+class ForumAttachment(models.Model):
+    file = models.ImageField(upload_to='forum/attachments/%Y/%m/%d/')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='forum_attachments')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attachment by {self.author} at {self.created_at}"

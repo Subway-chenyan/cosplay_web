@@ -35,6 +35,16 @@ class ForumService {
   async deleteComment(id: number): Promise<void> {
     return api.delete(`/forum/comments/${id}/`)
   }
+
+  async uploadAttachment(file: File): Promise<{ file: string }> {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post<{ file: string }>('/forum/attachments/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  }
 }
 
 export const forumService = new ForumService()

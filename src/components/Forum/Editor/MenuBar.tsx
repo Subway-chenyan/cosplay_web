@@ -1,4 +1,5 @@
 import { Editor } from '@tiptap/react'
+import { useRef } from 'react'
 import {
   Bold,
   Italic,
@@ -10,21 +11,37 @@ import {
   Undo,
   Redo,
   Image as ImageIcon,
+  Loader2,
 } from 'lucide-react'
+import { forumService } from '../../../services/forumService'
+import { useState } from 'react'
 
 interface MenuBarProps {
   editor: Editor | null
 }
 
 const MenuBar = ({ editor }: MenuBarProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isUploading, setIsUploading] = useState(false)
+
   if (!editor) {
     return null
   }
 
-  const addImage = () => {
-    const url = window.prompt('URL')
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run()
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const response = await forumService.uploadAttachment(file)
+      editor.chain().focus().setImage({ src: response.file }).run()
+    } catch (error) {
+      console.error('Failed to upload image:', error)
+      alert('图片上传失败，请重试')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
@@ -72,15 +89,23 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       isActive: editor.isActive('blockquote'),
     },
     {
-      icon: <ImageIcon className="w-4 h-4" />,
-      title: 'Image',
-      action: addImage,
+      icon: isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />,
+      title: 'Upload Image',
+      action: () => fileInputRef.current?.click(),
       isActive: false,
+      disabled: isUploading
     },
   ]
 
   return (
     <div className="flex flex-wrap items-center gap-1 p-2 bg-black border-b-2 border-p5-red mb-2">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
       {buttons.map((btn, index) => (
         <button
           key={index}
@@ -88,10 +113,11 @@ const MenuBar = ({ editor }: MenuBarProps) => {
             e.preventDefault()
             btn.action()
           }}
+          disabled={btn.disabled}
           className={`p-2 transition-all transform hover:scale-110 ${
             btn.isActive
               ? 'bg-p5-red text-white -rotate-3 scale-110 shadow-[2px_2px_0_0_white]'
-              : 'text-white hover:text-p5-red'
+              : 'text-white hover:text-p5-red disabled:opacity-50'
           }`}
           title={btn.title}
         >

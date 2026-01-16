@@ -71,6 +71,7 @@ LOCAL_APPS = [
     'apps.users',
     'apps.map',
     'apps.forum',
+    'storages',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -158,10 +159,40 @@ USE_TZ = True
 STATIC_URL = config('STATIC_URL', default='/static/')
 STATIC_ROOT = config('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
 
-MEDIA_URL = config('MEDIA_URL', default='/media/')
-MEDIA_ROOT = config('MEDIA_ROOT', default=os.path.join(BASE_DIR, 'media'))
+# Cloudflare R2 Storage Configuration
+if config('R2_ACCESS_KEY_ID', default=None):
+    AWS_ACCESS_KEY_ID = config('R2_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = config('R2_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = config('R2_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL = config('R2_ENDPOINT_URL')
+    AWS_S3_REGION_NAME = 'auto'  # R2 使用 auto
+    AWS_S3_CUSTOM_DOMAIN = config('R2_CUSTOM_DOMAIN', default=None)
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # 媒体文件配置
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "location": "media",
+                "file_overwrite": False,
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+    # 如果没有自定义域名，django-storages 会自动使用 endpoint url
+    if AWS_S3_CUSTOM_DOMAIN:
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    else:
+        # R2 默认 S3 风格 URL: https://<bucket>.<account_id>.r2.cloudflarestorage.com
+        # 但 R2 建议通过自定义域名访问。如果没有，这里保持默认 MEDIA_URL 可能会有问题。
+        # 我们暂时维持默认，或者根据 endpoint 手动拼接。
+        pass
+else:
+    MEDIA_URL = config('MEDIA_URL', default='/media/')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
