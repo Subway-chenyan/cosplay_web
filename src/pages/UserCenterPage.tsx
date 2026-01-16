@@ -39,6 +39,7 @@ function UserCenterPage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -223,6 +224,39 @@ function UserCenterPage() {
     }
   }
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingAvatar(true)
+    try {
+      const token = localStorage.getItem('access_token')
+      const formData = new FormData()
+      formData.append('avatar', file)
+
+      const response = await fetch('/api/users/update-profile/', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // 注意：不要手动设置 Content-Type，让浏览器自动处理以包含 boundary
+        },
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setProfile(data.data)
+        showMessage('头像更新成功！', 'success')
+      } else {
+        showMessage('头像更新失败', 'error')
+      }
+    } catch (error) {
+      showMessage('网络错误', 'error')
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
+
   const handleApplyForContributor = async () => {
     if (applicationReason.length < 10) {
       showMessage('申请理由至少需要 10 个字', 'error')
@@ -305,13 +339,37 @@ function UserCenterPage() {
             <div className="absolute inset-0 bg-p5-red transform translate-x-3 translate-y-3 -skew-x-3 z-0"></div>
             <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-3">
               <div className="transform skew-x-3 flex items-center justify-between">
-                <div>
-                  <h1 className="text-4xl md:text-5xl font-black text-black uppercase italic">
-                    用户中心 / USER CENTER
-                  </h1>
-                  <p className="text-gray-600 font-bold mt-2">
-                    {profile.nickname || profile.username}
-                  </p>
+                <div className="flex items-center space-x-6">
+                  {/* 头像展示与上传 */}
+                  <div className="relative group/avatar">
+                    <div className="w-24 h-24 bg-black border-4 border-p5-red transform rotate-3 overflow-hidden shadow-[4px_4px_0_0_black]">
+                      {profile.avatar ? (
+                        <img src={profile.avatar} alt={profile.username} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                          <User className="w-12 h-12 text-white" />
+                        </div>
+                      )}
+                      {uploadingAvatar && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
+                    </div>
+                    <label className="absolute -bottom-2 -right-2 bg-p5-red p-2 border-2 border-black cursor-pointer hover:bg-black transition-colors shadow-[2px_2px_0_0_white]">
+                      <Upload className="w-4 h-4 text-white" />
+                      <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={uploadingAvatar} />
+                    </label>
+                  </div>
+
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-black text-black uppercase italic tracking-tighter">
+                      用户中心 / USER CENTER
+                    </h1>
+                    <p className="text-gray-600 font-bold mt-1 text-xl italic uppercase">
+                      {profile.nickname || profile.username}
+                    </p>
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="inline-block bg-black text-white px-4 py-2 transform -skew-x-12">
