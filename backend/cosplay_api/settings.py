@@ -52,6 +52,13 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'drf_spectacular',
     'django_celery_beat',
+    # Django allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.weibo',
+    'allauth.socialaccount.providers.github',
 ]
 
 LOCAL_APPS = [
@@ -63,6 +70,7 @@ LOCAL_APPS = [
     'apps.awards',
     'apps.users',
     'apps.map',
+    'apps.forum',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -77,6 +85,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # allauth middleware（必须放在 AuthenticationMiddleware 之后）
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'cosplay_api.urls'
@@ -359,3 +369,36 @@ CACHES = {
         }
     }
 }
+
+# Django allauth configuration
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# allauth account settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # 开发环境可设为 'none'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_MIN_LENGTH = 3
+ACCOUNT_PASSWORD_MIN_LENGTH = 8
+
+# allauth social account settings
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_REQ_EMAIL = True
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': ['user:email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+    'weibo': {
+        'SCOPE': ['email'],
+    }
+}
+
+# allauth adapter (可选，自定义用户创建逻辑)
+# ACCOUNT_ADAPTER = 'apps.users.adapters.CustomAccountAdapter'
