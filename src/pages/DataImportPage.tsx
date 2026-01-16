@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Upload, Download, AlertCircle, Loader2, FileText, Database, Key, Lock } from 'lucide-react'
+import { Upload, Download, AlertCircle, Loader2, FileText, Database } from 'lucide-react'
 import { RootState, AppDispatch } from '../store/store'
 import {
-    verifyUploadKey,
     startImport,
     fetchTaskStatus,
     downloadTemplate,
-    clearCurrentTask,
-    clearError,
-    resetKeyValidation
+    clearError
 } from '../store/slices/dataImportSlice'
 
 const DataImportPage: React.FC = () => {
@@ -17,17 +14,12 @@ const DataImportPage: React.FC = () => {
     const {
         currentTask,
         isUploading,
-        isVerifyingKey,
-        isKeyValid,
-        uploadKey,
         error
     } = useSelector((state: RootState) => state.dataImport)
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [validateOnly, setValidateOnly] = useState(false)
     const importType = 'video' // 固定为视频数据导入
-    const [inputKey, setInputKey] = useState('')
-    const [step, setStep] = useState<'key' | 'upload'>('key')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -50,27 +42,19 @@ const DataImportPage: React.FC = () => {
         }
     }
 
-    const handleVerifyKey = () => {
-        if (!inputKey.trim()) return
-        dispatch(verifyUploadKey(inputKey.trim()))
-    }
-
     const handleDownloadTemplate = () => {
-        if (!uploadKey) return
         dispatch(downloadTemplate({
-            importType,
-            uploadKey
+            importType
         }))
     }
 
     const handleStartImport = () => {
-        if (!selectedFile || !uploadKey) return
+        if (!selectedFile) return
 
         dispatch(startImport({
             file: selectedFile,
             import_type: importType,
-            validate_only: validateOnly,
-            upload_key: uploadKey
+            validate_only: validateOnly
         }))
     }
 
@@ -80,19 +64,9 @@ const DataImportPage: React.FC = () => {
         }
 
         pollIntervalRef.current = setInterval(() => {
-            dispatch(fetchTaskStatus({
-                taskId,
-                uploadKey
-            }))
+            dispatch(fetchTaskStatus(taskId))
         }, 2000)
     }
-
-    // 监听密钥验证状态
-    useEffect(() => {
-        if (isKeyValid) {
-            setStep('upload')
-        }
-    }, [isKeyValid])
 
     // 监听currentTask变化，开始轮询
     useEffect(() => {
@@ -108,7 +82,7 @@ const DataImportPage: React.FC = () => {
                 clearInterval(pollIntervalRef.current)
             }
         }
-    }, [currentTask, uploadKey])
+    }, [currentTask, dispatch])
 
     // 清理错误信息
     useEffect(() => {
@@ -119,14 +93,6 @@ const DataImportPage: React.FC = () => {
             return () => clearTimeout(timer)
         }
     }, [error, dispatch])
-
-    const handleResetKey = () => {
-        dispatch(resetKeyValidation())
-        setInputKey('')
-        setStep('key')
-        setSelectedFile(null)
-        dispatch(clearCurrentTask())
-    }
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -155,24 +121,12 @@ const DataImportPage: React.FC = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-4xl font-black text-black mb-2 uppercase italic transform -skew-x-6" style={{ textShadow: '2px 2px 0px #d90614' }}>
-                            SECURE ACCESS / 数据导入
+                            DATA IMPORT / 数据导入
                         </h1>
                         <p className="text-gray-600 font-bold border-b-2 border-black inline-block pb-1">
                             支持CSV、Excel格式文件的批量视频数据导入
                         </p>
                     </div>
-
-                    {isKeyValid && (
-                        <button
-                            onClick={handleResetKey}
-                            className="px-4 py-2 bg-black text-white font-black uppercase italic transform -skew-x-12 hover:bg-p5-red transition-all"
-                        >
-                            <span className="flex items-center transform skew-x-12">
-                                <Lock className="h-4 w-4 mr-2 text-p5-red" />
-                                RESET KEY / 更换密钥
-                            </span>
-                        </button>
-                    )}
                 </div>
 
                 {/* 错误信息显示 */}
@@ -186,60 +140,8 @@ const DataImportPage: React.FC = () => {
                 )}
             </div>
 
-            {step === 'key' ? (
-                /* 密钥验证界面 */
-                <div className="max-w-md mx-auto relative group">
-                    <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-y-1 z-0"></div>
-                    <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-y-1">
-                        <div className="text-center mb-8 transform skew-y-1">
-                            <div className="mx-auto flex items-center justify-center h-16 w-16 bg-p5-red transform rotate-12 border-2 border-black shadow-[4px_4px_0_0_black] mb-6">
-                                <Key className="h-8 w-8 text-white transform -rotate-12" />
-                            </div>
-                            <h2 className="text-2xl font-black text-black uppercase italic mb-2">Security Check / 安全验证</h2>
-                            <p className="text-sm text-gray-500 font-bold">PLEASE ENTER YOUR ACCESS KEY TO PROCEED</p>
-                        </div>
-
-                        <div className="space-y-6 transform skew-y-1">
-                            <div className="relative">
-                                <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-2 transform -skew-x-12 uppercase">
-                                    Access Key
-                                </label>
-                                <input
-                                    type="password"
-                                    value={inputKey}
-                                    onChange={(e) => setInputKey(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleVerifyKey()}
-                                    placeholder="ENTER KEY HERE..."
-                                    className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300"
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleVerifyKey}
-                                disabled={!inputKey.trim() || isVerifyingKey}
-                                className="group relative w-full overflow-hidden"
-                            >
-                                <div className="absolute inset-0 bg-p5-red transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                                <div className="relative z-10 flex items-center justify-center px-4 py-4 bg-black text-white font-black uppercase italic text-xl border-2 border-transparent group-hover:border-white transition-all disabled:bg-gray-400">
-                                    {isVerifyingKey ? (
-                                        <>
-                                            <Loader2 className="mr-3 h-6 w-6 animate-spin text-p5-red" />
-                                            VERIFYING...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Key className="mr-3 h-6 w-6 text-p5-red" />
-                                            GRANT ACCESS / 验证密钥
-                                        </>
-                                    )}
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                /* 数据导入界面 */
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* 数据导入界面 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* 导入配置 */}
                     <div className="space-y-8">
                         <div className="relative group">
@@ -489,7 +391,6 @@ const DataImportPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            )}
         </div>
     )
 }

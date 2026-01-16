@@ -9,6 +9,9 @@ import VideoDetailPage from './pages/VideoDetailPage'
 import DataImportPage from './pages/DataImportPage'
 import ManagementPage from './pages/ManagementPage'
 import ChoreoMasterPage from './pages/ChoreoMasterPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import UserCenterPage from './pages/UserCenterPage'
 
 function App() {
   return (
@@ -20,11 +23,15 @@ function App() {
           <Route path="/groups" element={<GroupsPage />} />
           <Route path="/group/:id" element={<GroupDetailPage />} />
           <Route path="/competitions" element={<CompetitionsPage />} />
-        <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
-        <Route path="/data-import" element={<DataImportPage />} />
-        <Route path="/management" element={<ManagementPage />} />
-        <Route path="/choreo" element={<ChoreoMasterPage />} />
+          <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
+          <Route path="/data-import" element={<DataImportPage />} />
+          <Route path="/management" element={<ManagementPage />} />
+          <Route path="/choreo" element={<ChoreoMasterPage />} />
         </Route>
+        {/* 认证相关路由（不需要 Layout） */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/user-center" element={<UserCenterPage />} />
       </Routes>
     </div>
   )

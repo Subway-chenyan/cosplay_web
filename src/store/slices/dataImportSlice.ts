@@ -17,9 +17,6 @@ export interface ImportTask {
 interface DataImportState {
   currentTask: ImportTask | null
   isUploading: boolean
-  isVerifyingKey: boolean
-  isKeyValid: boolean
-  uploadKey: string
   history: ImportTask[]
   error: string | null
 }
@@ -27,21 +24,9 @@ interface DataImportState {
 const initialState: DataImportState = {
   currentTask: null,
   isUploading: false,
-  isVerifyingKey: false,
-  isKeyValid: false,
-  uploadKey: '',
   history: [],
   error: null
 }
-
-// 异步thunk：验证上传密钥
-export const verifyUploadKey = createAsyncThunk(
-  'dataImport/verifyUploadKey',
-  async (uploadKey: string) => {
-    const result = await api.verifyUploadKey(uploadKey)
-    return { ...result, uploadKey }
-  }
-)
 
 // 异步thunk：开始导入
 export const startImport = createAsyncThunk(
@@ -50,7 +35,6 @@ export const startImport = createAsyncThunk(
     file: File
     import_type: string
     validate_only: boolean
-    upload_key: string
   }) => {
     const result = await api.startImport(params)
     return { ...result, import_type: params.import_type }
@@ -60,17 +44,17 @@ export const startImport = createAsyncThunk(
 // 异步thunk：查询任务状态
 export const fetchTaskStatus = createAsyncThunk(
   'dataImport/fetchTaskStatus',
-  async (params: { taskId: string; uploadKey: string }) => {
-    return await api.getImportStatus(params.taskId, params.uploadKey)
+  async (taskId: string) => {
+    return await api.getImportStatus(taskId)
   }
 )
 
 // 异步thunk：下载模板
 export const downloadTemplate = createAsyncThunk(
   'dataImport/downloadTemplate',
-  async (params: { importType: string; uploadKey: string }) => {
-    const blob = await api.downloadTemplate(params.importType, params.uploadKey)
-    
+  async (params: { importType: string }) => {
+    const blob = await api.downloadTemplate(params.importType)
+
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -97,34 +81,10 @@ const dataImportSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null
-    },
-    setUploadKey: (state, action: PayloadAction<string>) => {
-      state.uploadKey = action.payload
-    },
-    resetKeyValidation: (state) => {
-      state.isKeyValid = false
-      state.uploadKey = ''
     }
   },
   extraReducers: (builder) => {
     builder
-      // 验证密钥
-      .addCase(verifyUploadKey.pending, (state) => {
-        state.isVerifyingKey = true
-        state.error = null
-      })
-      .addCase(verifyUploadKey.fulfilled, (state, action) => {
-        state.isVerifyingKey = false
-        state.isKeyValid = action.payload.valid
-        if (action.payload.valid) {
-          state.uploadKey = action.payload.uploadKey
-        }
-      })
-      .addCase(verifyUploadKey.rejected, (state, action) => {
-        state.isVerifyingKey = false
-        state.isKeyValid = false
-        state.error = action.error.message || '密钥验证失败'
-      })
       // 开始导入
       .addCase(startImport.pending, (state) => {
         state.isUploading = true
@@ -175,11 +135,9 @@ const dataImportSlice = createSlice({
   }
 })
 
-export const { 
-  clearCurrentTask, 
-  updateTaskStatus, 
-  clearError, 
-  setUploadKey, 
-  resetKeyValidation 
+export const {
+  clearCurrentTask,
+  updateTaskStatus,
+  clearError
 } = dataImportSlice.actions
-export default dataImportSlice.reducer 
+export default dataImportSlice.reducer

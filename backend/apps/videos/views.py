@@ -97,16 +97,16 @@ def verify_upload_key_api(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([permissions.IsAuthenticated])
 def download_template(request):
     """下载导入模板"""
     try:
-        # 验证密钥
-        if not verify_upload_key(request):
+        # 检查用户权限
+        if not request.user.can_import_data():
             return Response({
-                'error': '无效的上传密钥'
-            }, status=status.HTTP_401_UNAUTHORIZED)
-        
+                'error': '权限不足，需要贡献者及以上权限'
+            }, status=status.HTTP_403_FORBIDDEN)
+
         import_type = request.GET.get('type', 'video')
         
         # 生成模板文件
@@ -203,15 +203,15 @@ def run_import_task(task_id, file_path, import_type, validate_only=False):
             pass
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([permissions.IsAuthenticated])
 def start_import(request):
     """开始数据导入"""
     try:
-        # 验证密钥
-        if not verify_upload_key(request):
+        # 检查用户权限
+        if not request.user.can_import_data():
             return Response({
-                'error': '无效的上传密钥'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+                'error': '权限不足，需要贡献者及以上权限'
+            }, status=status.HTTP_403_FORBIDDEN)
         
         # 获取参数
         import_type = request.data.get('import_type', 'video')
@@ -272,15 +272,15 @@ def start_import(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([permissions.IsAuthenticated])
 def get_import_status(request, task_id):
     """获取导入任务状态"""
     try:
-        # 验证密钥
-        if not verify_upload_key(request):
+        # 检查用户权限
+        if not request.user.can_import_data():
             return Response({
-                'error': '无效的上传密钥'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+                'error': '权限不足，需要贡献者及以上权限'
+            }, status=status.HTTP_403_FORBIDDEN)
         
         task = IMPORT_TASKS.get(task_id)
         if not task:

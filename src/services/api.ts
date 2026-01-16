@@ -122,11 +122,8 @@ class ApiService {
     return response.data
   }
 
-  async downloadTemplate(importType: string, uploadKey: string): Promise<Blob> {
+  async downloadTemplate(importType: string): Promise<Blob> {
     const response = await axiosInstance.get(`/videos/import/template/?type=${importType}`, {
-      headers: {
-        'X-Upload-Key': uploadKey
-      },
       responseType: 'blob'
     })
     return response.data
@@ -136,23 +133,21 @@ class ApiService {
     file: File
     import_type: string
     validate_only?: boolean
-    upload_key: string
   }): Promise<{task_id: string, message: string}> {
     const formData = new FormData()
     formData.append('file', params.file)
     formData.append('import_type', params.import_type)
     formData.append('validate_only', params.validate_only ? 'true' : 'false')
-    
+
     const response = await axiosInstance.post('/videos/import/start/', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-        'X-Upload-Key': params.upload_key
+        'Content-Type': 'multipart/form-data'
       }
     })
     return response.data
   }
 
-  async getImportStatus(taskId: string, uploadKey: string): Promise<{
+  async getImportStatus(taskId: string): Promise<{
     task_id: string
     import_type: string
     status: string
@@ -164,11 +159,7 @@ class ApiService {
     created_at: string
     updated_at: string
   }> {
-    const response = await axiosInstance.get(`/videos/import/status/${taskId}/`, {
-      headers: {
-        'X-Upload-Key': uploadKey
-      }
-    })
+    const response = await axiosInstance.get(`/videos/import/status/${taskId}/`)
     return response.data
   }
 }
