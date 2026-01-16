@@ -25,7 +25,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostListSerializer(serializers.ModelSerializer):
     author_name = serializers.ReadOnlyField(source='author.username')
     category_name = serializers.ReadOnlyField(source='category.name')
-    comment_count = serializers.IntegerField(source='comments.count', read_only=True)
+    comment_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Post

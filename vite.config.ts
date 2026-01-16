@@ -24,7 +24,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'https://data.cosdrama.cn',
+        target: 'http://localhost:8888',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
@@ -45,7 +45,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'https://data.cosdrama.cn',
+        target: 'http://localhost:8888',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api'),

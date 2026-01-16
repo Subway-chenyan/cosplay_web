@@ -1,0 +1,22 @@
+ERROR 2026-01-16 22:29:33,248 views 386454 140490626236480 Failed to import SQLAgent: cannot import name 'create_agent' from 'langchain.agents' (/home/subway/subway_code/cosplay_web/backend/venv/lib/python3.11/site-packages/langchain/agents/__init__.py)
+ERROR 2026-01-16 22:29:33,248 views 386454 140490626236480 Attempted paths: ['/home/subway/subway_code/cosplay_web/backend/apps/text2sql', '/home/subway/subway_code/cosplay_web/apps/text2sql', '/home/ubuntu/cosplay_web/backend/apps/text2sql', './apps/text2sql']
+ERROR 2026-01-16 22:29:33,248 views 386454 140490626236480 Current working directory: /home/subway/subway_code/cosplay_web
+ERROR 2026-01-16 22:29:33,248 views 386454 140490626236480 Python path: ['/home/subway/subway_code/cosplay_web', '/home/subway/subway_code/cosplay_web/backend', '/usr/lib/python311.zip']...
+ERROR 2026-01-16 22:29:33,250 views 386454 140490626236480 Import error traceback: Traceback (most recent call last):
+  File "/home/subway/subway_code/cosplay_web/backend/apps/videos/views.py", line 345, in <module>
+    from sql_agent_cached import SQLAgent
+  File "/home/subway/subway_code/cosplay_web/backend/apps/text2sql/sql_agent_cached.py", line 15, in <module>
+    from langchain.agents import create_agent
+ImportError: cannot import name 'create_agent' from 'langchain.agents' (/home/subway/subway_code/cosplay_web/backend/venv/lib/python3.11/site-packages/langchain/agents/__init__.py)
+
+ERROR 2026-01-16 22:29:55,845 views 386905 139984087580736 Failed to import SQLAgent: cannot import name 'create_agent' from 'langchain.agents' (/home/subway/subway_code/cosplay_web/backend/venv/lib/python3.11/site-packages/langchain/agents/__init__.py)
+ERROR 2026-01-16 22:29:55,846 views 386905 139984087580736 Attempted paths: ['/home/subway/subway_code/cosplay_web/backend/apps/text2sql', '/home/subway/subway_code/cosplay_web/apps/text2sql', '/home/ubuntu/cosplay_web/backend/apps/text2sql', './apps/text2sql']
+ERROR 2026-01-16 22:29:55,846 views 386905 139984087580736 Current working directory: /home/subway/subway_code/cosplay_web
+ERROR 2026-01-16 22:29:55,846 views 386905 139984087580736 Python path: ['/home/subway/subway_code/cosplay_web', '/home/subway/subway_code/cosplay_web/backend', '/usr/lib/python311.zip']...
+ERROR 2026-01-16 22:29:55,848 views 386905 139984087580736 Import error traceback: Traceback (most recent call last):
+  File "/home/subway/subway_code/cosplay_web/backend/apps/videos/views.py", line 345, in <module>
+    from sql_agent_cached import SQLAgent
+  File "/home/subway/subway_code/cosplay_web/backend/apps/text2sql/sql_agent_cached.py", line 15, in <module>
+    from langchain.agents import create_agent
+ImportError: cannot import name 'create_agent' from 'langchain.agents' (/home/subway/subway_code/cosplay_web/backend/venv/lib/python3.11/site-packages/langchain/agents/__init__.py)
+

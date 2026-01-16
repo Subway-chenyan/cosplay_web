@@ -5,6 +5,7 @@ import competitionsReducer from './slices/competitionsSlice'
 import tagsReducer from './slices/tagsSlice'
 import awardsReducer from './slices/awardsSlice'
 import dataImportReducer from './slices/dataImportSlice'
+import forumReducer from './slices/forumSlice'
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     tags: tagsReducer,
     awards: awardsReducer,
     dataImport: dataImportReducer,
+    forum: forumReducer,
   },
 })
 

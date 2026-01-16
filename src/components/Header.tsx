@@ -17,6 +17,7 @@ function Header() {
     { name: '主页', href: '/' },
     { name: '社团', href: '/groups' },
     { name: '比赛', href: '/competitions' },
+    { name: '论坛', href: '/forum' },
     { name: '队形编排', href: '/choreo' },
   ]
 

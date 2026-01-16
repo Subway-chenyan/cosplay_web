@@ -1,1 +1,0 @@
-后端使用虚拟环境/home/ubuntu/cosplay_web/backend/.venv/bin/activate
