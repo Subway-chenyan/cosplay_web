@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { fetchPostDetail, clearCurrentPost } from '../../store/slices/forumSlice'
 import { forumService } from '../../services/forumService'
-import { MessageSquare, User, Calendar, CornerDownRight, Send } from 'lucide-react'
+import { MessageSquare, User, Calendar, CornerDownRight, Send, Edit3 } from 'lucide-react'
 import DOMPurify from 'dompurify'
 
 const ForumPostDetail = () => {
@@ -15,8 +15,10 @@ const ForumPostDetail = () => {
   const [commentContent, setCommentContent] = useState('')
   const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
+    fetchCurrentUser()
     if (id) {
       dispatch(fetchPostDetail(parseInt(id)))
     }
@@ -24,6 +26,22 @@ const ForumPostDetail = () => {
       dispatch(clearCurrentPost())
     }
   }, [dispatch, id])
+
+  const fetchCurrentUser = async () => {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    try {
+      const response = await fetch('/api/users/me/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentUser(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch user:', error)
+    }
+  }
 
   const handleSubmitComment = async () => {
     if (!id || !commentContent.trim() || isSubmitting) return
@@ -95,12 +113,25 @@ const ForumPostDetail = () => {
       <div className="bg-black text-white py-12 px-4 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[radial-gradient(#d90614_1px,transparent_1px)] [background-size:20px_20px]"></div>
         <div className="container mx-auto max-w-4xl relative z-10">
-          <button
-            onClick={() => navigate('/forum')}
-            className="mb-6 text-p5-red font-black italic uppercase hover:translate-x-1 transition-transform inline-block"
-          >
-            ← 返回 / BACK TO FORUM
-          </button>
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => navigate('/forum')}
+              className="text-p5-red font-black italic uppercase hover:translate-x-1 transition-transform inline-block"
+            >
+              ← 返回 / BACK TO FORUM
+            </button>
+            {currentUser && currentPost && String(currentUser.id) === String(currentPost.author) && (
+              <button
+                onClick={() => navigate(`/forum/edit/${id}`)}
+                className="bg-white text-black px-4 py-1 font-black italic uppercase text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
+              >
+                <div className="flex items-center gap-1 transform -skew-x-12">
+                  <Edit3 className="w-3 h-3" />
+                  编辑 / EDIT
+                </div>
+              </button>
+            )}
+          </div>
           <div className="bg-p5-red inline-block px-3 py-1 transform -skew-x-12 mb-4">
             <span className="text-xs font-black italic uppercase">{currentPost.category_name}</span>
           </div>

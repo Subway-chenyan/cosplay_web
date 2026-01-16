@@ -173,6 +173,10 @@ function UserCenterPage() {
     setTimeout(() => setMessage(''), 3000)
   }
 
+  const getInitial = (name: string) => {
+    return name ? name.charAt(0).toUpperCase() : '?'
+  }
+
   const handleSave = async () => {
     setSaving(true)
     try {
@@ -342,12 +346,12 @@ function UserCenterPage() {
                 <div className="flex items-center space-x-6">
                   {/* 头像展示与上传 */}
                   <div className="relative group/avatar">
-                    <div className="w-24 h-24 bg-black border-4 border-p5-red transform rotate-3 overflow-hidden shadow-[4px_4px_0_0_black]">
+                    <div className="w-24 h-24 bg-black border-4 border-p5-red transform rotate-3 overflow-hidden shadow-[4px_4px_0_0_black] flex items-center justify-center">
                       {profile.avatar ? (
                         <img src={profile.avatar} alt={profile.username} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                          <User className="w-12 h-12 text-white" />
+                        <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white text-4xl font-black italic transform -rotate-3">
+                          {getInitial(profile.nickname || profile.username)}
                         </div>
                       )}
                       {uploadingAvatar && (

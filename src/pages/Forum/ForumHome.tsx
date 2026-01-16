@@ -1,24 +1,47 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { AppDispatch, RootState } from '../../store/store'
 import { fetchCategories, fetchPosts, setFilters } from '../../store/slices/forumSlice'
-import { MessageSquare, Eye, Plus, ChevronRight } from 'lucide-react'
+import { MessageSquare, Eye, Plus, ChevronRight, User } from 'lucide-react'
 
 const ForumHome = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { categories, posts, loading, filters } = useSelector((state: RootState) => state.forum)
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
     dispatch(fetchCategories())
+    fetchCurrentUser()
   }, [dispatch])
 
   useEffect(() => {
     dispatch(fetchPosts(filters))
   }, [dispatch, filters])
 
+  const fetchCurrentUser = async () => {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+    try {
+      const response = await fetch('/api/users/me/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentUser(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch user:', error)
+    }
+  }
+
   const handleCategoryClick = (categoryId?: number) => {
-    dispatch(setFilters({ category: categoryId }))
+    dispatch(setFilters({ category: categoryId, author: undefined }))
+  }
+
+  const handleMyPostsClick = () => {
+    if (!currentUser) return
+    dispatch(setFilters({ category: undefined, author: currentUser.id }))
   }
 
   return (
@@ -40,12 +63,32 @@ const ForumHome = () => {
             <button
               onClick={() => handleCategoryClick(undefined)}
               className={`w-full text-left px-6 py-4 transform -skew-x-12 border-2 border-black transition-all flex items-center justify-between group ${
-                !filters.category ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
+                !filters.category && !filters.author ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
               }`}
             >
               <span className="font-black italic uppercase">全部 / ALL</span>
-              <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${!filters.category ? 'text-white' : 'text-black'}`} />
+              <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${!filters.category && !filters.author ? 'text-white' : 'text-black'}`} />
             </button>
+
+            {currentUser && (
+              <button
+                onClick={handleMyPostsClick}
+                className={`w-full text-left px-6 py-4 transform -skew-x-12 border-2 border-black transition-all flex items-center justify-between group ${
+                  filters.author ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <User className={`w-4 h-4 ${filters.author ? 'text-white' : 'text-p5-red'}`} />
+                  <span className="font-black italic uppercase block leading-none">我的帖子 / MY POSTS</span>
+                </div>
+                <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${filters.author ? 'text-white' : 'text-black'}`} />
+              </button>
+            )}
+
+            <div className="pt-4 pb-2">
+              <div className="h-0.5 bg-black/10 transform -skew-x-12"></div>
+            </div>
+
             {categories.map((cat) => (
               <button
                 key={cat.id}

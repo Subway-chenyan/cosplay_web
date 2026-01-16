@@ -40,6 +40,7 @@ export interface PostDetail extends Post {
 
 export interface PostFilters {
   category?: number
+  author?: string | number
   search?: string
   ordering?: string
 }

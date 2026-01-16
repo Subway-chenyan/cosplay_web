@@ -2,6 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import MenuBar from './MenuBar'
+import { useEffect } from 'react'
 
 interface P5EditorProps {
   content: string
@@ -28,6 +29,13 @@ const P5Editor = ({ content, onChange }: P5EditorProps) => {
       },
     },
   })
+
+  // 当外部内容更改且与编辑器内容不一致时，更新编辑器内容
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
 
   return (
     <div className="relative group">

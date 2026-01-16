@@ -12,6 +12,7 @@ import ChoreoMasterPage from './pages/ChoreoMasterPage'
 import ForumHome from './pages/Forum/ForumHome'
 import ForumPostDetail from './pages/Forum/ForumPostDetail'
 import NewPost from './pages/Forum/NewPost'
+import EditPost from './pages/Forum/EditPost'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import UserCenterPage from './pages/UserCenterPage'
@@ -34,6 +35,7 @@ function App() {
           <Route path="/forum/post/:id" element={<ForumPostDetail />} />
         </Route>
         <Route path="/forum/new" element={<NewPost />} />
+        <Route path="/forum/edit/:id" element={<EditPost />} />
         {/* 认证相关路由（不需要 Layout） */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
