@@ -1,14 +1,14 @@
 {
-  "env": {
-    "ANTHROPIC_AUTH_TOKEN": "sk-0bPWrDEuUD9aJjepH0A1ppHFW8kQvccMkrHPL4221hvAj",
-    "ANTHROPIC_BASE_URL": "http://localhost:8317",
-    "API_TIMEOUT_MS": "3000000",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gemini-3-pro-preview",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gemini-claude-opus-4-5-thinking",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gemini-3-flash-preview",
-    "ANTHROPIC_MODEL": "gemini-3-flash-preview",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  },
+  // "env": {
+  //   "ANTHROPIC_AUTH_TOKEN": "sk-0bPWrDEuUD9aJjepH0A1ppHFW8kQvccMkrHPL4221hvAj",
+  //   "ANTHROPIC_BASE_URL": "http://localhost:18317",
+  //   "API_TIMEOUT_MS": "3000000",
+  //   "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gemini-3-pro-preview",
+  //   "ANTHROPIC_DEFAULT_OPUS_MODEL": "gemini-claude-opus-4-5-thinking",
+  //   "ANTHROPIC_DEFAULT_SONNET_MODEL": "gemini-3-flash-preview",
+  //   "ANTHROPIC_MODEL": "gemini-3-flash-preview",
+  //   "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  // },
   "statusLine": {
     "type": "command",
     "command": "input=$(cat); printf \"$(whoami)@$(hostname -s):$(echo \"$input\" | jq -r '.workspace.current_dir')\""
