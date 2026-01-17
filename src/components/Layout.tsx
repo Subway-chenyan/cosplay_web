@@ -1,8 +1,11 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
 
 function Layout() {
+  const location = useLocation()
+  const isChoreoPage = location.pathname === '/choreo'
+
   return (
     <div className="min-h-screen bg-black flex flex-col" style={{ backgroundImage: 'url("/src/assets/p5-bg.png")', backgroundSize: 'cover', backgroundAttachment: 'fixed', backgroundPosition: 'center' }}>
       <Header />
@@ -16,7 +19,7 @@ function Layout() {
           <Outlet />
         </div>
       </main>
-      <Footer />
+      {!isChoreoPage && <Footer />}
     </div>
   )
 }

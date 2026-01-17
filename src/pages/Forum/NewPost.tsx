@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from '../../store/store'
 import { fetchCategories } from '../../store/slices/forumSlice'
 import { forumService } from '../../services/forumService'
 import P5Editor from '../../components/Forum/Editor/P5Editor'
-import { Send, X, AlertCircle } from 'lucide-react'
+import { Send, X, AlertCircle, LogIn } from 'lucide-react'
 
 const NewPost = () => {
   const navigate = useNavigate()
@@ -17,8 +17,17 @@ const NewPost = () => {
   const [categoryId, setCategoryId] = useState<number | ''>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
+    // 检查登录状态
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      setIsAuthenticated(false)
+      setError('请先登录后再发帖')
+      return
+    }
+    setIsAuthenticated(true)
     dispatch(fetchCategories())
   }, [dispatch])
 
@@ -63,13 +72,32 @@ const NewPost = () => {
           </button>
         </div>
 
-        {error && (
+        {/* 未登录提示 */}
+        {!isAuthenticated && (
+          <div className="mb-8 bg-p5-red p-8 border-2 border-white transform -rotate-1 shadow-[8px_8px_0_0_white]">
+            <div className="flex items-center gap-4 mb-4">
+              <AlertCircle className="w-8 h-8" />
+              <span className="text-2xl font-black italic uppercase">需要登录 / Login Required</span>
+            </div>
+            <p className="mb-6 text-lg">您需要登录后才能发布帖子。请点击下方按钮前往登录页面。</p>
+            <button
+              onClick={() => navigate('/login')}
+              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 font-black italic uppercase hover:bg-p5-red hover:text-white transition-all transform hover:scale-105 border-2 border-black"
+            >
+              <LogIn className="w-5 h-5" />
+              前往登录 / Go to Login
+            </button>
+          </div>
+        )}
+
+        {error && isAuthenticated && (
           <div className="mb-8 bg-p5-red p-4 border-2 border-white flex items-center gap-3 animate-bounce">
             <AlertCircle className="w-6 h-6" />
             <span className="font-bold italic uppercase">{error}</span>
           </div>
         )}
 
+        {isAuthenticated && (
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* 标题输入 */}
           <div className="relative">
@@ -136,6 +164,8 @@ const NewPost = () => {
             </button>
           </div>
         </form>
+        )}
+      </div>
       </div>
     </div>
   )

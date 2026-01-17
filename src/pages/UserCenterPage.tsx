@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Edit3, Shield, AlertCircle, CheckCircle, Save, Upload, Database, FileText, MessageSquare } from 'lucide-react'
+import { User, Edit3, Shield, AlertCircle, CheckCircle, Save, Upload, Database, FileText, MessageSquare, LogOut } from 'lucide-react'
 import Header from '../components/Header'
 import SearchableMultiSelectModal from '../components/SearchableMultiSelectModal'
 import RoleApprovalPanel from '../components/RoleApprovalPanel'
@@ -306,6 +306,13 @@ function UserCenterPage() {
     return roleMap[role] || role
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    navigate('/login')
+    showMessage('已退出登录', 'success')
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -376,12 +383,20 @@ function UserCenterPage() {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex items-center space-x-3">
                   <div className="inline-block bg-black text-white px-4 py-2 transform -skew-x-12">
                     <span className="block transform skew-x-12 font-black uppercase italic">
                       {getRoleDisplayName(profile.role)}
                     </span>
                   </div>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-p5-red text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-black transition-colors flex items-center"
+                    title="退出登录"
+                  >
+                    <LogOut className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">退出</span>
+                  </button>
                 </div>
               </div>
             </div>

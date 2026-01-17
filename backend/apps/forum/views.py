@@ -3,6 +3,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import ForumCategory, Post, Comment, ForumAttachment
 from .serializers import ForumCategorySerializer, PostListSerializer, PostDetailSerializer, CommentSerializer, ForumAttachmentSerializer
 from django.db.models import F, Count
+import logging
+
+logger = logging.getLogger(__name__)
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -54,6 +57,13 @@ class AttachmentViewSet(viewsets.ModelViewSet):
     queryset = ForumAttachment.objects.all()
     serializer_class = ForumAttachmentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # 调试日志：检查认证头
+        auth_header = request.META.get('HTTP_AUTHORIZATION', 'No auth header')
+        logger.info(f"Attachment upload attempt - Auth header: {auth_header[:20]}... if exists else 'None'")
+        logger.info(f"User authenticated: {request.user.is_authenticated}")
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

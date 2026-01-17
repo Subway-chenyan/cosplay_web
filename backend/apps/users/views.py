@@ -183,7 +183,9 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     def get_authenticators(self):
         """create 操作不需要认证，其他操作需要 JWT 认证"""
-        if self.action == 'create':
+        # 使用 getattr 安全地访问 action，避免初始化时的 AttributeError
+        action = getattr(self, 'action', None)
+        if action == 'create':
             return []
         from rest_framework_simplejwt.authentication import JWTAuthentication
         return [JWTAuthentication()]
