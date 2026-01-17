@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Shield, Clock, CheckCircle, XCircle, User as UserIcon, Mail, AlertCircle } from 'lucide-react'
+import { Clock, CheckCircle, XCircle, User as UserIcon, Mail, AlertCircle } from 'lucide-react'
 
 interface RoleApplication {
   user_id: string
