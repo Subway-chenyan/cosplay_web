@@ -7,4 +7,5 @@ urlpatterns = [
     path('refresh/', views.RefreshView.as_view(), name='refresh'),
     path('me/', views.MeView.as_view(), name='me'),
     path('verify-management-key/', views.VerifyManagementKeyView.as_view(), name='verify-management-key'),
+    path('r2-sign/', views.R2SignView.as_view(), name='r2-sign'),
 ]

@@ -128,3 +128,7 @@ backend/*.log.worktrees/
 backend/venv/
 django.log
 *.log
+
+CLAUDE.md
+backend/.env
+.claude/settings.json

@@ -147,3 +147,63 @@ class VerifyManagementKeyView(APIView):
                 'valid': False,
                 'message': '管理密钥错误'
             }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class R2SignView(APIView):
+    """
+    获取R2上传签名
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        import boto3
+        from botocore.config import Config
+        from django.conf import settings
+
+        file_name = request.data.get('file_name')
+        file_type = request.data.get('file_type')
+        folder = request.data.get('folder', 'uploads')
+
+        if not file_name or not file_type:
+            return Response({'error': '需要file_name和file_type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 确保文件名安全
+        import time
+        safe_name = f"{int(time.time())}_{file_name.replace(' ', '_')}"
+        key = f"{folder}/{safe_name}"
+
+        try:
+            s3_client = boto3.client('s3',
+                endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                config=Config(signature_version='s3v4'),
+                region_name=settings.AWS_S3_REGION_NAME
+            )
+
+            # 生成预签名URL
+            presigned_url = s3_client.generate_presigned_url('put_object',
+                Params={
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Key': key,
+                    'ContentType': file_type,
+                },
+                ExpiresIn=3600
+            )
+
+            # 如果配置了自定义域名，返回自定义域名的访问URL
+            if settings.AWS_S3_CUSTOM_DOMAIN:
+                public_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{key}"
+            else:
+                # 否则使用R2默认URL
+                # 注意：这里可能需要根据实际情况调整
+                public_url = f"{settings.AWS_S3_ENDPOINT_URL}/{settings.AWS_STORAGE_BUCKET_NAME}/{key}"
+
+            return Response({
+                'upload_url': presigned_url,
+                'public_url': public_url,
+                'key': key
+            })
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar } from 'lucide-react'
+import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar, Upload } from 'lucide-react'
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
 import { videoService } from '../services/videoService'
@@ -269,6 +269,9 @@ const ManagementPage: React.FC = () => {
     bilibili: ''
   })
 
+  const [groupLogoFile, setGroupLogoFile] = useState<File | null>(null)
+  const [groupLogoPreview, setGroupLogoPreview] = useState<string | null>(null)
+
   const [selectedGroupForEdit, setSelectedGroupForEdit] = useState<Group | null>(null)
 
   // 赛事表单状态
@@ -359,6 +362,8 @@ const ManagementPage: React.FC = () => {
       qq_group: '',
       bilibili: ''
     })
+    setGroupLogoFile(null)
+    setGroupLogoPreview(null)
     setSelectedGroupForEdit(null)
   }
 
@@ -449,6 +454,21 @@ const ManagementPage: React.FC = () => {
       qq_group: group.qq_group || '',
       bilibili: group.bilibili || ''
     })
+    setGroupLogoPreview(group.logo || null)
+    setGroupLogoFile(null)
+  }
+
+  // 处理社团Logo文件选择
+  const handleGroupLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setGroupLogoFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setGroupLogoPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   // 提交视频表单
@@ -494,68 +514,86 @@ const ManagementPage: React.FC = () => {
     setLoading(true)
 
     try {
-      if (groupMode === 'create') {
-        // 准备创建数据，移除id字段和空字符串字段
-        const createData = {
-          name: groupForm.name.trim(),
-          description: groupForm.description || '',
-          founded_date: groupForm.founded_date || undefined,
-          province: groupForm.province || '',
-          city: groupForm.city || '',
-          location: groupForm.location || '',
-          website: groupForm.website || '',
-          email: groupForm.email || '',
-          phone: groupForm.phone || '',
-          weibo: groupForm.weibo || '',
-          wechat: groupForm.wechat || '',
-          qq_group: groupForm.qq_group || '',
-          bilibili: groupForm.bilibili || ''
-          // 不传递logo字段，因为后端是ImageField
+      let finalLogoUrl = groupForm.logo
+
+      // 1. 如果有新选择的文件，先进行上传
+      if (groupLogoFile) {
+        try {
+          const { upload_url, public_url } = await groupService.getUploadUrl(
+            groupLogoFile.name,
+            groupLogoFile.type
+          )
+
+          // 使用 fetch 直接上传文件到 R2
+          await fetch(upload_url, {
+            method: 'PUT',
+            body: groupLogoFile,
+            headers: {
+              'Content-Type': groupLogoFile.type
+            }
+          })
+
+          finalLogoUrl = public_url
+        } catch (uploadError: any) {
+          console.error('File upload error:', uploadError)
+          showMessage('error', `图片上传失败: ${uploadError.message || '未知错误'}`)
+          setLoading(false)
+          return // 中止提交
         }
-        await groupService.createGroup(createData)
+      }
+
+      // 2. 准备提交给后端的数据 (JSON)
+      const submitData: Partial<Group> = {
+        name: groupForm.name.trim(),
+        description: groupForm.description || '',
+        founded_date: groupForm.founded_date || undefined,
+        province: groupForm.province || '',
+        city: groupForm.city || '',
+        location: groupForm.location || '',
+        website: groupForm.website || '',
+        email: groupForm.email || '',
+        phone: groupForm.phone || '',
+        weibo: groupForm.weibo || '',
+        wechat: groupForm.wechat || '',
+        qq_group: groupForm.qq_group || '',
+        bilibili: groupForm.bilibili || '',
+        logo: finalLogoUrl || ''
+      }
+
+      // 3. 提交社团数据
+      if (groupMode === 'create') {
+        await groupService.createGroup(submitData)
         showMessage('success', '社团创建成功！')
       } else {
         if (!groupForm.id) {
           showMessage('error', '请先选择要编辑的社团')
           return
         }
-        // 准备更新数据，确保格式正确
-        const updateData = {
-          name: groupForm.name?.trim(),
-          description: groupForm.description || '',
-          founded_date: groupForm.founded_date || undefined,
-          province: groupForm.province || '',
-          city: groupForm.city || '',
-          location: groupForm.location || '',
-          website: groupForm.website || '',
-          email: groupForm.email || '',
-          phone: groupForm.phone || '',
-          weibo: groupForm.weibo || '',
-          wechat: groupForm.wechat || '',
-          qq_group: groupForm.qq_group || '',
-          bilibili: groupForm.bilibili || ''
-          // 不传递logo、id等字段
-        }
-        await groupService.updateGroup(groupForm.id, updateData)
+        await groupService.updateGroup(groupForm.id, submitData)
         showMessage('success', '社团信息更新成功！')
       }
       resetGroupForm()
     } catch (error: any) {
       console.error('Error with group operation:', error)
+      if (error.response?.data) {
+        console.error('Server error details:', error.response.data)
+      }
 
       // 更详细的错误处理
       let errorMessage = `社团${groupMode === 'create' ? '创建' : '更新'}失败`
 
       if (error?.response?.data) {
         const errorData = error.response.data
-        if (errorData.name && errorData.name.includes('already exists')) {
-          errorMessage = '社团名称已存在，请使用其他名称'
-        } else if (errorData.name) {
-          errorMessage = `社团名称: ${errorData.name[0]}`
+        if (typeof errorData === 'object') {
+          // 提取具体的字段错误
+          const firstError = Object.entries(errorData)[0]
+          if (firstError) {
+            const [field, msgs] = firstError
+            const msg = Array.isArray(msgs) ? msgs[0] : msgs
+            errorMessage = `${field}: ${msg}`
+          }
         } else if (errorData.detail) {
           errorMessage = errorData.detail
-        } else if (typeof errorData === 'string') {
-          errorMessage = errorData
         }
       } else if (error?.message) {
         errorMessage = error.message
@@ -948,7 +986,7 @@ const ManagementPage: React.FC = () => {
                     </div>
 
                     {groupMode === 'edit' && (
-                      <div className="mb-10 p-6 bg-black transform -skew-x-2 border-l-8 border-p5-red shadow-xl">
+                      <div className="mb-10 p-6 bg-black transform -skew-x-2 border-l-8 border-p5-red shadow-xl relative z-20">
                         <div className="transform skew-x-2">
                           <label className="block text-sm font-black text-p5-red uppercase mb-3 tracking-widest">
                             TARGET SELECTION / 选择要编辑的社团
@@ -1010,15 +1048,45 @@ const ManagementPage: React.FC = () => {
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Emblem URL / 社团Logo链接
+                          Emblem Upload / 社团Logo上传
                         </label>
-                        <input
-                          type="url"
-                          value={groupForm.logo || ''}
-                          onChange={(e) => setGroupForm({ ...groupForm, logo: e.target.value })}
-                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="https://..."
-                        />
+                        <div className="w-full p-4 border-4 border-black font-black focus-within:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black] flex flex-col items-center">
+                          {groupLogoPreview ? (
+                            <div className="relative mb-4 group/preview">
+                              <img
+                                src={groupLogoPreview}
+                                alt="Logo Preview"
+                                className="h-32 w-32 object-cover border-4 border-black shadow-[4px_4px_0_0_black]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setGroupLogoFile(null)
+                                  setGroupLogoPreview(null)
+                                }}
+                                className="absolute -top-2 -right-2 bg-p5-red text-white p-1 border-2 border-black hover:bg-black transition-colors"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="mb-4 text-gray-400 italic">No emblem selected / 未选择Logo</div>
+                          )}
+                          <label className="cursor-pointer bg-black text-white px-6 py-2 font-black uppercase italic hover:bg-p5-red transition-colors transform -skew-x-12">
+                            <span className="transform skew-x-12 flex items-center">
+                              <Upload className="w-5 h-5 mr-2" />
+                              SELECT IMAGE / 选择图片
+                            </span>
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={handleGroupLogoChange}
+                            />
+                          </label>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -1234,7 +1302,7 @@ const ManagementPage: React.FC = () => {
                     </div>
 
                     {eventMode === 'edit' && (
-                      <div className="mb-10 p-6 bg-p5-red transform skew-x-2 border-r-8 border-black shadow-xl">
+                      <div className="mb-10 p-6 bg-p5-red transform skew-x-2 border-r-8 border-black shadow-xl relative z-20">
                         <div className="transform -skew-x-2">
                           <label className="block text-sm font-black text-white uppercase mb-3 tracking-widest">
                             SELECT ARCHIVE / 选择要编辑的赛事

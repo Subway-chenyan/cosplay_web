@@ -185,6 +185,8 @@ if config('R2_ACCESS_KEY_ID', default=None):
     # 如果没有自定义域名，django-storages 会自动使用 endpoint url
     if AWS_S3_CUSTOM_DOMAIN:
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+        AWS_S3_CUSTOM_DOMAIN = AWS_S3_CUSTOM_DOMAIN  # 确保 django-storages 使用它
+        AWS_QUERYSTRING_AUTH = False  # 公共桶不需要签名，解决时限问题
     else:
         # R2 默认 S3 风格 URL: https://<bucket>.<account_id>.r2.cloudflarestorage.com
         # 但 R2 建议通过自定义域名访问。如果没有，这里保持默认 MEDIA_URL 可能会有问题。

@@ -41,6 +41,15 @@ class GroupService {
     return api.patch<Group>(`/groups/${id}/`, data)
   }
 
+  // 获取文件上传签名
+  async getUploadUrl(fileName: string, fileType: string): Promise<{ upload_url: string, public_url: string, key: string }> {
+    return api.post('/auth/r2-sign/', {
+      file_name: fileName,
+      file_type: fileType,
+      folder: 'groups'
+    })
+  }
+
   // 删除社团
   async deleteGroup(id: string): Promise<void> {
     return api.delete(`/groups/${id}/`)

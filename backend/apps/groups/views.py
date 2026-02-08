@@ -16,12 +16,15 @@ from apps.videos.serializers import VideoSerializer
 from apps.videos.pagination import LargeResultsSetPagination
 
 
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
 class GroupViewSet(viewsets.ModelViewSet):
     """
     社团视图集
     """
     queryset = Group.objects.filter(is_active=True)
     serializer_class = GroupSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     pagination_class = LargeResultsSetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'province', 'city', 'location', 'description']

@@ -12,8 +12,8 @@ class Group(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, unique=True, verbose_name='社团名称')
     description = models.TextField(blank=True, verbose_name='社团描述')
-    logo = models.ImageField(upload_to='group_logos/', blank=True, null=True, verbose_name='社团logo')
-    
+    logo = models.ImageField(upload_to='group_logos/', max_length=500, blank=True, null=True, verbose_name='社团logo')
+
     # 基本信息
     founded_date = models.DateField(blank=True, null=True, verbose_name='成立时间')
     province = models.CharField(max_length=50, blank=True, verbose_name='所在省份')
