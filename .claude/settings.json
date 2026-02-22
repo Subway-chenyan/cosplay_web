@@ -9,6 +9,12 @@
     "ANTHROPIC_MODEL": "gemini-3-flash-preview",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
   },
+  "permissions": {
+    "allow": [
+      "*"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
   "statusLine": {
     "type": "command",
     "command": "input=$(cat); printf \"$(whoami)@$(hostname -s):$(echo \"$input\" | jq -r '.workspace.current_dir')\""
@@ -16,13 +22,8 @@
   "enabledPlugins": {
     "git-workflow@claude-code-templates": true,
     "testing-suite@claude-code-templates": false,
-    "superpowers@superpowers-marketplace": true
+    "superpowers@superpowers-marketplace": true,
+    "episodic-memory@superpowers-marketplace": true
   },
-  "alwaysThinkingEnabled": true,
-  "permissions": {
-    "allow": [
-      "*"
-    ],
-    "defaultMode": "bypassPermissions"
-  }
+  "alwaysThinkingEnabled": true
 }
