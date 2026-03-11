@@ -149,10 +149,19 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # 只要赛事的 start_date 或 end_date 在该月，或者跨越该月，都算作当月的赛事
+        # (start_date <= month_end AND end_date >= month_start)
+        from calendar import monthrange
+        import datetime
+        
+        _, last_day = monthrange(year, month)
+        month_start = datetime.date(year, month, 1)
+        month_end = datetime.date(year, month, last_day)
+        
         events = Event.objects.filter(
-            date__year=year,
-            date__month=month
-        ).select_related('competition').order_by('date')
+            start_date__lte=month_end,
+            end_date__gte=month_start
+        ).select_related('competition').order_by('start_date')
         
         serializer = self.get_serializer(events, many=True)
         return Response(serializer.data)
@@ -160,18 +169,18 @@ class EventViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def by_date_range(self, request):
         """按日期范围获取赛事信息"""
-        start_date = request.query_params.get('start_date')
-        end_date = request.query_params.get('end_date')
+        start_date_str = request.query_params.get('start_date')
+        end_date_str = request.query_params.get('end_date')
         
-        if not start_date or not end_date:
+        if not start_date_str or not end_date_str:
             return Response(
                 {'error': '需要提供start_date和end_date参数'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         try:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
         except ValueError:
             return Response(
                 {'error': '日期格式错误，应为YYYY-MM-DD'}, 
@@ -179,8 +188,9 @@ class EventViewSet(viewsets.ModelViewSet):
             )
         
         events = Event.objects.filter(
-            date__range=[start_date, end_date]
-        ).select_related('competition').order_by('date')
+            start_date__lte=end_date,
+            end_date__gte=start_date
+        ).select_related('competition').order_by('start_date')
         
         serializer = self.get_serializer(events, many=True)
         return Response(serializer.data)

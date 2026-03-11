@@ -63,7 +63,8 @@ class Event(models.Model):
     赛事信息模型
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateField(verbose_name='赛事日期')
+    start_date = models.DateField(verbose_name='赛事开始日期')
+    end_date = models.DateField(verbose_name='赛事结束日期')
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE, 
                                    related_name='events', verbose_name='关联比赛')
     title = models.CharField(max_length=200, verbose_name='赛事标题')
@@ -78,11 +79,12 @@ class Event(models.Model):
     class Meta:
         verbose_name = '赛事信息'
         verbose_name_plural = '赛事信息'
-        ordering = ['-date']
+        ordering = ['-start_date']
         indexes = [
-            models.Index(fields=['date']),
-            models.Index(fields=['competition', 'date']),
+            models.Index(fields=['start_date']),
+            models.Index(fields=['end_date']),
+            models.Index(fields=['competition', 'start_date']),
         ]
     
     def __str__(self):
-        return f"{self.title} - {self.date}"
+        return f"{self.title} - {self.start_date} to {self.end_date}"

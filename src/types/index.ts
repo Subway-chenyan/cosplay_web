@@ -136,7 +136,8 @@ export interface PaginatedResponse<T> {
 
 export interface Event {
   id: string
-  date: string
+  start_date: string
+  end_date: string
   competition: string
   competition_name: string
   title: string
