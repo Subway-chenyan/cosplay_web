@@ -128,8 +128,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
         {/* 日历头部 */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-10 transform skew-x-1 border-b-8 border-black pb-6">
           <div className="flex items-center space-x-6 mb-4 md:mb-0">
-            <div className="bg-black p-4 transform -rotate-12 border-4 border-p5-red shadow-[4px_4px_0_0_black]">
-              <span className="text-4xl font-black text-white italic tracking-tighter">赛事日历 / EVENT CALENDAR</span>
+            <div className="bg-black p-2 md:p-4 transform -rotate-12 border-4 border-p5-red shadow-[4px_4px_0_0_black]">
+              <span className="text-xl md:text-4xl font-black text-white italic tracking-tighter">赛事日历 / EVENT CALENDAR</span>
             </div>
           </div>
 
@@ -238,7 +238,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
               </svg>
             </div>
             <div>
-              <h3 className="text-3xl font-black text-black uppercase italic tracking-tighter">历战档案 / UPCOMING INTEL</h3>
+              <h3 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter">历战档案 / UPCOMING INTEL</h3>
               <p className="text-xs font-black text-p5-red uppercase italic">目标已锁定 / TARGETS IDENTIFIED</p>
             </div>
           </div>
@@ -323,7 +323,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                       <div className="bg-black inline-block px-4 py-1 transform -skew-x-12 mb-4">
                         <span className="text-sm font-black text-white italic uppercase tracking-tighter">情报确认 / TARGET IDENTIFIED</span>
                       </div>
-                      <h3 className="text-4xl font-black text-black uppercase italic tracking-tighter leading-none break-words" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                      <h3 className="text-2xl md:text-4xl font-black text-black uppercase italic tracking-tighter leading-none break-words" style={{ textShadow: '2px 2px 0px #d90614' }}>
                         {selectedEvent.title}
                       </h3>
                     </div>

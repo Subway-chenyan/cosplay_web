@@ -186,7 +186,7 @@ function GroupDetailPage() {
           <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
             <Users className="w-20 h-20 text-black transform -rotate-12" />
           </div>
-          <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+          <h3 className="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
             目标失踪 / TARGET MISSING
           </h3>
           <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white mb-8">
@@ -336,7 +336,7 @@ function GroupDetailPage() {
               <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black shadow-[4px_4px_0_0_black]">
                 <Trophy className="w-8 h-8 text-white transform -rotate-12" />
               </div>
-              <h2 className="text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
+              <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
                 历战功绩 / ACCOMPLISHMENTS
               </h2>
             </div>
@@ -437,7 +437,7 @@ function GroupDetailPage() {
           <div className="absolute inset-0 bg-p5-red opacity-10 transform translate-x-2 translate-y-2 -skew-x-1 z-0"></div>
           <div className="relative z-10 bg-white border-4 border-black p-8 shadow-[8px_8px_0_0_black]">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-black text-black uppercase italic border-b-8 border-black">
+              <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-black">
                 行动记录 / FIELD LOGS ({groupVideos.length})
               </h2>
             </div>
@@ -462,7 +462,7 @@ function GroupDetailPage() {
           <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <h3 className="text-4xl font-black text-black uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+            <h3 className="text-2xl md:text-4xl font-black text-black uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
               尚无行动记录 / NO DATA CAPTURED
             </h3>
             <p className="bg-black text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-p5-red">

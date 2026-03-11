@@ -94,7 +94,7 @@ function GroupsPage() {
         <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
         <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-x-2">
           <div className="transform skew-x-2">
-            <h1 className="text-5xl font-black text-black mb-4 uppercase italic border-b-8 border-p5-red inline-block" style={{ textShadow: '4px 4px 0px #d90614' }}>
+            <h1 className="text-3xl md:text-5xl font-black text-black mb-4 uppercase italic border-b-8 border-p5-red inline-block" style={{ textShadow: '4px 4px 0px #d90614' }}>
               社团档案 / ALLIANCE RECORD
             </h1>
             <p className="block text-xl font-black italic bg-black text-white px-4 py-1 transform -skew-x-12 w-fit mb-8">
@@ -142,8 +142,8 @@ function GroupsPage() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-black text-p5-red uppercase italic tracking-tighter">已锁定地区 / LOCATION IDENTIFIED :</span>
-                  <h2 className="text-5xl font-black text-white uppercase italic leading-none p5-text-shadow-red">
-                    {selectedProvince} <span className="text-p5-red">/</span> {filteredGroups.length} <span className="text-2xl">个已知社团 / GROUPS FOUND</span>
+                  <h2 className="text-2xl md:text-5xl font-black text-white uppercase italic leading-none p5-text-shadow-red">
+                    {selectedProvince} <span className="text-p5-red">/</span> {filteredGroups.length} <span className="text-lg md:text-2xl">个已知社团 / GROUPS FOUND</span>
                   </h2>
                 </div>
               </div>

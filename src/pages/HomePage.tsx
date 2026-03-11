@@ -235,7 +235,7 @@ function HomePage() {
       <div className="relative bg-black p-8 overflow-hidden border-b-8 border-p5-red shadow-[8px_8px_0_0_black]">
         <div className="absolute inset-0 bg-gradient-to-r from-p5-red/80 to-black transform skew-x-12 scale-150 origin-bottom-left -z-0"></div>
         <div className="relative z-10 text-center">
-          <h1 className="text-6xl font-black mb-4 text-white uppercase italic tracking-tighter" style={{ textShadow: '6px 6px 0px #d90614' }}>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 text-white uppercase italic tracking-tighter" style={{ textShadow: '6px 6px 0px #d90614' }}>
             COSPLAY / 舞台剧库
           </h1>
           <p className="text-lg text-white font-black bg-black inline-block px-6 py-1 transform skew-x-12 border-2 border-p5-red">
@@ -487,7 +487,7 @@ function HomePage() {
             <div className="relative group">
               <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 -skew-x-12 z-0 shadow-lg"></div>
               <div className="relative z-10 bg-black px-6 py-2 transform -skew-x-12 border-2 border-white flex items-baseline space-x-3">
-                <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">
+                <h2 className="text-xl md:text-3xl font-black text-white uppercase italic tracking-tighter">
                   行动记录 / FIELD LOGS
                 </h2>
                 <span className="text-p5-red font-black italic text-sm">

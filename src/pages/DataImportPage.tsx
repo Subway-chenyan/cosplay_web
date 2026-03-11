@@ -120,7 +120,7 @@ const DataImportPage: React.FC = () => {
                 <div className="absolute -left-4 top-0 w-1 h-full bg-p5-red transform -skew-x-12"></div>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-black text-black mb-2 uppercase italic transform -skew-x-6" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                        <h1 className="text-2xl md:text-4xl font-black text-black mb-2 uppercase italic transform -skew-x-6" style={{ textShadow: '2px 2px 0px #d90614' }}>
                             DATA IMPORT / 数据导入
                         </h1>
                         <p className="text-gray-600 font-bold border-b-2 border-black inline-block pb-1">

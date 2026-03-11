@@ -380,7 +380,7 @@ function CompetitionDetailPage() {
               <Trophy className="w-10 h-10 text-white transform -rotate-12" />
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic leading-none mb-4" style={{ textShadow: '4px 4px 0px #000000' }}>
+            <h1 className="text-3xl md:text-6xl font-black text-white uppercase italic leading-none mb-4" style={{ textShadow: '4px 4px 0px #000000' }}>
               {competition.name}
             </h1>
 
@@ -526,7 +526,7 @@ function CompetitionDetailPage() {
             <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
               <Trophy className="w-8 h-8 text-white transform -rotate-12" />
             </div>
-            <h2 className="text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
+            <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
               TARGET INTEL SECURED / 获奖作品
             </h2>
           </div>
@@ -560,18 +560,18 @@ function CompetitionDetailPage() {
                     {/* 奖项标题 */}
                     <div className={`p-6 border-b-4 border-black relative`}>
                       <div className="absolute inset-0 opacity-20 p5-halftone"></div>
-                      <div className="flex items-center justify-between transform skew-x-1 relative z-10">
-                        <div className="flex items-center space-x-4">
-                          <div className="text-p5-red transform rotate-12 scale-150">
+                      <div className="flex items-center justify-between transform skew-x-1 relative z-10 gap-2">
+                        <div className="flex items-center space-x-4 min-w-0">
+                          <div className="text-p5-red transform rotate-12 scale-150 shrink-0">
                             {awardInfo.icon}
                           </div>
-                          <h3 className="text-3xl font-black text-black uppercase italic tracking-tighter" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                          <h3 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter whitespace-nowrap" style={{ textShadow: '2px 2px 0px #d90614' }}>
                             {awardInfo.label}
                           </h3>
                         </div>
-                        <div className="bg-black text-white px-6 py-1 font-black uppercase italic transform -skew-x-12 shadow-[4px_4px_0_0_#d90614] border border-white">
-                          <span className="transform skew-x-12 inline-block">
-                            已发现 {totalCount} 条情报 / RECORDS FOUND
+                        <div className="bg-black text-white px-3 md:px-6 py-1 font-black uppercase italic transform -skew-x-12 shadow-[4px_4px_0_0_#d90614] border border-white shrink-0">
+                          <span className="transform skew-x-12 inline-block text-xs md:text-sm">
+                            已发现 {totalCount} 条情报
                           </span>
                         </div>
                       </div>
@@ -595,10 +595,6 @@ function CompetitionDetailPage() {
                                   onClick={() => handleVideoClick(video.id)}
                                   dramaName={awardRecord?.drama_name}
                                 />
-                              </div>
-                              {/* 奖项标识 */}
-                              <div className={`absolute -top-2 -right-2 z-20 bg-p5-red text-white p-1.5 transform rotate-6 border-2 border-black`}>
-                                {awardInfo.icon}
                               </div>
                               {/* 年份标识 */}
                               {video.year && (
@@ -650,7 +646,7 @@ function CompetitionDetailPage() {
               </div>
               <div className="bg-black text-white px-6 py-1 font-black uppercase italic transform -skew-x-12">
                 <span className="transform skew-x-12 inline-block">
-                  {unawardedVideos.length} ENTRIES
+                  {unawardedVideos.length} 条记录
                 </span>
               </div>
             </div>
@@ -701,7 +697,7 @@ function CompetitionDetailPage() {
                 <Calendar className="w-8 h-8 text-white transform -rotate-12" />
               </div>
               <div>
-                <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter">CALENDAR ARCHIVE / 年份概览</h2>
+                <h2 className="text-2xl md:text-3xl font-black text-black uppercase italic tracking-tighter">CALENDAR ARCHIVE / 年份概览</h2>
                 <p className="text-xs font-black text-gray-400 mt-1">CHOOSE A TARGET YEAR TO INVESTIGATE</p>
               </div>
             </div>
@@ -728,11 +724,11 @@ function CompetitionDetailPage() {
                         <div className="text-sm font-black text-gray-500 uppercase italic tracking-widest space-y-1">
                           <div className="flex items-center justify-center space-x-2">
                             <Play className="w-4 h-4 text-p5-red" />
-                            <span>{yearVideos.length} RECORDS</span>
+                            <span>{yearVideos.length} 条情报</span>
                           </div>
                           <div className="flex items-center justify-center space-x-2">
                             <Trophy className="w-4 h-4 text-yellow-600" />
-                            <span>{yearAwardedVideos.length} AWARDS</span>
+                            <span>{yearAwardedVideos.length} 项奖励</span>
                           </div>
                         </div>
                         <div className="mt-6 flex justify-center">

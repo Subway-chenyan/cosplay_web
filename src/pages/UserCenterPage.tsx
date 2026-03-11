@@ -375,7 +375,7 @@ function UserCenterPage() {
                   </div>
 
                   <div>
-                    <h1 className="text-4xl md:text-5xl font-black text-black uppercase italic tracking-tighter">
+                    <h1 className="text-2xl md:text-5xl font-black text-black uppercase italic tracking-tighter">
                       用户中心 / USER CENTER
                     </h1>
                     <p className="text-gray-600 font-bold mt-1 text-xl italic uppercase">

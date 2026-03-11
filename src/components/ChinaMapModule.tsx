@@ -252,7 +252,7 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
               <MapPin className="w-8 h-8 text-white transform -rotate-12" />
             </div>
             <div>
-              <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter">OPERATIONAL MAP / 社团分布</h2>
+              <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter">OPERATIONAL MAP / 社团分布</h2>
               <p className="text-xs font-black text-p5-red uppercase italic">DEPLOYMENT STATUS BY REGION / 各地区部署状态</p>
             </div>
           </div>

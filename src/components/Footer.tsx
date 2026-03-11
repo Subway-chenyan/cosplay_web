@@ -67,7 +67,7 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* 背景遮罩 */}
       <div
         className="absolute inset-0 bg-black/70"
@@ -75,16 +75,16 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       />
 
       {/* 弹窗内容 */}
-      <div className="relative z-10 w-full max-w-lg mx-4">
+      <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* P5 风格装饰背景 */}
-        <div className="absolute inset-0 bg-p5-red transform translate-x-3 translate-y-3 -skew-x-3" />
+        <div className="absolute inset-0 bg-p5-red transform translate-x-1 md:translate-x-3 translate-y-1 md:translate-y-3 -skew-x-3" />
 
-        <div className="relative bg-white border-4 border-black p-6 transform -skew-x-1">
+        <div className="relative bg-white border-4 border-black p-4 md:p-6 transform -skew-x-1">
           <div className="transform skew-x-1">
             {/* 标题栏 */}
             <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black">
-              <h2 className="text-2xl font-black uppercase italic flex items-center">
-                <MessageSquare className="w-6 h-6 mr-2" />
+              <h2 className="text-xl md:text-2xl font-black uppercase italic flex items-center">
+                <MessageSquare className="w-5 h-5 md:w-6 md:h-6 mr-2" />
                 问题反馈 / FEEDBACK
               </h2>
               <button

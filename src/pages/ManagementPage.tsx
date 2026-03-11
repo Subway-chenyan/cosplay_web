@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar, Upload } from 'lucide-react'
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
@@ -7,14 +7,18 @@ import { eventService } from '../services/eventService'
 import { authService } from '../services/authService'
 import { api } from '../services/api'
 import { Group, Event } from '../types'
+// import { provinceNameMap } from '../data/chinaGeoJSON'
+import { chinaDivisions } from '../data/chinaDivisions'
 
 interface SearchableSelectProps {
   placeholder: string
   onChange: (value: string, item?: any) => void
-  searchFunction: (query: string) => Promise<any>
+  searchFunction?: (query: string) => Promise<any>
+  optionsList?: any[]
   displayField: string
   valueField: string
   disabled?: boolean
+  value?: string
 }
 
 interface DropdownSelectProps {
@@ -141,9 +145,11 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   placeholder,
   onChange,
   searchFunction,
+  optionsList,
   displayField,
   valueField,
-  disabled = false
+  disabled = false,
+  value
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -151,8 +157,31 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [loading, setLoading] = useState(false)
   const [selectedItem, setSelectedItem] = useState<any>(null)
 
+  // 处理初始值
   useEffect(() => {
-    if (searchQuery.length > 0) {
+    if (value) {
+      if (optionsList) {
+        const found = optionsList.find(opt => opt[valueField] === value);
+        if (found) setSelectedItem(found);
+      } else if (searchFunction) {
+        // 如果是异步的，可能需要通过ID加载详情，这里简化处理
+      }
+    } else {
+      setSelectedItem(null);
+    }
+  }, [value, optionsList, valueField]);
+
+  useEffect(() => {
+    if (optionsList) {
+      if (searchQuery.trim() === '') {
+        setOptions(optionsList)
+      } else {
+        const filtered = optionsList.filter(item =>
+          item[displayField].toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        setOptions(filtered)
+      }
+    } else if (searchFunction && searchQuery.length > 0) {
       setLoading(true)
       searchFunction(searchQuery)
         .then(response => {
@@ -168,12 +197,18 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     } else {
       setOptions([])
     }
-  }, [searchQuery, searchFunction])
+  }, [searchQuery, searchFunction, optionsList, displayField])
 
   const handleSelect = (item: any) => {
     setSelectedItem(item)
     onChange(item[valueField], item)
     setIsOpen(false)
+    setSearchQuery('')
+  }
+
+  const handleClear = () => {
+    setSelectedItem(null)
+    onChange('', null)
     setSearchQuery('')
   }
 
@@ -188,11 +223,31 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             setSearchQuery(e.target.value)
             setIsOpen(true)
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            if (optionsList) {
+              setOptions(optionsList)
+            }
+            setIsOpen(true)
+          }}
+          onBlur={() => {
+            // 延迟关闭，以便点击选项
+            setTimeout(() => setIsOpen(false), 200);
+          }}
           disabled={disabled}
           className="w-full p-4 border-0 focus:ring-0 font-black uppercase italic tracking-tighter bg-gray-50 placeholder-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+          {selectedItem && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-p5-red hover:scale-110 transition-transform"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </button>
+          )}
           {loading ? (
             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
           ) : (
@@ -201,21 +256,18 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </div>
       </div>
 
-      {isOpen && searchQuery.length > 0 && (
+      {isOpen && (optionsList || (searchFunction && searchQuery.length > 0)) && (
         <div className="absolute z-50 w-full mt-2 bg-white border-4 border-black shadow-[8px_8px_0_0_black] max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
           {loading ? (
             <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">SEARCHING / 搜索中...</div>
           ) : options.length > 0 ? (
-            options.map((item) => (
+            options.map((item, index) => (
               <div
-                key={item[valueField]}
-                onClick={() => handleSelect(item)}
+                key={index}
+                onMouseDown={() => handleSelect(item)}
                 className="px-4 py-3 hover:bg-black hover:text-white cursor-pointer border-b-2 border-gray-100 last:border-b-0 transition-colors"
               >
                 <div className="font-black italic uppercase tracking-tighter">{item[displayField]}</div>
-                {item.description && (
-                  <div className="text-xs text-gray-500 mt-1 truncate group-hover:text-white/80">{item.description}</div>
-                )}
               </div>
             ))
           ) : (
@@ -287,6 +339,23 @@ const ManagementPage: React.FC = () => {
   })
 
   const [selectedEventForEdit, setSelectedEventForEdit] = useState<Event | null>(null)
+
+  const [availableCities, setAvailableCities] = useState<{ name: string, id: string }[]>([])
+
+  const provinceOptions = useMemo(() => Object.keys(chinaDivisions).map(name => ({ name, id: name })), [])
+
+  // 当省份改变时，获取对应城市
+  useEffect(() => {
+    if (groupForm.province && chinaDivisions[groupForm.province]) {
+      const cities = chinaDivisions[groupForm.province].map(city => ({
+        name: city,
+        id: city
+      }))
+      setAvailableCities(cities)
+    } else {
+      setAvailableCities([])
+    }
+  }, [groupForm.province])
 
   // 检查认证状态
   useEffect(() => {
@@ -564,15 +633,37 @@ const ManagementPage: React.FC = () => {
       if (groupMode === 'create') {
         await groupService.createGroup(submitData)
         showMessage('success', '社团创建成功！')
+        resetGroupForm()
       } else {
         if (!groupForm.id) {
           showMessage('error', '请先选择要编辑的社团')
+          setLoading(false)
           return
         }
-        await groupService.updateGroup(groupForm.id, submitData)
+        const updatedGroup = await groupService.updateGroup(groupForm.id, submitData)
         showMessage('success', '社团信息更新成功！')
+        // 更新成功后，将表单数据更新为后端返回的最新数据，而不是重置
+        setSelectedGroupForEdit(updatedGroup)
+        setGroupForm({
+          id: updatedGroup.id,
+          name: updatedGroup.name,
+          description: updatedGroup.description,
+          logo: updatedGroup.logo || '',
+          founded_date: updatedGroup.founded_date || '',
+          province: updatedGroup.province || '',
+          city: updatedGroup.city || '',
+          location: updatedGroup.location || '',
+          website: updatedGroup.website || '',
+          email: updatedGroup.email || '',
+          phone: updatedGroup.phone || '',
+          weibo: updatedGroup.weibo || '',
+          wechat: updatedGroup.wechat || '',
+          qq_group: updatedGroup.qq_group || '',
+          bilibili: updatedGroup.bilibili || ''
+        })
+        setGroupLogoPreview(updatedGroup.logo || null)
+        setGroupLogoFile(null)
       }
-      resetGroupForm()
     } catch (error: any) {
       console.error('Error with group operation:', error)
       if (error.response?.data) {
@@ -691,7 +782,7 @@ const ManagementPage: React.FC = () => {
 
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 transform skew-y-1">
               <div>
-                <h1 className="text-5xl font-black text-black uppercase italic tracking-tighter mb-2 p5-text-shadow-red">
+                <h1 className="text-3xl md:text-5xl font-black text-black uppercase italic tracking-tighter mb-2 p5-text-shadow-red">
                   CORE OVERRIDE / 数据管理
                 </h1>
                 <p className="bg-black text-white px-4 py-1 inline-block font-black italic transform -skew-x-12">
@@ -771,7 +862,7 @@ const ManagementPage: React.FC = () => {
                       <div className="bg-black p-3 transform rotate-12 border-2 border-white">
                         <Plus className="w-8 h-8 text-white transform -rotate-12" />
                       </div>
-                      <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
+                      <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
                         DATA ENTRY / 添加新视频
                       </h2>
                     </div>
@@ -947,7 +1038,7 @@ const ManagementPage: React.FC = () => {
                         <div className="bg-p5-red p-3 transform -rotate-6 border-4 border-black shadow-[4px_4px_0_0_black]">
                           <Users className="w-8 h-8 text-white transform rotate-6" />
                         </div>
-                        <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow-red">
+                        <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow-red">
                           ALLIANCE / 社团信息管理
                         </h2>
                       </div>
@@ -1094,26 +1185,33 @@ const ManagementPage: React.FC = () => {
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
                             Province / 省份
                           </label>
-                          <input
-                            type="text"
-                            value={groupForm.province || ''}
-                            onChange={(e) => setGroupForm({ ...groupForm, province: e.target.value })}
-                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="REGION..."
-                          />
+                          <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
+                            <SearchableSelect
+                              placeholder="SELECT REGION..."
+                              value={groupForm.province}
+                              onChange={(value) => setGroupForm({ ...groupForm, province: value, city: '' })}
+                              optionsList={provinceOptions}
+                              displayField="name"
+                              valueField="id"
+                            />
+                          </div>
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
                             City / 城市
                           </label>
-                          <input
-                            type="text"
-                            value={groupForm.city || ''}
-                            onChange={(e) => setGroupForm({ ...groupForm, city: e.target.value })}
-                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4_0_0_black]"
-                            placeholder="CITY..."
-                          />
+                          <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
+                            <SearchableSelect
+                              placeholder={groupForm.province ? "SELECT CITY..." : "SELECT PROVINCE FIRST..."}
+                              value={groupForm.city}
+                              onChange={(value) => setGroupForm({ ...groupForm, city: value })}
+                              optionsList={availableCities}
+                              displayField="name"
+                              valueField="id"
+                              disabled={!groupForm.province}
+                            />
+                          </div>
                         </div>
 
                         <div className="relative">
@@ -1266,7 +1364,7 @@ const ManagementPage: React.FC = () => {
                         <div className="bg-black p-3 transform rotate-6 border-4 border-white shadow-[4px_4px_0_0_black]">
                           <Calendar className="w-8 h-8 text-white transform -rotate-6" />
                         </div>
-                        <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
+                        <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
                           {eventMode === 'create' ? 'BATTLE ENTRY / 添加新赛事' : 'ARCHIVE EDIT / 编辑赛事信息'}
                         </h2>
                       </div>
