@@ -329,7 +329,8 @@ const ManagementPage: React.FC = () => {
   // 赛事表单状态
   const [eventForm, setEventForm] = useState<Partial<Event>>({
     id: '',
-    date: '',
+    start_date: '',
+    end_date: '',
     competition: '',
     title: '',
     description: '',
@@ -439,7 +440,8 @@ const ManagementPage: React.FC = () => {
   const resetEventForm = () => {
     setEventForm({
       id: '',
-      date: '',
+      start_date: '',
+      end_date: '',
       competition: '',
       title: '',
       description: '',
@@ -455,7 +457,8 @@ const ManagementPage: React.FC = () => {
     setSelectedEventForEdit(event)
     setEventForm({
       id: event.id,
-      date: event.date,
+      start_date: event.start_date,
+      end_date: event.end_date,
       competition: event.competition,
       title: event.title,
       description: event.description || '',
@@ -469,15 +472,16 @@ const ManagementPage: React.FC = () => {
   // 处理赛事提交
   const handleEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!eventForm.date || !eventForm.competition || !eventForm.title) {
-      showMessage('error', '请填写必填字段：日期、比赛和标题')
+    if (!eventForm.start_date || !eventForm.competition || !eventForm.title) {
+      showMessage('error', '请填写必填字段：开始日期、比赛和标题')
       return
     }
 
     setLoading(true)
     try {
       const eventData = {
-        date: eventForm.date,
+        start_date: eventForm.start_date,
+        end_date: eventForm.end_date || eventForm.start_date, // 如果未设置结束日期，默认与开始日期相同
         competition: eventForm.competition,
         title: eventForm.title,
         description: eventForm.description || '',
@@ -1422,18 +1426,31 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Battle Date / 赛事日期 *
+                            Start Date / 开始日期 *
                           </label>
                           <input
                             type="date"
                             required
-                            value={eventForm.date}
-                            onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                            value={eventForm.start_date}
+                            onChange={(e) => setEventForm({ ...eventForm, start_date: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black]"
                           />
                         </div>
 
                         <div className="relative">
+                          <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
+                            End Date / 结束日期
+                          </label>
+                          <input
+                            type="date"
+                            value={eventForm.end_date}
+                            min={eventForm.start_date}
+                            onChange={(e) => setEventForm({ ...eventForm, end_date: e.target.value })}
+                            className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black]"
+                          />
+                        </div>
+
+                        <div className="relative md:col-span-2">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
                             Linked Competition / 关联比赛 *
                           </label>

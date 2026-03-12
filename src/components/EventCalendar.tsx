@@ -259,7 +259,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
             });
 
             if (selectedDate) {
-              const selectedDateStr = selectedDate.toDateString();
               displayEvents = displayEvents.filter(event => {
                 const start = new Date(event.start_date);
                 const end = new Date(event.end_date);
@@ -376,7 +375,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                     <div className="space-y-6">
                       <div className="bg-gray-100 p-4 border-l-8 border-black">
                         <p className="text-[10px] font-black text-p5-red uppercase italic mb-1">执行日期 / EXECUTION DATE</p>
-                        <p className="text-xl font-black italic">{selectedEvent.date}</p>
+                        <p className="text-xl font-black italic">
+                          {selectedEvent.start_date === selectedEvent.end_date
+                            ? selectedEvent.start_date
+                            : `${selectedEvent.start_date} ~ ${selectedEvent.end_date}`}
+                        </p>
                       </div>
 
                       <div className="bg-gray-100 p-4 border-l-8 border-p5-red">
