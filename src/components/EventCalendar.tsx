@@ -202,6 +202,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                   const isEnd = currD.getTime() === endD.getTime() || day.date.getDay() === 6
                   const isRealStart = currD.getTime() === startD.getTime()
 
+                  const isRealEnd = currD.getTime() === endD.getTime()
+
                   return (
                     <div
                       key={event.id}
@@ -210,10 +212,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                         setSelectedEvent(event);
                       }}
                       className={`
-                        text-[10px] bg-black text-white px-2 py-1 font-black italic uppercase tracking-tighter truncate hover:bg-p5-red transition-colors cursor-pointer border-p5-red
-                        ${isRealStart ? 'border-l-4' : ''}
-                        ${!isStart ? '-ml-[5px] md:-ml-[14px] pl-[5px] md:pl-[14px] border-l-0 rounded-l-none' : ''}
-                        ${!isEnd ? '-mr-[5px] md:-mr-[14px] pr-[5px] md:pr-[14px] border-r-0 rounded-r-none relative z-20' : ''}
+                        text-[10px] bg-black text-white px-2 py-1 font-black italic uppercase tracking-tighter truncate hover:bg-p5-red transition-colors cursor-pointer relative
+                        ${isRealStart ? 'border-l-4 border-l-p5-red' : 'border-l-0'}
+                        ${isRealEnd ? 'border-r-4 border-r-green-500' : 'border-r-0'}
+                        ${!isStart ? '-ml-[5px] md:-ml-[14px] pl-[5px] md:pl-[14px] rounded-l-none' : ''}
+                        ${!isEnd ? '-mr-[5px] md:-mr-[14px] pr-[5px] md:pr-[14px] rounded-r-none relative z-20' : ''}
                       `}
                       title={`${event.title} - ${event.competition_name}`}
                     >
