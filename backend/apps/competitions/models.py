@@ -63,8 +63,8 @@ class Event(models.Model):
     赛事信息模型
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    start_date = models.DateField(verbose_name='赛事开始日期')
-    end_date = models.DateField(verbose_name='赛事结束日期')
+    start_date = models.DateField(verbose_name='赛事开始日期', null=True, blank=True)
+    end_date = models.DateField(verbose_name='赛事结束日期', null=True, blank=True)
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE, 
                                    related_name='events', verbose_name='关联比赛')
     title = models.CharField(max_length=200, verbose_name='赛事标题')
