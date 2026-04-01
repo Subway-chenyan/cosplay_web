@@ -72,7 +72,21 @@ class Event(models.Model):
     contact = models.CharField(max_length=200, blank=True, verbose_name='联系方式')
     website = models.URLField(blank=True, verbose_name='官网链接')
     promotional_image = models.URLField(blank=True, verbose_name='宣传图链接')
-    
+    region = models.CharField(max_length=100, blank=True, default='', verbose_name='赛区')
+    stage = models.CharField(
+        max_length=20,
+        choices=[('preliminary', '初赛'), ('advancing', '复赛'), ('final', '决赛')],
+        blank=True,
+        default='',
+        verbose_name='赛事阶段'
+    )
+    videos = models.ManyToManyField(
+        'videos.Video',
+        blank=True,
+        related_name='events',
+        verbose_name='关联视频'
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     
@@ -84,6 +98,8 @@ class Event(models.Model):
             models.Index(fields=['start_date']),
             models.Index(fields=['end_date']),
             models.Index(fields=['competition', 'start_date']),
+            models.Index(fields=['region']),
+            models.Index(fields=['stage']),
         ]
     
     def __str__(self):
