@@ -134,6 +134,14 @@ export interface PaginatedResponse<T> {
   results: T[]
 }
 
+export interface EventVideo {
+  id: string
+  bv_number: string
+  title: string
+  url: string
+  thumbnail: string
+}
+
 export interface Event {
   id: string
   start_date: string
@@ -145,6 +153,10 @@ export interface Event {
   contact: string
   website: string
   promotional_image: string
+  region: string
+  stage: 'preliminary' | 'advancing' | 'final' | ''
+  stage_display: string
+  videos: EventVideo[]
   created_at: string
   updated_at: string
 }
