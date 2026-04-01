@@ -35,5 +35,25 @@ export const eventService = {
   // 删除赛事
   deleteEvent: async (id: string): Promise<void> => {
     await api.delete<void>(`/competitions/events/${id}/`)
-  }
+  },
+
+  // 获取当前活跃赛事
+  getActiveEvents: async (): Promise<Event[]> => {
+    return await api.get<Event[]>('/competitions/events/active/')
+  },
+
+  // 获取比赛赛程
+  getCompetitionSchedule: async (competitionId: string): Promise<Event[]> => {
+    return await api.get<Event[]>(`/competitions/competitions/${competitionId}/schedule/`)
+  },
+
+  // 关联视频到赛事
+  linkVideo: async (eventId: string, videoId: string): Promise<Event> => {
+    return await api.post<Event>(`/competitions/events/${eventId}/link_video/`, { video_id: videoId })
+  },
+
+  // 取消关联视频
+  unlinkVideo: async (eventId: string, videoId: string): Promise<Event> => {
+    return await api.post<Event>(`/competitions/events/${eventId}/unlink_video/`, { video_id: videoId })
+  },
 }
