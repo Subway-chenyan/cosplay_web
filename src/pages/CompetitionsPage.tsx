@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
@@ -7,11 +7,13 @@ import { Trophy, Calendar } from 'lucide-react'
 import { Competition } from '../types'
 import EventCalendar from '../components/EventCalendar'
 import Pagination from '../components/Pagination'
+import ScheduleTab from '../components/schedule/ScheduleTab'
 
 function CompetitionsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { competitions, loading, error, pagination, currentPage } = useSelector((state: RootState) => state.competitions)
+  const [activeTab, setActiveTab] = useState<'list' | 'schedule'>('list')
 
   useEffect(() => {
     if (competitions.length === 0) {
@@ -67,6 +69,30 @@ function CompetitionsPage() {
         </div>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="flex space-x-4 mb-8 transform skew-x-1">
+        <button
+          onClick={() => setActiveTab('list')}
+          className={`px-6 py-2 transform -skew-x-12 font-black uppercase italic transition-all ${activeTab === 'list'
+            ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
+            : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
+          }`}
+        >
+          <span className="transform skew-x-12 inline-block">比赛列表 / ARCHIVE</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('schedule')}
+          className={`px-6 py-2 transform -skew-x-12 font-black uppercase italic transition-all ${activeTab === 'schedule'
+            ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
+            : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
+          }`}
+        >
+          <span className="transform skew-x-12 inline-block">当前赛程 / LIVE SCHEDULE</span>
+        </button>
+      </div>
+
+      {activeTab === 'list' && (
+      <>
       {competitions && competitions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {competitions.map((competition) => (
@@ -171,6 +197,10 @@ function CompetitionsPage() {
       <div className="mt-16">
         <EventCalendar />
       </div>
+      </>
+      )}
+
+      {activeTab === 'schedule' && <ScheduleTab />}
     </div>
   )
 }
