@@ -96,6 +96,18 @@ class CompetitionViewSet(viewsets.ModelViewSet):
             'competition': self.get_serializer(competition).data
         })
 
+    @action(detail=True, methods=['get'])
+    def schedule(self, request, pk=None):
+        """获取比赛的完整赛程"""
+        competition = self.get_object()
+        events = Event.objects.filter(
+            competition=competition
+        ).select_related('competition').prefetch_related('videos').order_by(
+            'region', 'stage', 'start_date'
+        )
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)
+
 
 class CompetitionYearVideosView(generics.ListAPIView):
     """
@@ -191,6 +203,58 @@ class EventViewSet(viewsets.ModelViewSet):
             start_date__lte=end_date,
             end_date__gte=start_date
         ).select_related('competition').order_by('start_date')
-        
+
         serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def active(self, request):
+        """获取当前进行中或即将开始的赛事"""
+        import datetime as dt
+        today = dt.date.today()
+        threshold = today - dt.timedelta(days=30)
+
+        events = Event.objects.filter(
+            end_date__gte=threshold
+        ).select_related('competition').prefetch_related('videos').order_by(
+            'competition__name', 'region', 'stage', 'start_date'
+        )
+
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def link_video(self, request, pk=None):
+        """关联视频到赛事"""
+        event = self.get_object()
+        video_id = request.data.get('video_id')
+
+        if not video_id:
+            return Response({'error': '需要提供video_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            video = Video.objects.get(id=video_id)
+        except Video.DoesNotExist:
+            return Response({'error': '视频不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        event.videos.add(video)
+        serializer = self.get_serializer(event)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def unlink_video(self, request, pk=None):
+        """取消关联视频"""
+        event = self.get_object()
+        video_id = request.data.get('video_id')
+
+        if not video_id:
+            return Response({'error': '需要提供video_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            video = Video.objects.get(id=video_id)
+        except Video.DoesNotExist:
+            return Response({'error': '视频不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        event.videos.remove(video)
+        serializer = self.get_serializer(event)
         return Response(serializer.data)
