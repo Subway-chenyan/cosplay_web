@@ -46,7 +46,7 @@ function CompetitionDetailPage() {
   const [hasMore, setHasMore] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [scheduleEvents, setScheduleEvents] = useState<EventType[]>([])
-  const [scheduleLoading, setScheduleLoading] = useState(true)
+  const [_scheduleLoading, setScheduleLoading] = useState(true)
 
   // 获取当前比赛的自定义配置
   const customConfig = getCompetitionCustomConfig(id || '')

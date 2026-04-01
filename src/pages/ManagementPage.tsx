@@ -487,7 +487,9 @@ const ManagementPage: React.FC = () => {
         description: eventForm.description || '',
         contact: eventForm.contact || '',
         website: eventForm.website || '',
-        promotional_image: eventForm.promotional_image || ''
+        promotional_image: eventForm.promotional_image || '',
+        region: '',
+        stage: '' as const,
       }
 
       if (eventMode === 'create') {

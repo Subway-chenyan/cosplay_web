@@ -23,12 +23,12 @@ export const eventService = {
   },
 
   // 创建赛事
-  createEvent: async (eventData: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'competition_name'>): Promise<Event> => {
+  createEvent: async (eventData: Partial<Event>): Promise<Event> => {
     return await api.post<Event>('/competitions/events/', eventData)
   },
 
   // 更新赛事
-  updateEvent: async (id: string, eventData: Partial<Omit<Event, 'id' | 'created_at' | 'updated_at' | 'competition_name'>>): Promise<Event> => {
+  updateEvent: async (id: string, eventData: Partial<Event>): Promise<Event> => {
     return await api.patch<Event>(`/competitions/events/${id}/`, eventData)
   },
 
