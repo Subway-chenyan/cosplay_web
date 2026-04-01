@@ -18,8 +18,9 @@ class EventAdmin(admin.ModelAdmin):
     """
     赛事信息管理后台
     """
-    list_display = ['title', 'competition', 'start_date', 'end_date', 'contact', 'created_at']
-    list_filter = ['start_date', 'end_date', 'competition', 'created_at']
-    search_fields = ['title', 'description', 'contact']
+    list_display = ['title', 'competition', 'region', 'stage', 'start_date', 'end_date', 'contact', 'created_at']
+    list_filter = ['start_date', 'end_date', 'competition', 'region', 'stage', 'created_at']
+    search_fields = ['title', 'description', 'contact', 'region']
     ordering = ['-start_date']
     date_hierarchy = 'start_date'
+    filter_horizontal = ['videos']
