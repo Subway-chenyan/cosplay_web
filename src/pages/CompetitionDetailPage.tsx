@@ -12,6 +12,9 @@ import {
   getCompetitionCustomConfig,
   getAwardSortWeight
 } from '../config/competitionCustomConfig'
+import { eventService } from '../services/eventService'
+import { Event as EventType } from '../types'
+import CompetitionSchedule from '../components/schedule/CompetitionSchedule'
 import {
   ArrowLeft,
   Trophy,
@@ -42,6 +45,8 @@ function CompetitionDetailPage() {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [scheduleEvents, setScheduleEvents] = useState<EventType[]>([])
+  const [scheduleLoading, setScheduleLoading] = useState(true)
 
   // 获取当前比赛的自定义配置
   const customConfig = getCompetitionCustomConfig(id || '')
@@ -66,6 +71,17 @@ function CompetitionDetailPage() {
       dispatch(fetchCompetitionAwardRecords({ competitionId: id }) as any)
     }
   }, [dispatch, id, selectedYear])
+
+  // 获取比赛赛程
+  useEffect(() => {
+    if (id) {
+      setScheduleLoading(true)
+      eventService.getCompetitionSchedule(id)
+        .then(events => setScheduleEvents(events))
+        .catch(err => console.error('Failed to fetch schedule:', err))
+        .finally(() => setScheduleLoading(false))
+    }
+  }, [id])
 
   const competition = competitions.find(c => c.id === id)
 
@@ -392,6 +408,27 @@ function CompetitionDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* 赛程时间线 */}
+      {scheduleEvents.length > 0 && (
+        <div className="space-y-8">
+          <div className="flex items-center space-x-4 transform skew-x-1">
+            <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
+              <Calendar className="w-8 h-8 text-white transform -rotate-12" />
+            </div>
+            <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
+              SCHEDULE / 赛程时间线
+            </h2>
+          </div>
+          <CompetitionSchedule
+            competitionName={competition.name}
+            events={scheduleEvents}
+            isAdmin={false}
+            onLinkVideo={() => {}}
+            onUnlinkVideo={() => {}}
+          />
+        </div>
+      )}
 
       {/* 筛选器 */}
       <div className="relative group">
