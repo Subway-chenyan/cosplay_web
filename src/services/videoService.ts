@@ -187,6 +187,16 @@ class VideoService {
     window.URL.revokeObjectURL(url)
   }
 
+  // 关联赛事到视频
+  async linkEvent(videoId: string, eventId: string): Promise<Video> {
+    return api.post<Video>(`/videos/${videoId}/link_event/`, { event_id: eventId })
+  }
+
+  // 取消关联赛事
+  async unlinkEvent(videoId: string, eventId: string): Promise<Video> {
+    return api.post<Video>(`/videos/${videoId}/unlink_event/`, { event_id: eventId })
+  }
+
   // 搜索社团（用于视频创建时选择社团）
   async searchGroups(search?: string, pageSize: number = 20) {
     const queryParams = api.buildQueryParams({

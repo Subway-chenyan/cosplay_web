@@ -388,6 +388,46 @@ class VideoViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(uploaded_by=self.request.user)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def link_event(self, request, pk=None):
+        """关联赛事到视频"""
+        video = self.get_object()
+        event_id = request.data.get('event_id')
+
+        if not event_id:
+            return Response({'error': '需要提供event_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.competitions.models import Event
+        try:
+            event = Event.objects.get(pk=event_id)
+        except Event.DoesNotExist:
+            return Response({'error': '赛事不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        event.videos.add(video)
+        video.refresh_from_db()
+        serializer = self.get_serializer(video)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def unlink_event(self, request, pk=None):
+        """取消关联赛事"""
+        video = self.get_object()
+        event_id = request.data.get('event_id')
+
+        if not event_id:
+            return Response({'error': '需要提供event_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.competitions.models import Event
+        try:
+            event = Event.objects.get(pk=event_id)
+        except Event.DoesNotExist:
+            return Response({'error': '赛事不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        event.videos.remove(video)
+        video.refresh_from_db()
+        serializer = self.get_serializer(video)
+        return Response(serializer.data)
     
     @action(
         detail=False,

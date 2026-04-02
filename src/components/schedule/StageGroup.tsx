@@ -1,4 +1,4 @@
-import { Swords, Target, Trophy, Flag } from 'lucide-react'
+import { Swords, Target, Trophy, Flag, Crown } from 'lucide-react'
 import { Event } from '../../types'
 import EventCard from './EventCard'
 
@@ -9,9 +9,11 @@ interface StageGroupProps {
   isAdmin?: boolean
   onLinkVideo?: (eventId: string) => void
   onUnlinkVideo?: (eventId: string, videoId: string) => void
+  isFinal?: boolean
 }
 
-function getStageIcon(stage: string) {
+function getStageIcon(stage: string, isFinal?: boolean) {
+  if (isFinal) return <Crown className="w-5 h-5 text-white transform -rotate-12" />
   switch (stage) {
     case 'preliminary':
       return <Swords className="w-5 h-5 text-white transform -rotate-12" />
@@ -37,6 +39,14 @@ function getStageLabel(stage: string): string {
   }
 }
 
+/** Check if the event has ended */
+function isEventPast(endDate: string): boolean {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const end = new Date(endDate + 'T23:59:59')
+  return end < today
+}
+
 export default function StageGroup({
   stage,
   stageDisplay,
@@ -44,19 +54,40 @@ export default function StageGroup({
   isAdmin,
   onLinkVideo,
   onUnlinkVideo,
+  isFinal = false,
 }: StageGroupProps) {
   if (!events || events.length === 0) return null
+
+  const iconBg = isFinal ? 'bg-amber-500' : 'bg-p5-red'
+  const borderAccent = isFinal ? 'border-amber-500' : 'border-p5-red'
+  const shadowColor = isFinal ? '#b45309' : '#d90614'
+
+  // Sort: completed events first (sorted by end_date desc), then upcoming (sorted by start_date asc)
+  const sortedEvents = [...events].sort((a, b) => {
+    const aPast = isEventPast(a.end_date)
+    const bPast = isEventPast(b.end_date)
+    if (aPast && !bPast) return -1
+    if (!aPast && bPast) return 1
+    // Both past: most recent first
+    if (aPast && bPast) return new Date(b.end_date).getTime() - new Date(a.end_date).getTime()
+    // Both upcoming: soonest first
+    return new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  })
+
+  // Separate completed and upcoming for layout
+  const completedEvents = sortedEvents.filter((e) => isEventPast(e.end_date))
+  const upcomingEvents = sortedEvents.filter((e) => !isEventPast(e.end_date))
 
   return (
     <div className="mb-8">
       {/* Stage header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="bg-p5-red p-2 transform rotate-12 border-2 border-black shadow-[3px_3px_0_0_black]">
-          {getStageIcon(stage)}
+        <div className={`${iconBg} p-2 transform rotate-12 border-2 border-black shadow-[3px_3px_0_0_black]`}>
+          {getStageIcon(stage, isFinal)}
         </div>
         <div>
-          <h3 className="text-lg md:text-xl font-black text-black uppercase italic tracking-tighter"
-            style={{ textShadow: '2px 2px 0px #d90614' }}
+          <h3 className={`text-lg md:text-xl font-black uppercase italic tracking-tighter ${isFinal ? 'text-amber-700' : 'text-black'}`}
+            style={{ textShadow: `2px 2px 0px ${shadowColor}` }}
           >
             {stageDisplay || getStageLabel(stage)}
           </h3>
@@ -64,21 +95,60 @@ export default function StageGroup({
             {events.length} 场赛事 / {events.length} EVENTS
           </p>
         </div>
-        <div className="flex-1 border-b-4 border-p5-red ml-2"></div>
+        <div className={`flex-1 border-b-4 ${borderAccent} ml-2`}></div>
       </div>
 
-      {/* Event cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            isAdmin={isAdmin}
-            onLinkVideo={onLinkVideo}
-            onUnlinkVideo={onUnlinkVideo}
-          />
-        ))}
-      </div>
+      {/* Completed events: full-width single column for better video display */}
+      {completedEvents.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-px flex-1 bg-gray-300"></div>
+            <span className="text-[10px] font-black uppercase italic text-gray-500 px-2">
+              已完成 / COMPLETED ({completedEvents.length})
+            </span>
+            <div className="h-px flex-1 bg-gray-300"></div>
+          </div>
+          <div className="space-y-4">
+            {completedEvents.map((event) => (
+              <EventCard
+                key={event.id}
+                event={event}
+                isAdmin={isAdmin}
+                onLinkVideo={onLinkVideo}
+                onUnlinkVideo={onUnlinkVideo}
+                isFinal={isFinal}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Upcoming events: compact grid */}
+      {upcomingEvents.length > 0 && (
+        <div>
+          {completedEvents.length > 0 && (
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-gray-300"></div>
+              <span className="text-[10px] font-black uppercase italic text-gray-500 px-2">
+                即将开始 / UPCOMING ({upcomingEvents.length})
+              </span>
+              <div className="h-px flex-1 bg-gray-300"></div>
+            </div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {upcomingEvents.map((event) => (
+              <EventCard
+                key={event.id}
+                event={event}
+                isAdmin={isAdmin}
+                onLinkVideo={onLinkVideo}
+                onUnlinkVideo={onUnlinkVideo}
+                isFinal={isFinal}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

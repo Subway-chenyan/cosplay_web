@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchVideoDetail } from '../store/slices/videosSlice'
 import { groupService } from '../services/groupService'
-import { Group } from '../types'
+import { eventService } from '../services/eventService'
+import { authService } from '../services/authService'
+import { api } from '../services/api'
+import { Group, VideoEvent } from '../types'
 import {
   ArrowLeft,
   Calendar,
@@ -12,8 +15,111 @@ import {
   ExternalLink,
   Play,
   Globe,
-  Loader2
+  Loader2,
+  Trophy,
+  Search,
+  X,
+  Plus,
+  Trash2
 } from 'lucide-react'
+
+/** Search events modal for binding */
+function EventBindModal({ videoId, isOpen, onClose, onBound }: {
+  videoId: string
+  isOpen: boolean
+  onClose: () => void
+  onBound: () => void
+}) {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<{ id: string; title: string; region: string; stage_display: string; start_date: string }[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const searchEvents = useCallback(async (q: string) => {
+    if (!q.trim()) { setResults([]); return }
+    setLoading(true)
+    try {
+      const data = await api.get<any[]>(`/competitions/events/?search=${encodeURIComponent(q)}&page_size=10`)
+      setResults(Array.isArray(data) ? data : (data as any).results || [])
+    } catch { setResults([]) }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const t = setTimeout(() => searchEvents(query), 400)
+    return () => clearTimeout(t)
+  }, [query, isOpen, searchEvents])
+
+  useEffect(() => { if (isOpen) { setQuery(''); setResults([]) } }, [isOpen])
+  useEffect(() => {
+    if (!isOpen) return
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', h)
+    return () => document.removeEventListener('keydown', h)
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
+  const handleBind = async (eventId: string) => {
+    try {
+      await eventService.linkVideo(eventId, videoId)
+      onBound()
+      onClose()
+    } catch { /* silent */ }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative w-full max-w-lg z-10">
+        <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-2 border-2 border-black z-0"></div>
+        <div className="relative z-10 bg-white border-4 border-black transform -skew-x-1 overflow-hidden">
+          <div className="bg-black text-white px-4 py-3 flex items-center justify-between border-b-4 border-p5-red">
+            <div className="flex items-center gap-2 transform skew-x-1">
+              <Trophy className="w-5 h-5 text-p5-red" />
+              <h3 className="font-black uppercase italic text-sm">绑定赛事 / BIND EVENT</h3>
+            </div>
+            <button onClick={onClose} className="w-8 h-8 bg-p5-red text-white flex items-center justify-center border-2 border-white hover:bg-white hover:text-p5-red transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="p-4 transform skew-x-1">
+            <div className="relative">
+              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                placeholder="搜索赛事名称..."
+                className="w-full border-2 border-black px-3 py-2 pr-10 text-sm font-bold focus:outline-none focus:border-p5-red focus:ring-2 focus:ring-p5-red/20" autoFocus />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            </div>
+          </div>
+          <div className="px-4 pb-4 max-h-80 overflow-y-auto transform skew-x-1">
+            {loading && <div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 text-p5-red animate-spin" /></div>}
+            {!loading && query && results.length === 0 && <p className="text-center py-8 text-sm text-gray-500 font-bold italic">无搜索结果</p>}
+            {!loading && results.length > 0 && (
+              <div className="space-y-2">
+                {results.map((ev) => (
+                  <button key={ev.id} onClick={() => handleBind(ev.id)}
+                    className="w-full text-left flex items-center gap-3 p-2 border-2 border-gray-200 hover:border-p5-red hover:bg-red-50 transition-all">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-black uppercase italic text-black truncate">{ev.title}</p>
+                      <p className="text-[10px] text-gray-400 font-bold">{ev.region} · {ev.stage_display || ev.start_date}</p>
+                    </div>
+                    <Plus className="w-4 h-4 text-p5-red" />
+                  </button>
+                ))}
+              </div>
+            )}
+            {!query && !loading && (
+              <div className="text-center py-6">
+                <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-xs text-gray-400 font-bold italic">输入关键词搜索赛事</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function VideoDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -23,7 +129,21 @@ function VideoDetailPage() {
   const [isPlayerLoaded, setIsPlayerLoaded] = useState(false)
 
   const [groupDetails, setGroupDetails] = useState<Group | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [bindModalOpen, setBindModalOpen] = useState(false)
+  const [videoEvents, setVideoEvents] = useState<VideoEvent[]>([])
 
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (authService.isAuthenticated()) {
+        try {
+          const user = await authService.getCurrentUser()
+          setIsAdmin(user.is_staff || user.is_superuser)
+        } catch { setIsAdmin(false) }
+      }
+    }
+    checkAdmin()
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -40,6 +160,8 @@ function VideoDetailPage() {
             const group = await groupService.getGroupById(currentVideo.group)
             setGroupDetails(group)
           }
+          // Set events from video data
+          setVideoEvents(currentVideo.events || [])
         } catch (error) {
           console.error('Error fetching related data:', error)
         }
@@ -49,11 +171,18 @@ function VideoDetailPage() {
     fetchRelatedData()
   }, [currentVideo, id])
 
-  const video = currentVideo && currentVideo.id === id ? currentVideo : null
+  const refreshVideo = () => {
+    if (id) dispatch(fetchVideoDetail(id))
+  }
 
-  // const formatDate = (dateString: string) => {
-  //   return new Date(dateString).toLocaleDateString('zh-CN')
-  // }
+  const handleUnbindEvent = async (eventId: string) => {
+    try {
+      await eventService.unlinkVideo(eventId, id!)
+      refreshVideo()
+    } catch { /* silent */ }
+  }
+
+  const video = currentVideo && currentVideo.id === id ? currentVideo : null
 
   // 从B站URL提取视频ID和分P信息
   const getBilibiliVideoInfo = (url: string) => {
@@ -99,6 +228,12 @@ function VideoDetailPage() {
   }
 
   const { bvNumber, page } = getBilibiliVideoInfo(video.url)
+
+  /** Format date */
+  const fmtDate = (d: string) => {
+    const dt = new Date(d + 'T00:00:00')
+    return `${dt.getMonth() + 1}月${dt.getDate()}日`
+  }
 
   return (
     <div className="space-y-6">
@@ -242,8 +377,86 @@ function VideoDetailPage() {
           </div>
         </div>
 
-        {/* 右侧社团信息 */}
+        {/* 右侧信息栏 */}
         <div className="space-y-8">
+          {/* ========== 赛事信息 / Competition Info ========== */}
+          {(videoEvents.length > 0 || isAdmin) && (
+            <div className="relative group">
+              <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 z-0 shadow-lg"></div>
+              <div className="relative z-10 bg-white border-4 border-black p-6 overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-10 -rotate-45 translate-x-16 -translate-y-16"></div>
+
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-black text-black uppercase italic border-b-4 border-p5-red inline-block" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                    赛事信息 / EVENTS
+                  </h2>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setBindModalOpen(true)}
+                      className="bg-p5-red text-white px-2 py-1 text-[10px] font-black uppercase italic transform -skew-x-6 hover:bg-black transition-colors inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span className="transform skew-x-6 inline-block">绑定</span>
+                    </button>
+                  )}
+                </div>
+
+                {videoEvents.length > 0 ? (
+                  <div className="space-y-3">
+                    {videoEvents.map((ev) => (
+                      <div key={ev.id} className="p-3 bg-gray-50 border-2 border-black transform -skew-x-1 relative group/ev hover:bg-red-50 transition-colors">
+                        <div className="transform skew-x-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-black text-black uppercase italic truncate">
+                                {ev.title}
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                {ev.competition_name && (
+                                  <span className="text-[10px] font-bold text-p5-red bg-p5-red/10 px-1.5 py-0.5">
+                                    {ev.competition_name}
+                                  </span>
+                                )}
+                                {ev.region && (
+                                  <span className="text-[10px] font-bold text-gray-500 inline-flex items-center gap-0.5">
+                                    <MapPin className="w-2.5 h-2.5" />
+                                    {ev.region}
+                                  </span>
+                                )}
+                                {ev.stage_display && (
+                                  <span className="text-[10px] font-black uppercase italic text-white bg-black px-1.5 py-0.5 transform -skew-x-6">
+                                    <span className="transform skew-x-6 inline-block">{ev.stage_display}</span>
+                                  </span>
+                                )}
+                              </div>
+                              {ev.start_date && (
+                                <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400 font-bold">
+                                  <Calendar className="w-2.5 h-2.5" />
+                                  {fmtDate(ev.start_date)}{ev.end_date && ev.end_date !== ev.start_date ? ` - ${fmtDate(ev.end_date)}` : ''}
+                                </div>
+                              )}
+                            </div>
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleUnbindEvent(ev.id)}
+                                className="w-6 h-6 bg-gray-200 text-gray-500 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors flex-shrink-0"
+                                title="取消绑定"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 italic">未绑定赛事 / NO EVENTS BOUND</p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* 社团详细信息 */}
           {groupDetails && (
             <div className="relative group">
@@ -330,9 +543,15 @@ function VideoDetailPage() {
             </div>
           )}
         </div>
-
-
       </div>
+
+      {/* Event Bind Modal */}
+      <EventBindModal
+        videoId={id || ''}
+        isOpen={bindModalOpen}
+        onClose={() => setBindModalOpen(false)}
+        onBound={refreshVideo}
+      />
     </div>
   )
 }

@@ -17,9 +17,11 @@ class CompetitionYearSerializer(serializers.ModelSerializer):
 
 class EventVideoSerializer(serializers.ModelSerializer):
     """精简的视频序列化器，用于嵌套在赛事中"""
+    group_name = serializers.CharField(source='group.name', read_only=True, default='')
+
     class Meta:
         model = Video
-        fields = ['id', 'bv_number', 'title', 'url', 'thumbnail']
+        fields = ['id', 'bv_number', 'title', 'url', 'thumbnail', 'group_name']
 
 
 class EventSerializer(serializers.ModelSerializer):

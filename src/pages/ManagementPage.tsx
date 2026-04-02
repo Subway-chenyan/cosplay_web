@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar, Upload } from 'lucide-react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar, Upload, Trophy, X } from 'lucide-react'
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
 import { videoService } from '../services/videoService'
@@ -326,6 +326,13 @@ const ManagementPage: React.FC = () => {
 
   const [selectedGroupForEdit, setSelectedGroupForEdit] = useState<Group | null>(null)
 
+  // 视频赛事绑定状态
+  const eventSearchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [videoEventSearch, setVideoEventSearch] = useState('')
+  const [videoEventResults, setVideoEventResults] = useState<{ id: string; title: string; region: string; stage_display: string; start_date: string; competition_name: string }[]>([])
+  const [videoEventSearching, setVideoEventSearching] = useState(false)
+  const [selectedEvents, setSelectedEvents] = useState<{ id: string; title: string; competition_name: string; region: string; stage_display: string }[]>([])
+
   // 赛事表单状态
   const [eventForm, setEventForm] = useState<Partial<Event>>({
     id: '',
@@ -412,6 +419,22 @@ const ManagementPage: React.FC = () => {
       competition: '',
       uploaded_by_username: ''
     })
+    setSelectedEvents([])
+    setVideoEventSearch('')
+    setVideoEventResults([])
+  }
+
+  // 搜索赛事用于绑定
+  const searchEventsForBinding = async (q: string) => {
+    setVideoEventSearching(true)
+    try {
+      const url = q.trim()
+        ? `/competitions/events/?search=${encodeURIComponent(q)}&page_size=50`
+        : `/competitions/events/?page_size=50`
+      const data = await api.get<any>(url)
+      setVideoEventResults(Array.isArray(data) ? data : (data as any).results || [])
+    } catch { setVideoEventResults([]) }
+    finally { setVideoEventSearching(false) }
   }
 
   const resetGroupForm = () => {
@@ -565,7 +588,17 @@ const ManagementPage: React.FC = () => {
         // 不传递uploaded_by_username，让后端处理
       }
 
-      await videoService.createVideo(submitData)
+      const created = await videoService.createVideo(submitData)
+
+      // 自动绑定选中的赛事
+      if (selectedEvents.length > 0) {
+        try {
+          for (const ev of selectedEvents) {
+            await videoService.linkEvent(created.id, ev.id)
+          }
+        } catch { /* silent */ }
+      }
+
       showMessage('success', '视频信息添加成功！')
       resetVideoForm()
     } catch (error) {
@@ -1003,6 +1036,97 @@ const ManagementPage: React.FC = () => {
                             />
                           </div>
                         </div>
+                      </div>
+
+                      {/* 赛事选择 - 搜索并多选赛事 */}
+                      <div className="border-4 border-black p-6 bg-gray-50 shadow-[4px_4px_0_0_black]">
+                        <div className="flex items-center gap-3 mb-4 border-b-4 border-p5-red pb-2">
+                          <div className="bg-p5-red p-2 border-2 border-black">
+                            <Trophy className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="text-sm font-black text-black uppercase italic tracking-tighter">
+                            BIND EVENTS / 绑定赛事
+                          </h3>
+                          {selectedEvents.length > 0 && (
+                            <span className="text-[10px] font-bold text-p5-red bg-p5-red/10 px-2 py-0.5">
+                              已选 {selectedEvents.length} 个
+                            </span>
+                          )}
+                        </div>
+
+                        {/* 已选择的赛事标签 */}
+                        {selectedEvents.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {selectedEvents.map(ev => (
+                              <span key={ev.id} className="inline-flex items-center gap-1.5 px-2 py-1 border-2 border-black bg-white text-xs font-black uppercase italic">
+                                <span className="truncate max-w-[180px]">{ev.title}</span>
+                                {ev.competition_name && <span className="text-p5-red font-bold">({ev.competition_name})</span>}
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedEvents(prev => prev.filter(e => e.id !== ev.id))}
+                                  className="w-4 h-4 bg-black text-white flex items-center justify-center hover:bg-p5-red transition-colors flex-shrink-0"
+                                >
+                                  <X className="w-2.5 h-2.5" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* 搜索赛事输入框 */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={videoEventSearch}
+                            onChange={(e) => {
+                              const q = e.target.value
+                              setVideoEventSearch(q)
+                              if (eventSearchTimerRef.current) clearTimeout(eventSearchTimerRef.current)
+                              eventSearchTimerRef.current = setTimeout(() => searchEventsForBinding(q), 300)
+                            }}
+                            onFocus={() => searchEventsForBinding(videoEventSearch)}
+                            className="w-full p-3 border-4 border-black font-bold focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-white text-sm"
+                            placeholder="输入赛事名称搜索并选择..."
+                          />
+                          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          {videoEventSearching && (
+                            <Loader2 className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 text-p5-red animate-spin" />
+                          )}
+                        </div>
+
+                        {/* 搜索结果下拉 */}
+                        {videoEventResults.length > 0 && (
+                          <div className="mt-2 max-h-48 overflow-y-auto border-2 border-black bg-white">
+                            {videoEventResults
+                              .filter(ev => !selectedEvents.some(s => s.id === ev.id))
+                              .map(ev => (
+                                <button
+                                  key={ev.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedEvents(prev => [...prev, {
+                                      id: ev.id,
+                                      title: ev.title,
+                                      competition_name: ev.competition_name || '',
+                                      region: ev.region || '',
+                                      stage_display: ev.stage_display || ''
+                                    }])
+                                  }}
+                                  className="w-full text-left flex items-center gap-3 p-2 border-b border-gray-100 hover:bg-red-50 transition-all"
+                                >
+                                  <Plus className="w-4 h-4 text-p5-red flex-shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-black uppercase italic text-black truncate">{ev.title}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold">{ev.region}{ev.stage_display ? ` · ${ev.stage_display}` : ''}{ev.start_date ? ` · ${ev.start_date}` : ''}</p>
+                                  </div>
+                                </button>
+                              ))
+                            }
+                          </div>
+                        )}
+                        {videoEventSearch && !videoEventSearching && videoEventResults.filter(ev => !selectedEvents.some(s => s.id === ev.id)).length === 0 && (
+                          <p className="text-xs text-gray-400 italic mt-2 text-center py-2">无搜索结果</p>
+                        )}
                       </div>
 
                       <div className="flex justify-end space-x-6 pt-6">

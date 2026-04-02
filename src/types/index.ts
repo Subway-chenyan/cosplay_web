@@ -15,6 +15,7 @@ export interface Video {
   created_at: string
   updated_at: string
   tags: Tag[]
+  events?: VideoEvent[]
 }
 
 export interface Group {
@@ -140,6 +141,20 @@ export interface EventVideo {
   title: string
   url: string
   thumbnail: string
+  group_name?: string
+}
+
+/** Event info embedded in Video detail (from VideoEventSerializer) */
+export interface VideoEvent {
+  id: string
+  title: string
+  competition: string
+  competition_name: string
+  region: string
+  stage: 'preliminary' | 'advancing' | 'final' | ''
+  stage_display: string
+  start_date: string
+  end_date: string
 }
 
 export interface Event {

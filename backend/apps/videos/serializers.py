@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Video
 from apps.tags.models import Tag
+from apps.competitions.models import Event
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -12,6 +13,16 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'category', 'color']
 
 
+class VideoEventSerializer(serializers.ModelSerializer):
+    """精简的赛事序列化器，用于嵌套在视频中"""
+    competition_name = serializers.CharField(source='competition.name', read_only=True)
+    stage_display = serializers.CharField(source='get_stage_display', read_only=True)
+
+    class Meta:
+        model = Event
+        fields = ['id', 'title', 'competition', 'competition_name', 'region', 'stage', 'stage_display', 'start_date', 'end_date']
+
+
 class VideoSerializer(serializers.ModelSerializer):
     """
     视频序列化器
@@ -20,22 +31,23 @@ class VideoSerializer(serializers.ModelSerializer):
     group_name = serializers.CharField(source='group.name', read_only=True)
     competition_name = serializers.CharField(source='competition.name', read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+    events = VideoEventSerializer(many=True, read_only=True)
     tag_ids = serializers.PrimaryKeyRelatedField(
-        many=True, 
+        many=True,
         queryset=Tag.objects.filter(is_active=True),
         source='tags',
         required=False,
         write_only=True,
         help_text="标签ID列表"
     )
-    
+
     class Meta:
         model = Video
         fields = [
             'id', 'bv_number', 'title', 'description', 'url', 'thumbnail',
-            'uploaded_by', 'uploaded_by_username', 'group', 'group_name', 
+            'uploaded_by', 'uploaded_by_username', 'group', 'group_name',
             'competition', 'competition_name', 'year',
-            'tags', 'tag_ids', 'created_at', 'updated_at'
+            'tags', 'tag_ids', 'events', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id']
 

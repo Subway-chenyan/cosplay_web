@@ -132,6 +132,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    search_fields = ['title', 'description', 'region', 'competition__name']
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
