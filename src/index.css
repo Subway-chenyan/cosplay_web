@@ -12,6 +12,20 @@
     @apply bg-gray-50 text-gray-900;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  [class*="skew-x-"],
+  [class*="skew-y-"] {
+    --tw-skew-x: 0deg !important;
+    --tw-skew-y: 0deg !important;
+  }
+
+  [class*="rotate-"] {
+    --tw-rotate: 0deg !important;
+  }
+
+  .italic {
+    font-style: normal !important;
+  }
 }
 
 @layer components {
@@ -20,15 +34,15 @@
   }
 
   .btn-primary {
-    @apply bg-black text-white px-6 py-2 border-2 border-black font-black uppercase italic transition-all transform -skew-x-12 hover:bg-p5-red hover:border-white hover:shadow-[4px_4px_0_0_black];
+    @apply bg-black text-white px-6 py-2 border-2 border-black font-black transition-all hover:bg-p5-red hover:border-white hover:shadow-[4px_4px_0_0_black];
   }
 
   .btn-secondary {
-    @apply bg-white text-black px-6 py-2 border-4 border-black font-black uppercase italic transition-all transform -skew-x-12 hover:bg-black hover:text-white;
+    @apply bg-white text-black px-6 py-2 border-4 border-black font-black transition-all hover:bg-black hover:text-white;
   }
 
   .filter-chip {
-    @apply px-4 py-1 text-sm font-black border-2 border-black bg-white transform -skew-x-6 hover:bg-p5-red hover:text-white transition-all cursor-pointer uppercase italic;
+    @apply px-4 py-1 text-sm font-black border-2 border-black bg-white hover:bg-p5-red hover:text-white transition-all cursor-pointer;
   }
 
   .filter-chip.active {

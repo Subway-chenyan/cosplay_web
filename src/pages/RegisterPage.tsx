@@ -84,11 +84,11 @@ function RegisterPage() {
       <div className="max-w-2xl mx-auto">
         {/* P5 风格标题 */}
         <div className="relative group mb-8">
-          <div className="absolute inset-0 bg-p5-red transform translate-x-3 translate-y-3 -skew-x-3 z-0"></div>
-          <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-3">
-            <div className="transform skew-x-3">
-              <h1 className="text-4xl md:text-5xl font-black text-black mb-2 uppercase italic">
-                用户注册 / SIGN UP
+          <div className="absolute inset-0 bg-p5-red translate-x-3 translate-y-3 z-0"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
+                用户注册
               </h1>
               <p className="text-gray-600 font-bold">加入 Cosplay 舞台剧视频数据库</p>
             </div>
@@ -112,8 +112,8 @@ function RegisterPage() {
 
               {/* 用户名 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  用户名 / USERNAME *
+                <label className="block text-sm font-black text-gray-700 mb-2">
+                  用户名 *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -133,8 +133,8 @@ function RegisterPage() {
 
               {/* 邮箱 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  邮箱 / EMAIL *
+                <label className="block text-sm font-black text-gray-700 mb-2">
+                  邮箱 *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -154,8 +154,8 @@ function RegisterPage() {
 
               {/* 昵称 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  昵称 / NICKNAME
+                <label className="block text-sm font-black text-gray-700 mb-2">
+                  昵称
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -174,8 +174,8 @@ function RegisterPage() {
 
               {/* 密码 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  密码 / PASSWORD *
+                <label className="block text-sm font-black text-gray-700 mb-2">
+                  密码 *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -195,8 +195,8 @@ function RegisterPage() {
 
               {/* 确认密码 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  确认密码 / CONFIRM PASSWORD *
+                <label className="block text-sm font-black text-gray-700 mb-2">
+                  确认密码 *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

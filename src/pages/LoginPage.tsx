@@ -76,11 +76,11 @@ function LoginPage() {
       <div className="max-w-2xl mx-auto">
         {/* P5 风格标题 */}
         <div className="relative group mb-8">
-          <div className="absolute inset-0 bg-p5-red transform translate-x-3 translate-y-3 -skew-x-3 z-0"></div>
-          <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-3">
-            <div className="transform skew-x-3">
-              <h1 className="text-4xl md:text-5xl font-black text-black mb-2 uppercase italic">
-                用户登录 / LOGIN
+          <div className="absolute inset-0 bg-p5-red translate-x-3 translate-y-3 z-0"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
+                用户登录
               </h1>
               <p className="text-gray-600 font-bold">欢迎回到 Cosplay 舞台剧视频数据库</p>
             </div>
@@ -163,10 +163,10 @@ function LoginPage() {
                 disabled={loading}
                 className="w-full relative group"
               >
-                <div className="absolute inset-0 bg-p5-red transform translate-x-1.5 translate-y-1.5 -skew-x-6 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform"></div>
-                <div className="relative bg-white border-3 border-black px-6 py-4 transform -skew-x-6 group-hover:-skew-x-3 transition-transform">
-                  <span className="block text-xl font-black uppercase italic transform skew-x-6 group-hover:skew-x-3 transition-transform">
-                    {loading ? '登录中...' : '立即登录 / LOGIN NOW'}
+                <div className="absolute inset-0 bg-p5-red translate-x-1.5 translate-y-1.5 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform"></div>
+                <div className="relative bg-white border-3 border-black px-6 py-4">
+                  <span className="block text-xl font-black">
+                    {loading ? '登录中...' : '立即登录'}
                   </span>
                 </div>
               </button>
@@ -176,7 +176,7 @@ function LoginPage() {
                   <div className="w-full border-t-2 border-black"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-4 text-sm font-black uppercase italic text-gray-600">
+                  <span className="bg-white px-4 text-sm font-black text-gray-600">
                     或使用第三方账号登录
                   </span>
                 </div>

@@ -32,11 +32,11 @@ function QQLoginCallbackPage() {
       <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="relative group mb-8">
-            <div className="absolute inset-0 bg-p5-red transform translate-x-3 translate-y-3 -skew-x-3 z-0"></div>
-            <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-3">
-              <div className="transform skew-x-3">
-                <h1 className="text-4xl md:text-5xl font-black text-black mb-2 uppercase italic">
-                  QQ 登录 / CONNECT
+            <div className="absolute inset-0 bg-p5-red translate-x-3 translate-y-3 z-0"></div>
+            <div className="relative z-10 bg-white border-4 border-black p-6">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
+                  QQ 登录
                 </h1>
                 <p className="text-gray-600 font-bold">
                   正在处理第三方登录结果
@@ -46,7 +46,7 @@ function QQLoginCallbackPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
+            <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
             <div className="relative z-10 bg-white border-4 border-black p-8">
               {errorMessage ? (
                 <div className="space-y-6">

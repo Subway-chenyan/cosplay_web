@@ -56,38 +56,38 @@ function CompetitionsPage() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* 页面标题 */}
       <div className="relative group mb-12">
-        <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
-        <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-x-2">
-          <div className="transform skew-x-2">
-            <h1 className="text-3xl md:text-5xl font-black text-black mb-4 uppercase italic border-b-8 border-p5-red inline-block" style={{ textShadow: '4px 4px 0px #d90614' }}>
-              赛事档案 / BATTLE ARCHIVE
+        <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
+        <div className="relative z-10 bg-white border-4 border-black p-8">
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black text-black mb-4 border-b-8 border-p5-red inline-block" style={{ textShadow: '4px 4px 0px #d90614' }}>
+              赛事档案
             </h1>
-            <p className="block text-xl font-black italic bg-black text-white px-4 py-1 transform -skew-x-12 w-fit mb-4">
-              持续更新中... / RECORDS SECURED
+            <p className="block text-xl font-black bg-black text-white px-4 py-1 w-fit mb-4">
+              持续更新中...
             </p>
           </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex space-x-4 mb-8 transform skew-x-1">
+      <div className="flex space-x-4 mb-8">
         <button
           onClick={() => setActiveTab('list')}
-          className={`px-6 py-2 transform -skew-x-12 font-black uppercase italic transition-all ${activeTab === 'list'
+          className={`px-6 py-2 font-black transition-all ${activeTab === 'list'
             ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
             : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
           }`}
         >
-          <span className="transform skew-x-12 inline-block">比赛列表 / ARCHIVE</span>
+          <span className="inline-block">比赛列表</span>
         </button>
         <button
           onClick={() => setActiveTab('schedule')}
-          className={`px-6 py-2 transform -skew-x-12 font-black uppercase italic transition-all ${activeTab === 'schedule'
+          className={`px-6 py-2 font-black transition-all ${activeTab === 'schedule'
             ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
             : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
           }`}
         >
-          <span className="transform skew-x-12 inline-block">当前赛程 / LIVE SCHEDULE</span>
+          <span className="inline-block">当前赛程</span>
         </button>
       </div>
 
@@ -102,17 +102,17 @@ function CompetitionsPage() {
               onClick={() => handleCompetitionClick(competition)}
             >
               {/* Background decoration */}
-              <div className="absolute inset-0 bg-black transform translate-x-1 translate-y-1 -skew-x-1 border-2 border-gray-800 z-0 group-hover:bg-p5-red transition-colors"></div>
+              <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 border-2 border-gray-800 z-0 group-hover:bg-p5-red transition-colors"></div>
 
               <div className="relative z-10 bg-white border-2 border-black p-6 h-full flex flex-col overflow-hidden">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-xl font-black text-black uppercase transform -skew-x-6 border-b-4 border-p5-red inline-block pr-2 mb-2 group-hover:text-p5-red transition-colors leading-tight">
+                    <h3 className="text-xl font-black text-black border-b-4 border-p5-red inline-block pr-2 mb-2 group-hover:text-p5-red transition-colors leading-tight">
                       {competition.name}
                     </h3>
                   </div>
                   <div className="flex-shrink-0 ml-4">
-                    <div className="w-12 h-12 bg-black transform rotate-12 flex items-center justify-center border-2 border-p5-red group-hover:rotate-0 transition-transform">
+                    <div className="w-12 h-12 bg-black flex items-center justify-center border-2 border-p5-red">
                       <Trophy className="w-6 h-6 text-p5-red" />
                     </div>
                   </div>
@@ -124,12 +124,12 @@ function CompetitionsPage() {
                   </p>
                 )}
 
-                <div className="mt-auto flex items-center justify-between text-xs font-black uppercase text-gray-500">
+                <div className="mt-auto flex items-center justify-between text-xs font-black text-gray-500">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-3 h-3 text-p5-red" />
-                      <span className="bg-black text-white px-1 transform skew-x-12 inline-block">
-                        <span className="transform -skew-x-12 inline-block">载入 / LOADED</span>
+                      <span className="bg-black text-white px-1 inline-block">
+                        <span className="inline-block">已载入</span>
                       </span>
                     </div>
                   </div>
@@ -141,7 +141,7 @@ function CompetitionsPage() {
                       className="text-p5-red hover:underline decoration-2 underline-offset-4"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      官方链接 / WEBSITE
+                      官方链接
                     </a>
                   )}
                 </div>
@@ -153,18 +153,18 @@ function CompetitionsPage() {
         </div>
       ) : (
         <div className="relative p-20 text-center group/no-results overflow-hidden">
-          <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+          <div className="absolute inset-0 bg-black z-0 border-y-8 border-p5-red shadow-2xl"></div>
           <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
-              <Trophy className="w-20 h-20 text-black transform -rotate-12" />
+            <div className="bg-white p-6 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+              <Trophy className="w-20 h-20 text-black" />
             </div>
-            <h3 className="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
-              暂无赛事情报 / NO INTEL FOUND
+            <h3 className="text-2xl md:text-4xl font-black text-white tracking-tight mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+              暂无赛事信息
             </h3>
-            <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white">
-              数据库中暂无记录 / ARCHIVE IS EMPTY
+            <p className="bg-p5-red text-white px-8 py-2 font-black border-2 border-white">
+              数据库中暂无记录
             </p>
           </div>
         </div>
@@ -185,9 +185,9 @@ function CompetitionsPage() {
       {/* Total Count Display */}
       {competitions.length > 0 && (
         <div className="text-center mt-12 mb-12">
-          <div className="inline-block bg-black text-white px-6 py-1 transform -skew-x-12 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
-            <span className="transform skew-x-12 inline-block font-black italic uppercase tracking-tighter">
-              已截获赛事日志: <span className="text-p5-red">{competitions.length}</span> / <span className="text-p5-red">{pagination.count}</span> BATTLE LOGS RECOVERED
+          <div className="inline-block bg-black text-white px-6 py-1 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
+            <span className="inline-block font-black">
+              当前页 <span className="text-p5-red">{competitions.length}</span> 条，共 <span className="text-p5-red">{pagination.count}</span> 条赛事
             </span>
           </div>
         </div>

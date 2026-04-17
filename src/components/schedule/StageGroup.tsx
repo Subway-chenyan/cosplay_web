@@ -13,16 +13,16 @@ interface StageGroupProps {
 }
 
 function getStageIcon(stage: string, isFinal?: boolean) {
-  if (isFinal) return <Crown className="w-5 h-5 text-white transform -rotate-12" />
+  if (isFinal) return <Crown className="w-5 h-5 text-white" />
   switch (stage) {
     case 'preliminary':
-      return <Swords className="w-5 h-5 text-white transform -rotate-12" />
+      return <Swords className="w-5 h-5 text-white" />
     case 'advancing':
-      return <Target className="w-5 h-5 text-white transform -rotate-12" />
+      return <Target className="w-5 h-5 text-white" />
     case 'final':
-      return <Trophy className="w-5 h-5 text-white transform -rotate-12" />
+      return <Trophy className="w-5 h-5 text-white" />
     default:
-      return <Flag className="w-5 h-5 text-white transform -rotate-12" />
+      return <Flag className="w-5 h-5 text-white" />
   }
 }
 
@@ -60,7 +60,6 @@ export default function StageGroup({
 
   const iconBg = isFinal ? 'bg-amber-500' : 'bg-p5-red'
   const borderAccent = isFinal ? 'border-amber-500' : 'border-p5-red'
-  const shadowColor = isFinal ? '#b45309' : '#d90614'
 
   // Sort: completed events first (sorted by end_date desc), then upcoming (sorted by start_date asc)
   const sortedEvents = [...events].sort((a, b) => {
@@ -82,20 +81,20 @@ export default function StageGroup({
     <div className="mb-8">
       {/* Stage header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className={`${iconBg} p-2 transform rotate-12 border-2 border-black shadow-[3px_3px_0_0_black]`}>
+        <div className={`${iconBg} p-2 border-2 border-black shadow-[3px_3px_0_0_black]`}>
           {getStageIcon(stage, isFinal)}
         </div>
         <div>
           <h3 className={`text-lg md:text-xl font-black uppercase italic tracking-tighter ${isFinal ? 'text-amber-700' : 'text-black'}`}
-            style={{ textShadow: `2px 2px 0px ${shadowColor}` }}
+            style={{ textShadow: isFinal ? '1px 1px 0px rgba(0,0,0,0.15)' : '1px 1px 0px rgba(217,6,20,0.15)' }}
           >
             {stageDisplay || getStageLabel(stage)}
           </h3>
-          <p className="text-[10px] font-black text-gray-400 uppercase italic">
-            {events.length} 场赛事 / {events.length} EVENTS
+          <p className="text-[10px] font-black text-gray-500 uppercase italic">
+            {events.length} 场赛事
           </p>
         </div>
-        <div className={`flex-1 border-b-4 ${borderAccent} ml-2`}></div>
+        <div className={`flex-1 border-b-4 ${borderAccent} ml-2 opacity-80`}></div>
       </div>
 
       {/* Completed events: full-width single column for better video display */}
@@ -104,7 +103,7 @@ export default function StageGroup({
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px flex-1 bg-gray-300"></div>
             <span className="text-[10px] font-black uppercase italic text-gray-500 px-2">
-              已完成 / COMPLETED ({completedEvents.length})
+              已完成（{completedEvents.length}）
             </span>
             <div className="h-px flex-1 bg-gray-300"></div>
           </div>
@@ -130,7 +129,7 @@ export default function StageGroup({
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px flex-1 bg-gray-300"></div>
               <span className="text-[10px] font-black uppercase italic text-gray-500 px-2">
-                即将开始 / UPCOMING ({upcomingEvents.length})
+                即将开始（{upcomingEvents.length}）
               </span>
               <div className="h-px flex-1 bg-gray-300"></div>
             </div>

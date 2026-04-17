@@ -401,8 +401,8 @@ function CompetitionDetailPage() {
             </h1>
 
             <p className="text-lg md:text-xl text-white font-bold bg-black inline-block px-6 py-1 transform -skew-x-12 shadow-[4px_4px_0_0_#d90614]">
-              <span className="transform skew-x-12 inline-block italic">
-                {competition.description || 'FIELD INVESTIGATION UNDERWAY'}
+              <span className="transform skew-x-12 inline-block">
+                {competition.description || '赛事信息更新中'}
               </span>
             </p>
           </div>
@@ -416,8 +416,8 @@ function CompetitionDetailPage() {
             <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
               <Calendar className="w-8 h-8 text-white transform -rotate-12" />
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
-              SCHEDULE / 赛程时间线
+            <h2 className="text-xl md:text-3xl font-black text-white uppercase italic border-b-8 border-p5-red" style={{ textShadow: '2px 2px 0px #000000' }}>
+              赛程时间线
             </h2>
           </div>
           <CompetitionSchedule
@@ -440,7 +440,7 @@ function CompetitionDetailPage() {
                 <Filter className="w-6 h-6 text-white transform rotate-6" />
               </div>
               <h2 className="text-2xl font-black text-black uppercase italic border-b-4 border-p5-red">
-                FILTER INTEL / 筛选记录
+                筛选记录
               </h2>
             </div>
             {(selectedYear || selectedAward) && (
@@ -449,7 +449,7 @@ function CompetitionDetailPage() {
                 className="bg-black text-white px-4 py-1 text-xs font-black uppercase italic transform -skew-x-12 hover:bg-p5-red transition-all"
               >
                 <span className="transform skew-x-12 inline-block flex items-center">
-                  <X className="w-4 h-4 mr-1" /> CLEAR FILTER
+                  <X className="w-4 h-4 mr-1" /> 清除筛选
                 </span>
               </button>
             )}
@@ -466,7 +466,7 @@ function CompetitionDetailPage() {
                 : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
                 }`}
             >
-              <span className="transform skew-x-12 inline-block">SORT BY YEAR</span>
+              <span className="transform skew-x-12 inline-block">按年份筛选</span>
             </button>
             <button
               onClick={() => {
@@ -478,14 +478,14 @@ function CompetitionDetailPage() {
                 : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
                 }`}
             >
-              <span className="transform skew-x-12 inline-block">SORT BY AWARD</span>
+              <span className="transform skew-x-12 inline-block">按奖项筛选</span>
             </button>
           </div>
 
           {/* 年份筛选 */}
           {viewMode === 'year' && (
             <div className="transform skew-x-1">
-              <h3 className="text-sm font-black text-black uppercase italic mb-4 border-l-4 border-p5-red pl-2">TARGET CALENDAR / 目标年份</h3>
+              <h3 className="text-sm font-black text-black mb-4 border-l-4 border-p5-red pl-2">目标年份</h3>
               <div className="flex flex-wrap gap-3">
                 {availableYears.map(year => (
                   <button
@@ -506,7 +506,7 @@ function CompetitionDetailPage() {
           {/* 奖项筛选 */}
           {viewMode === 'award' && (
             <div className="transform skew-x-1">
-              <h3 className="text-sm font-black text-black uppercase italic mb-4 border-l-4 border-p5-red pl-2">REWARD LIST / 奖项筛选</h3>
+              <h3 className="text-sm font-black text-black mb-4 border-l-4 border-p5-red pl-2">奖项筛选</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortAwards(competitionAwards).map(award => {
                   const awardInfo = createAwardInfo(award.name)
@@ -544,12 +544,12 @@ function CompetitionDetailPage() {
           <div className="flex items-center bg-black text-white p-4 border-l-8 border-p5-red shadow-[8px_8px_0_0_black] border-2 border-white">
             <Filter className="w-8 h-8 text-p5-red mr-6 animate-pulse" />
             <span className="text-xl font-black uppercase italic tracking-tighter p5-text-shadow-red">
-              正在提取情报 / INVESTIGATING :
+              当前筛选：
               {selectedYear && <span className="text-white ml-3 bg-p5-red px-3 py-0.5 transform -skew-x-12 inline-block">
-                <span className="transform skew-x-12 inline-block font-black">{selectedYear} YEARS</span>
+                <span className="transform skew-x-12 inline-block font-black">{selectedYear}年</span>
               </span>}
               {selectedAward && <span className="text-white ml-3 bg-p5-red px-3 py-0.5 transform -skew-x-12 inline-block">
-                <span className="transform skew-x-12 inline-block font-black">{competitionAwards.find(a => a.id === selectedAward)?.name} RECORDS</span>
+                <span className="transform skew-x-12 inline-block font-black">{competitionAwards.find(a => a.id === selectedAward)?.name}</span>
               </span>}
             </span>
           </div>
@@ -563,8 +563,8 @@ function CompetitionDetailPage() {
             <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
               <Trophy className="w-8 h-8 text-white transform -rotate-12" />
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
-              TARGET INTEL SECURED / 获奖作品
+            <h2 className="text-xl md:text-3xl font-black text-white uppercase italic border-b-8 border-p5-red" style={{ textShadow: '2px 2px 0px #000000' }}>
+              获奖作品
             </h2>
           </div>
 
@@ -677,8 +677,8 @@ function CompetitionDetailPage() {
                   <Users className="w-8 h-8 text-white transform rotate-12" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black text-black uppercase italic tracking-tighter">OTHERS / 参与作品</h2>
-                  <p className="text-xs font-black text-gray-500 uppercase italic">ADDITIONAL RECORDS FROM {selectedYear} CALENDAR</p>
+                  <h2 className="text-3xl font-black text-black tracking-tighter">参与作品</h2>
+                  <p className="text-xs font-black text-gray-500">{selectedYear} 年参赛作品</p>
                 </div>
               </div>
               <div className="bg-black text-white px-6 py-1 font-black uppercase italic transform -skew-x-12">
@@ -734,8 +734,8 @@ function CompetitionDetailPage() {
                 <Calendar className="w-8 h-8 text-white transform -rotate-12" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-black uppercase italic tracking-tighter">CALENDAR ARCHIVE / 年份概览</h2>
-                <p className="text-xs font-black text-gray-400 mt-1">CHOOSE A TARGET YEAR TO INVESTIGATE</p>
+                <h2 className="text-2xl md:text-3xl font-black text-black tracking-tighter">年份概览</h2>
+                <p className="text-xs font-black text-gray-400 mt-1">选择年份查看对应记录</p>
               </div>
             </div>
 

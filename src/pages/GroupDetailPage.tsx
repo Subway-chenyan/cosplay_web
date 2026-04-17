@@ -179,21 +179,21 @@ function GroupDetailPage() {
   if (!group) {
     return (
       <div className="relative p-20 text-center group/no-results overflow-hidden">
-        <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+        <div className="absolute inset-0 bg-black z-0 border-y-8 border-p5-red shadow-2xl"></div>
         <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
 
         <div className="relative z-10 flex flex-col items-center">
-          <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
-            <Users className="w-20 h-20 text-black transform -rotate-12" />
+          <div className="bg-white p-6 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+            <Users className="w-20 h-20 text-black" />
           </div>
-          <h3 className="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
-            目标失踪 / TARGET MISSING
+          <h3 className="text-2xl md:text-4xl font-black text-white tracking-tight mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+            未找到社团
           </h3>
-          <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white mb-8">
-            数据库中不存在该社团 / DATA ERROR
+          <p className="bg-p5-red text-white px-8 py-2 font-black border-2 border-white mb-8">
+            数据库中不存在该社团
           </p>
           <Link to="/groups" className="btn-secondary">
-            返回列表 / BACK TO ALLIANCE
+            返回列表
           </Link>
         </div>
       </div>
@@ -206,11 +206,11 @@ function GroupDetailPage() {
       <div className="flex items-center">
         <Link
           to="/groups"
-          className="group flex items-center bg-black text-white px-4 py-2 transform -skew-x-12 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
+          className="group flex items-center bg-black text-white px-4 py-2 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
         >
-          <span className="flex items-center transform skew-x-12">
+          <span className="flex items-center">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="font-black uppercase italic">返回列表 / BACK TO ALLIANCE</span>
+            <span className="font-black">返回列表</span>
           </span>
         </Link>
       </div>
@@ -223,16 +223,16 @@ function GroupDetailPage() {
         <div className="flex flex-col md:flex-row md:items-start space-y-6 md:space-y-0 md:space-x-10 relative z-10">
           {/* 社团Logo和名称 - 移动端水平布局 */}
           <div className="flex items-center space-x-6 md:flex-col md:space-x-0 md:space-y-4">
-            <div className="w-20 h-20 md:w-32 md:h-32 bg-p5-red transform rotate-6 border-4 border-black shadow-[4px_4px_0_0_black] overflow-hidden flex-shrink-0">
+            <div className="w-20 h-20 md:w-32 md:h-32 bg-p5-red border-4 border-black shadow-[4px_4px_0_0_black] overflow-hidden flex-shrink-0">
               {group.logo ? (
                 <img
                   src={group.logo}
                   alt={group.name}
-                  className="w-full h-full object-cover transform -rotate-6 scale-125"
+                  className="w-full h-full object-cover scale-125"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center transform -rotate-6">
-                  <span className="text-white font-black text-4xl md:text-6xl uppercase italic">
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-white font-black text-4xl md:text-6xl">
                     {group.name.charAt(0)}
                   </span>
                 </div>
@@ -240,7 +240,7 @@ function GroupDetailPage() {
             </div>
 
             <div className="flex-1 md:text-center">
-              <h1 className="text-3xl md:text-5xl font-black text-black uppercase italic leading-none transform -skew-x-6 mb-2" style={{ textShadow: '3px 3px 0px #d90614' }}>
+              <h1 className="text-3xl md:text-5xl font-black text-black leading-none mb-2" style={{ textShadow: '3px 3px 0px #d90614' }}>
                 {group.name}
               </h1>
             </div>
@@ -279,7 +279,7 @@ function GroupDetailPage() {
             {group.founded_date && (
               <div className="flex items-center text-gray-600 mb-4">
                 <Calendar className="w-5 h-5 mr-2" />
-                <span>始建于 {new Date(group.founded_date).getFullYear()}年 / ESTABLISHED</span>
+                <span>始建于 {new Date(group.founded_date).getFullYear()}年</span>
               </div>
             )}
 
@@ -330,18 +330,18 @@ function GroupDetailPage() {
       {/* 获奖作品 */}
       {(awardedVideos.length > 0 || awardRecordsWithoutVideo.length > 0) && (
         <div className="relative group">
-          <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-1 z-0"></div>
-          <div className="relative z-10 bg-white border-4 border-black p-6 md:p-10 transform -skew-x-1">
-            <div className="flex items-center space-x-4 mb-8 transform skew-x-1">
-              <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black shadow-[4px_4px_0_0_black]">
-                <Trophy className="w-8 h-8 text-white transform -rotate-12" />
+          <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
+          <div className="relative z-10 bg-white border-4 border-black p-6 md:p-10">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="bg-p5-red p-3 border-2 border-black shadow-[4px_4px_0_0_black]">
+                <Trophy className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-p5-red">
-                历战功绩 / ACCOMPLISHMENTS
+              <h2 className="text-xl md:text-3xl font-black text-black border-b-8 border-p5-red">
+                获奖作品
               </h2>
             </div>
 
-            <div className="space-y-10 transform skew-x-1">
+            <div className="space-y-10">
               {/* 有视频的获奖记录 */}
               {groupAwards.filter(awardRecord => awardRecord.video).map((awardRecord) => {
                 const awardVideo = awardedVideos.find(v => v.id === awardRecord.video)
@@ -351,26 +351,26 @@ function GroupDetailPage() {
 
                 return (
                   <div key={awardRecord.id} className="relative group/award">
-                    <div className="absolute inset-0 bg-black opacity-5 transform translate-x-1 translate-y-1 -skew-x-2 z-0"></div>
-                    <div className={`relative z-10 border-l-8 ${awardInfo.borderColor.replace('border-', 'border-')} p-6 bg-gray-50 transform -skew-x-2`}>
-                      <div className="flex flex-col md:flex-row items-start md:space-x-8 transform skew-x-2">
+                    <div className="absolute inset-0 bg-black opacity-5 translate-x-1 translate-y-1 z-0"></div>
+                    <div className={`relative z-10 border-l-8 ${awardInfo.borderColor.replace('border-', 'border-')} p-6 bg-gray-50`}>
+                      <div className="flex flex-col md:flex-row items-start md:space-x-8">
                         <div className="flex-1 min-w-0 mb-6 md:mb-0">
                           <div className="mb-4">
-                            <h3 className={`text-2xl font-black uppercase italic mb-2`} style={{ color: '#d90614' }}>
-                              {awardRecord.award_name || 'AWARD SECURED'}
+                            <h3 className={`text-2xl font-black mb-2`} style={{ color: '#d90614' }}>
+                              {awardRecord.award_name || '获奖记录'}
                             </h3>
                             <div className="flex flex-wrap gap-3">
-                              <span className={`inline-flex items-center px-3 py-1 bg-black text-white font-black text-xs uppercase italic transform -skew-x-12`}>
-                                <span className="transform skew-x-12">{awardRecord.competition_name || ''}</span>
+                              <span className={`inline-flex items-center px-3 py-1 bg-black text-white font-black text-xs`}>
+                                <span>{awardRecord.competition_name || ''}</span>
                               </span>
-                              <span className="inline-flex items-center px-3 py-1 border-2 border-black font-black text-xs uppercase italic transform -skew-x-12">
-                                <span className="transform skew-x-12">{awardRecord.competition_year || 'YEAR'}年</span>
+                              <span className="inline-flex items-center px-3 py-1 border-2 border-black font-black text-xs">
+                                <span>{awardRecord.competition_year || ''}年</span>
                               </span>
                             </div>
                           </div>
 
                           {awardRecord.description && (
-                            <p className="text-black font-bold italic border-l-4 border-gray-300 pl-4 mb-4">{awardRecord.description}</p>
+                            <p className="text-black font-bold border-l-4 border-gray-300 pl-4 mb-4">{awardRecord.description}</p>
                           )}
                         </div>
 
@@ -384,7 +384,7 @@ function GroupDetailPage() {
                               />
                             </div>
                             {/* 奖项标识 */}
-                            <div className={`absolute top-0 right-0 z-20 bg-p5-red text-white p-2 transform rotate-12 border-2 border-black shadow-[2px_2px_0_0_black]`}>
+                            <div className={`absolute top-0 right-0 z-20 bg-p5-red text-white p-2 border-2 border-black shadow-[2px_2px_0_0_black]`}>
                               {awardInfo.icon}
                             </div>
                           </div>
@@ -401,18 +401,18 @@ function GroupDetailPage() {
 
                 return (
                   <div key={awardRecord.id} className="relative group/award">
-                    <div className="absolute inset-0 bg-black opacity-5 transform translate-x-1 translate-y-1 -skew-x-2 z-0"></div>
-                    <div className={`relative z-10 border-l-8 border-gray-400 p-6 bg-gray-50 transform -skew-x-2`}>
-                      <div className="transform skew-x-2">
-                        <h3 className="text-xl font-black text-black uppercase italic mb-3">
-                          {awardRecord.award_name || 'OFF-SCREEN AWARD'}
+                    <div className="absolute inset-0 bg-black opacity-5 translate-x-1 translate-y-1 z-0"></div>
+                    <div className={`relative z-10 border-l-8 border-gray-400 p-6 bg-gray-50`}>
+                      <div>
+                        <h3 className="text-xl font-black text-black mb-3">
+                          {awardRecord.award_name || '获奖记录'}
                         </h3>
                         <div className="flex flex-wrap gap-2 mb-4">
-                          <span className="bg-black text-white px-2 py-1 text-xs font-black uppercase italic transform -skew-x-12">
-                            <span className="transform skew-x-12">{awardRecord.competition_name || ''}</span>
+                          <span className="bg-black text-white px-2 py-1 text-xs font-black">
+                            <span>{awardRecord.competition_name || ''}</span>
                           </span>
-                          <span className="border-2 border-black px-2 py-1 text-xs font-black italic transform -skew-x-12">
-                            <span className="transform skew-x-12">{awardRecord.competition_year || 'YEAR'}年</span>
+                          <span className="border-2 border-black px-2 py-1 text-xs font-black">
+                            <span>{awardRecord.competition_year || ''}年</span>
                           </span>
                         </div>
                         <div className="bg-white border-2 border-black p-4 italic font-bold">
@@ -434,11 +434,11 @@ function GroupDetailPage() {
       {/* 所有舞台剧视频 */}
       {groupVideos.length > 0 && (
         <div className="relative group mt-12">
-          <div className="absolute inset-0 bg-p5-red opacity-10 transform translate-x-2 translate-y-2 -skew-x-1 z-0"></div>
+          <div className="absolute inset-0 bg-p5-red opacity-10 translate-x-2 translate-y-2 z-0"></div>
           <div className="relative z-10 bg-white border-4 border-black p-8 shadow-[8px_8px_0_0_black]">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl md:text-3xl font-black text-black uppercase italic border-b-8 border-black">
-                行动记录 / FIELD LOGS ({groupVideos.length})
+              <h2 className="text-xl md:text-3xl font-black text-black border-b-8 border-black">
+                视频记录（{groupVideos.length}）
               </h2>
             </div>
 
@@ -458,15 +458,15 @@ function GroupDetailPage() {
       {/* 空状态 */}
       {groupVideos.length === 0 && (
         <div className="relative p-20 text-center group/no-results overflow-hidden mt-12">
-          <div className="absolute inset-0 bg-white transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-lg"></div>
+          <div className="absolute inset-0 bg-white z-0 border-y-8 border-p5-red shadow-lg"></div>
           <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <h3 className="text-2xl md:text-4xl font-black text-black uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
-              尚无行动记录 / NO DATA CAPTURED
+            <h3 className="text-2xl md:text-4xl font-black text-black tracking-tight mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+              暂无视频记录
             </h3>
-            <p className="bg-black text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-p5-red">
-              该社团暂无视频存档 / DATABASE CLEAR
+            <p className="bg-black text-white px-8 py-2 font-black border-2 border-p5-red">
+              该社团暂无视频存档
             </p>
           </div>
         </div>

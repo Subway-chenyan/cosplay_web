@@ -192,7 +192,7 @@ export default function CompetitionSchedule({
   if (!events || events.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-sm text-gray-500 font-bold italic">暂无赛程信息 / NO SCHEDULE DATA</p>
+        <p className="text-sm text-gray-500 font-bold">暂无赛程信息</p>
       </div>
     )
   }
@@ -201,13 +201,13 @@ export default function CompetitionSchedule({
     <div>
       {/* Competition name header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="flex-1 border-b-4 border-black">
-          <h3 className="text-lg md:text-2xl font-black text-black uppercase italic inline-block border-b-4 border-p5-red pb-1" style={{ textShadow: '2px 2px 0px #d90614' }}>
+        <div className="flex-1 border-b-4 border-p5-red/60">
+          <h3 className="text-lg md:text-2xl font-black text-white inline-block border-b-4 border-p5-red pb-1" style={{ textShadow: '2px 2px 0px #000000' }}>
             {competitionName}
           </h3>
         </div>
-        <div className="bg-black text-white px-3 py-1 text-xs font-black uppercase italic transform -skew-x-12 shadow-[3px_3px_0_0_#d90614]">
-          <span className="transform skew-x-12 inline-block">{events.length} 场赛事</span>
+        <div className="bg-black text-white px-3 py-1 text-xs font-black shadow-[3px_3px_0_0_#d90614]">
+          <span>{events.length} 场赛事</span>
         </div>
       </div>
 
@@ -220,26 +220,26 @@ export default function CompetitionSchedule({
             className="w-full text-left relative group/header"
           >
             {/* Shadow */}
-            <div className={`absolute inset-0 bg-black transform ${completedOpen ? 'translate-x-1 translate-y-1' : 'translate-x-0.5 translate-y-0.5'} -skew-x-2 z-0 transition-all ${completedOpen ? '' : 'group-hover/header:translate-x-1 group-hover/header:translate-y-1'}`}></div>
+            <div className={`absolute inset-0 bg-black ${completedOpen ? 'translate-x-1 translate-y-1' : 'translate-x-0.5 translate-y-0.5'} z-0 transition-all ${completedOpen ? '' : 'group-hover/header:translate-x-1 group-hover/header:translate-y-1'}`}></div>
 
             {/* Header bar */}
-            <div className={`relative z-10 flex items-center justify-between border-2 border-black px-4 py-3 transform -skew-x-2 transition-colors ${completedOpen ? 'bg-green-700 text-white' : 'bg-white text-black group-hover/header:bg-gray-100'}`}>
-              <div className="flex items-center gap-3 transform skew-x-2">
+            <div className={`relative z-10 flex items-center justify-between border-2 border-black px-4 py-3 transition-colors ${completedOpen ? 'bg-green-700 text-white' : 'bg-white text-black group-hover/header:bg-gray-100'}`}>
+              <div className="flex items-center gap-3">
                 <CheckCircle className={`w-4 h-4 ${completedOpen ? 'text-white' : 'text-green-600'}`} />
-                <span className="font-black uppercase italic text-sm md:text-base">
-                  已完成赛事 / COMPLETED
+                <span className="font-black text-sm md:text-base">
+                  已完成赛事
                 </span>
-                <span className={`text-xs font-black italic px-2 py-0.5 transform -skew-x-12 ${completedOpen ? 'bg-white text-green-700' : 'bg-green-700 text-white'}`}>
-                  <span className="transform skew-x-12 inline-block">{completedEvents.length} 场</span>
+                <span className={`text-xs font-black px-2 py-0.5 ${completedOpen ? 'bg-white text-green-700' : 'bg-green-700 text-white'}`}>
+                  <span>{completedEvents.length} 场</span>
                 </span>
                 {totalCompletedVideos > 0 && (
-                  <span className="text-xs font-bold italic flex items-center gap-1 opacity-80">
+                  <span className="text-xs font-bold flex items-center gap-1 opacity-80">
                     <Video className="w-3 h-3" />
                     {totalCompletedVideos} 个视频
                   </span>
                 )}
               </div>
-              <div className="transform skew-x-2">
+              <div>
                 <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${completedOpen ? 'rotate-180' : ''}`} />
               </div>
             </div>
@@ -252,16 +252,16 @@ export default function CompetitionSchedule({
                 <div key={event.id} className="mb-6 last:mb-0">
                   {/* Event header */}
                   <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <div className="bg-black text-white px-2 py-0.5 text-xs font-black uppercase italic transform -skew-x-12 inline-flex items-center gap-1">
-                      <span className="transform skew-x-12 inline-block">
+                    <div className="bg-black text-white px-2 py-0.5 text-xs font-black inline-flex items-center gap-1">
+                      <span>
                         {formatDateRange(event.start_date, event.end_date)}
                       </span>
                     </div>
-                    <h4 className="text-sm md:text-base font-black text-black uppercase italic">
+                    <h4 className="text-sm md:text-base font-black text-black">
                       {event.title}
                     </h4>
                     {event.stage_display && (
-                      <span className="text-[10px] font-black uppercase italic text-p5-red border border-p5-red px-1.5 py-0.5 transform -skew-x-6">
+                      <span className="text-[10px] font-black text-p5-red border border-p5-red px-1.5 py-0.5">
                         {event.stage_display}
                       </span>
                     )}
@@ -276,7 +276,7 @@ export default function CompetitionSchedule({
                     </div>
                   ) : (
                     <p className="text-xs text-gray-400 italic pl-2 border-l-2 border-gray-200">
-                      暂无参赛视频 / NO VIDEOS YET
+                      暂无参赛视频
                     </p>
                   )}
                 </div>

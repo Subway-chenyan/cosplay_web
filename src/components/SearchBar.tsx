@@ -10,7 +10,7 @@ interface SearchBarProps {
   className?: string
 }
 
-function SearchBar({ value, onChange, onClear, onSearch, className = "" }: SearchBarProps) {
+function SearchBar({ value, onChange, onClear, onSearch, placeholder, className = "" }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch()
@@ -28,15 +28,15 @@ function SearchBar({ value, onChange, onClear, onSearch, className = "" }: Searc
     <div className={`relative ${className}`}>
       <form onSubmit={handleSubmit} className="relative flex items-center space-x-2">
         <div className="relative flex-grow">
-          <div className="absolute inset-0 bg-black transform -skew-x-12 translate-x-1 translate-y-1"></div>
-          <div className="relative bg-white transform -skew-x-12 border-2 border-black focus-within:border-p5-red transition-colors flex items-center">
-            <Search className="h-5 w-5 text-black ml-4 transform skew-x-12" />
+          <div className="absolute inset-0 bg-black translate-x-1 translate-y-1"></div>
+          <div className="relative bg-white border-2 border-black focus-within:border-p5-red transition-colors flex items-center">
+            <Search className="h-5 w-5 text-black ml-4" />
             <input
               type="text"
-              placeholder="我想搜索... (例如: 2025 ChinaJoy 金奖)"
+              placeholder={placeholder || '请输入关键词搜索'}
               value={value}
               onChange={handleInputChange}
-              className="w-full pl-2 pr-10 py-3 bg-transparent border-none focus:ring-0 placeholder-gray-400 text-black font-black transform skew-x-12"
+              className="w-full pl-2 pr-10 py-3 bg-transparent border-none focus:ring-0 placeholder-gray-400 text-black font-black"
             />
           </div>
           {value && (
@@ -53,15 +53,15 @@ function SearchBar({ value, onChange, onClear, onSearch, className = "" }: Searc
 
         <button
           type="submit"
-          className="h-12 px-6 bg-p5-red text-white font-black transform -skew-x-12 border-2 border-b-4 border-black active:border-b-2 active:translate-y-1 transition-all hover:bg-black flex-shrink-0"
+          className="h-12 px-6 bg-p5-red text-white font-black border-2 border-b-4 border-black active:border-b-2 active:translate-y-1 transition-all hover:bg-black flex-shrink-0"
         >
-          <span className="transform skew-x-12 inline-block">搜索 / GO</span>
+          搜索
         </button>
       </form>
       {value && (
-        <div className="mt-2 text-xs font-black text-white bg-black inline-block px-3 py-1 transform -skew-x-12 border border-p5-red">
-          <span className="transform skew-x-12 inline-block italic uppercase tracking-tighter">
-            正在搜索: <span className="text-p5-red">"{value}"</span> / INVESTIGATION IN PROGRESS
+        <div className="mt-2 text-xs font-black text-white bg-black inline-block px-3 py-1 border border-p5-red">
+          <span>
+            正在搜索: <span className="text-p5-red">"{value}"</span>
           </span>
         </div>
       )}

@@ -77,7 +77,7 @@ function EventBindModal({ videoId, isOpen, onClose, onBound }: {
           <div className="bg-black text-white px-4 py-3 flex items-center justify-between border-b-4 border-p5-red">
             <div className="flex items-center gap-2 transform skew-x-1">
               <Trophy className="w-5 h-5 text-p5-red" />
-              <h3 className="font-black uppercase italic text-sm">绑定赛事 / BIND EVENT</h3>
+              <h3 className="font-black text-sm">绑定赛事</h3>
             </div>
             <button onClick={onClose} className="w-8 h-8 bg-p5-red text-white flex items-center justify-center border-2 border-white hover:bg-white hover:text-p5-red transition-colors">
               <X className="w-4 h-4" />
@@ -100,7 +100,7 @@ function EventBindModal({ videoId, isOpen, onClose, onBound }: {
                   <button key={ev.id} onClick={() => handleBind(ev.id)}
                     className="w-full text-left flex items-center gap-3 p-2 border-2 border-gray-200 hover:border-p5-red hover:bg-red-50 transition-all">
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black uppercase italic text-black truncate">{ev.title}</p>
+                    <p className="text-xs font-black text-black truncate">{ev.title}</p>
                       <p className="text-[10px] text-gray-400 font-bold">{ev.region} · {ev.stage_display || ev.start_date}</p>
                     </div>
                     <Plus className="w-4 h-4 text-p5-red" />
@@ -111,7 +111,7 @@ function EventBindModal({ videoId, isOpen, onClose, onBound }: {
             {!query && !loading && (
               <div className="text-center py-6">
                 <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-xs text-gray-400 font-bold italic">输入关键词搜索赛事</p>
+                <p className="text-xs text-gray-400 font-bold">输入关键词搜索赛事</p>
               </div>
             )}
           </div>
@@ -241,11 +241,11 @@ function VideoDetailPage() {
       <div className="flex items-center">
         <button
           onClick={() => navigate(-1)}
-          className="group flex items-center bg-black text-white px-4 py-2 transform -skew-x-12 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
+          className="group flex items-center bg-black text-white px-4 py-2 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
         >
-          <span className="flex items-center transform skew-x-12">
+          <span className="flex items-center">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="font-black uppercase italic">Go Back / 返回上一页</span>
+            <span className="font-black">返回上一页</span>
           </span>
         </button>
       </div>
@@ -295,15 +295,15 @@ function VideoDetailPage() {
             </div>
 
             {/* 跳转原视频模块 */}
-            <div className="p-6 bg-black text-white border-t-4 border-p5-red transform skew-x-1">
-              <div className="flex items-center justify-between transform -skew-x-1">
+            <div className="p-6 bg-black text-white border-t-4 border-p5-red">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transform rotate-12 border-2 border-p5-red">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border-2 border-p5-red">
                     <span className="text-p5-red font-black text-xl">B</span>
                   </div>
                   <div>
-                    <div className="text-xl font-black italic uppercase">Bilibili Recording / 原片档案</div>
-                    <div className="text-xs font-bold text-gray-400">ACCESSING ORIGINAL DATA / 获得更好的观看体验</div>
+                    <div className="text-xl font-black">B站原片</div>
+                    <div className="text-xs font-bold text-gray-400">获得更好的观看体验</div>
                   </div>
                 </div>
 
@@ -311,11 +311,11 @@ function VideoDetailPage() {
                   href={video.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-p5-red hover:bg-white hover:text-black text-white px-6 py-2 font-black uppercase italic transform -skew-x-12 transition-all shadow-[4px_4px_0_0_black]"
+                  className="bg-p5-red hover:bg-white hover:text-black text-white px-6 py-2 font-black transition-all shadow-[4px_4px_0_0_black]"
                 >
-                  <span className="transform skew-x-12 flex items-center">
+                  <span className="flex items-center">
                     <ExternalLink className="w-5 h-5 mr-2" />
-                    <span>Watch / 前往B站</span>
+                    <span>前往B站</span>
                   </span>
                 </a>
               </div>
@@ -350,15 +350,15 @@ function VideoDetailPage() {
                 {/* 标签 */}
                 {video.tags.length > 0 && (
                   <div className="mb-8 p-4 bg-gray-50 border-l-8 border-black">
-                    <h3 className="text-xs font-black text-black uppercase italic mb-3 tracking-widest border-b border-p5-red inline-block">标签情报 / INTEL TAGS</h3>
+                    <h3 className="text-xs font-black text-black mb-3 tracking-widest border-b border-p5-red inline-block">标签</h3>
                     <div className="flex flex-wrap gap-3">
                       {video.tags.map((tag) => (
                         <span
                           key={tag.id}
-                          className="px-3 py-1 text-xs font-black uppercase italic transform -skew-x-12 border-2 transition-all hover:scale-105 active:bg-black active:text-white"
+                          className="px-3 py-1 text-xs font-black border-2 transition-all hover:scale-105 active:bg-black active:text-white"
                           style={{ backgroundColor: 'white', borderColor: 'black', color: 'black' }}
                         >
-                          <span className="transform skew-x-12 inline-block">#{tag.name} / {tag.category}</span>
+                          <span className="inline-block">#{tag.name} · {tag.category}</span>
                         </span>
                       ))}
                     </div>
@@ -367,8 +367,8 @@ function VideoDetailPage() {
 
                 {/* 描述 */}
                 <div className="relative">
-                  <h3 className="text-lg font-black text-black uppercase italic mb-3 border-b-2 border-black inline-block p5-text-shadow">详情介绍 / DESCRIPTION</h3>
-                  <p className="text-black font-bold leading-relaxed italic border-l-4 border-p5-red pl-6 py-4 bg-white shadow-[4px_4px_0_0_black] border-2 border-black">
+                  <h3 className="text-lg font-black text-black mb-3 border-b-2 border-black inline-block p5-text-shadow">详情介绍</h3>
+                  <p className="text-black font-bold leading-relaxed border-l-4 border-p5-red pl-6 py-4 bg-white shadow-[4px_4px_0_0_black] border-2 border-black">
                     {video.description}
                   </p>
                 </div>
@@ -379,7 +379,7 @@ function VideoDetailPage() {
 
         {/* 右侧信息栏 */}
         <div className="space-y-8">
-          {/* ========== 赛事信息 / Competition Info ========== */}
+          {/* ========== 赛事信息 ========== */}
           {(videoEvents.length > 0 || isAdmin) && (
             <div className="relative group">
               <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 z-0 shadow-lg"></div>
@@ -387,13 +387,13 @@ function VideoDetailPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-10 -rotate-45 translate-x-16 -translate-y-16"></div>
 
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-black text-black uppercase italic border-b-4 border-p5-red inline-block" style={{ textShadow: '2px 2px 0px #d90614' }}>
-                    赛事信息 / EVENTS
+                  <h2 className="text-xl font-black text-black border-b-4 border-p5-red inline-block" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                    赛事信息
                   </h2>
                   {isAdmin && (
                     <button
                       onClick={() => setBindModalOpen(true)}
-                      className="bg-p5-red text-white px-2 py-1 text-[10px] font-black uppercase italic transform -skew-x-6 hover:bg-black transition-colors inline-flex items-center gap-1"
+                      className="bg-p5-red text-white px-2 py-1 text-[10px] font-black hover:bg-black transition-colors inline-flex items-center gap-1"
                     >
                       <Plus className="w-3 h-3" />
                       <span className="transform skew-x-6 inline-block">绑定</span>
@@ -424,8 +424,8 @@ function VideoDetailPage() {
                                   </span>
                                 )}
                                 {ev.stage_display && (
-                                  <span className="text-[10px] font-black uppercase italic text-white bg-black px-1.5 py-0.5 transform -skew-x-6">
-                                    <span className="transform skew-x-6 inline-block">{ev.stage_display}</span>
+                                  <span className="text-[10px] font-black text-white bg-black px-1.5 py-0.5">
+                                    <span>{ev.stage_display}</span>
                                   </span>
                                 )}
                               </div>
@@ -451,7 +451,7 @@ function VideoDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 italic">未绑定赛事 / NO EVENTS BOUND</p>
+                  <p className="text-xs text-gray-400">未绑定赛事</p>
                 )}
               </div>
             </div>
@@ -464,15 +464,15 @@ function VideoDetailPage() {
               <div className="relative z-10 bg-white border-4 border-black p-8 overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-10 -rotate-45 translate-x-16 -translate-y-16"></div>
 
-                <h2 className="text-2xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block p5-text-shadow-red">
-                  所属社团 / ALLIANCE
+                <h2 className="text-2xl font-black text-black mb-8 border-b-4 border-p5-red inline-block p5-text-shadow-red">
+                  所属社团
                 </h2>
 
                 {/* 社团头部 */}
                 <div className="flex items-center space-x-4 mb-8">
                   <button
                     onClick={handleGroupClick}
-                    className="w-20 h-20 bg-p5-red transform -rotate-6 border-4 border-black shadow-[4px_4px_0_0_black] overflow-hidden flex-shrink-0 hover:rotate-0 transition-transform cursor-pointer"
+                  className="w-20 h-20 bg-p5-red border-4 border-black shadow-[4px_4px_0_0_black] overflow-hidden flex-shrink-0 cursor-pointer"
                   >
                     {groupDetails.logo ? (
                       <img
@@ -492,22 +492,22 @@ function VideoDetailPage() {
                   <div className="flex-1 min-w-0">
                     <button
                       onClick={handleGroupClick}
-                      className="text-2xl font-black text-black uppercase italic leading-none hover:text-p5-red transition-colors cursor-pointer block text-left"
+                      className="text-2xl font-black text-black leading-none hover:text-p5-red transition-colors cursor-pointer block text-left"
                     >
                       {groupDetails.name}
                     </button>
 
                     {groupDetails.location && (
-                      <div className="flex items-center text-black font-black italic text-xs mt-2 uppercase bg-gray-100 px-2 py-1 transform -skew-x-12 border-l-4 border-p5-red">
-                        <MapPin className="w-4 h-4 mr-1 text-p5-red transform skew-x-12" />
-                        <span className="transform skew-x-12 inline-block">驻地: {groupDetails.location} / BASE</span>
+                      <div className="flex items-center text-black font-black text-xs mt-2 bg-gray-100 px-2 py-1 border-l-4 border-p5-red">
+                        <MapPin className="w-4 h-4 mr-1 text-p5-red" />
+                        <span className="inline-block">驻地: {groupDetails.location}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* 社团描述 */}
-                <div className="mb-8 p-4 bg-gray-100 italic font-bold text-sm border-2 border-black border-dashed">
+                <div className="mb-8 p-4 bg-gray-100 font-bold text-sm border-2 border-black border-dashed">
                   {groupDetails.description}
                 </div>
 
@@ -518,10 +518,10 @@ function VideoDetailPage() {
                       href={groupDetails.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center bg-black text-white px-4 py-2 transform -skew-x-12 hover:bg-white hover:text-black hover:border-2 hover:border-black transition-all group/link"
+                      className="flex items-center bg-black text-white px-4 py-2 hover:bg-white hover:text-black hover:border-2 hover:border-black transition-all group/link"
                     >
                       <Globe className="w-5 h-5 mr-3 group-hover/link:text-p5-red" />
-                      <span className="transform skew-x-12 font-black uppercase italic text-sm">Official Website / 官方网站</span>
+                      <span className="font-black text-sm">官方网站</span>
                     </a>
                   )}
 
@@ -530,12 +530,12 @@ function VideoDetailPage() {
                       href={groupDetails.bilibili}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center bg-p5-red text-white px-4 py-2 transform -skew-x-12 hover:bg-black transition-all group/link"
+                      className="flex items-center bg-p5-red text-white px-4 py-2 hover:bg-black transition-all group/link"
                     >
-                      <div className="w-5 h-5 mr-3 bg-white rounded flex items-center justify-center transform skew-x-12">
+                      <div className="w-5 h-5 mr-3 bg-white rounded flex items-center justify-center">
                         <span className="text-p5-red font-black text-xs">B</span>
                       </div>
-                      <span className="transform skew-x-12 font-black uppercase italic text-sm">Bilibili / 哔哩哔哩</span>
+                      <span className="font-black text-sm">哔哩哔哩</span>
                     </a>
                   )}
                 </div>

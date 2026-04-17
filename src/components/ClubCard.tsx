@@ -31,7 +31,7 @@ function ClubCard({ club, onClick }: ClubCardProps) {
       className="relative group cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
       onClick={handleClick}
     >
-      <div className="absolute inset-0 bg-black transform translate-x-1 translate-y-1 rotate-1 border-2 border-gray-800 z-0"></div>
+      <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 border-2 border-gray-800 z-0"></div>
 
       <div className="relative z-10 bg-white border-2 border-black p-5 h-full flex flex-col overflow-hidden">
         {/* Decorative corner */}
@@ -39,7 +39,7 @@ function ClubCard({ club, onClick }: ClubCardProps) {
 
         {/* 社团名称 */}
         <div className="mb-4 relative z-10">
-          <h3 className="text-xl font-black text-black uppercase transform -skew-x-6 border-b-4 border-p5-red inline-block pr-2 mb-1">
+          <h3 className="text-xl font-black text-black border-b-4 border-p5-red inline-block pr-2 mb-1">
             {club.name}
           </h3>
         </div>
@@ -47,8 +47,8 @@ function ClubCard({ club, onClick }: ClubCardProps) {
         {/* 位置信息 */}
         <div className="flex items-center text-sm font-bold text-gray-800 mb-2">
           <MapPin className="w-4 h-4 mr-2 text-p5-red" />
-          <span className="bg-black text-white px-1 transform skew-x-12 inline-block">
-            <span className="transform -skew-x-12 inline-block">{displayLocation}</span>
+          <span className="bg-black text-white px-1 inline-block">
+            <span>{displayLocation}</span>
           </span>
         </div>
 
@@ -56,7 +56,7 @@ function ClubCard({ club, onClick }: ClubCardProps) {
         <div className="flex items-center text-sm font-bold text-gray-800 mb-4">
           <Video className="w-4 h-4 mr-2 text-p5-red" />
           <span>
-            {club.video_count || 0} VIDEOS
+            {club.video_count || 0} 个视频
           </span>
         </div>
 

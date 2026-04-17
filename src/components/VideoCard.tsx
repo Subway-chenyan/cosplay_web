@@ -69,7 +69,7 @@ function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
       onClick={onClick}
     >
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-black transform translate-x-1 translate-y-1 -skew-x-2 border-2 border-gray-800 z-0"></div>
+      <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 border-2 border-gray-800 z-0"></div>
 
       {/* Main card content */}
       <div className="relative z-10 bg-white border-2 border-black h-full flex flex-col overflow-hidden">
@@ -102,7 +102,7 @@ function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
               {(imageError || !thumbnailUrl) && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100">
                   <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-                  <span className="text-xs text-gray-500">NO IMAGE</span>
+                  <span className="text-xs text-gray-500">暂无图片</span>
                 </div>
               )}
 
@@ -114,8 +114,8 @@ function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
           )}
 
           {/* Date Badge - P5 Style */}
-          <div className="absolute top-0 right-0 bg-p5-red text-white text-xs font-bold px-2 py-1 transform skew-x-12 origin-top-right border-l-2 border-b-2 border-white shadow-md">
-            <span className="transform -skew-x-12 inline-block">{video.year}</span>
+          <div className="absolute top-0 right-0 bg-p5-red text-white text-xs font-bold px-2 py-1 origin-top-right border-l-2 border-b-2 border-white shadow-md">
+            <span>{video.year}</span>
           </div>
         </div>
 

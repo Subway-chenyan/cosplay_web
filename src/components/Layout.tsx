@@ -7,7 +7,7 @@ function Layout() {
   const isChoreoPage = location.pathname === '/choreo'
 
   return (
-    <div className="min-h-screen bg-black flex flex-col" style={{ backgroundImage: 'url("/src/assets/p5-bg.png")', backgroundSize: 'cover', backgroundAttachment: 'fixed', backgroundPosition: 'center' }}>
+    <div className="min-h-screen bg-transparent flex flex-col">
       <Header />
       <main className="container mx-auto px-4 py-12 relative flex-grow">
         {/* Dynamic page decoration - More aggressive P5 shards */}

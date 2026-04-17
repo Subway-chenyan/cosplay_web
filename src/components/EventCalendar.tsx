@@ -360,7 +360,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                   <div className="flex justify-between items-start mb-8 border-b-4 border-black pb-4">
                     <div className="flex-1">
                       <div className="bg-black inline-block px-4 py-1 transform -skew-x-12 mb-4">
-                        <span className="text-sm font-black text-white italic uppercase tracking-tighter">情报确认 / TARGET IDENTIFIED</span>
+                        <span className="text-sm font-black text-white tracking-tighter">赛事信息</span>
                       </div>
                       <h3 className="text-2xl md:text-4xl font-black text-black uppercase italic tracking-tighter leading-none break-words" style={{ textShadow: '2px 2px 0px #d90614' }}>
                         {selectedEvent.title}
@@ -377,8 +377,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <div className="bg-gray-100 p-4 border-l-8 border-black">
-                        <p className="text-[10px] font-black text-p5-red uppercase italic mb-1">执行日期 / EXECUTION DATE</p>
-                        <p className="text-xl font-black italic">
+                        <p className="text-[10px] font-black text-p5-red mb-1">执行日期</p>
+                        <p className="text-xl font-black">
                           {selectedEvent.start_date === selectedEvent.end_date
                             ? selectedEvent.start_date
                             : `${selectedEvent.start_date} ~ ${selectedEvent.end_date}`}
@@ -386,14 +386,14 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                       </div>
 
                       <div className="bg-gray-100 p-4 border-l-8 border-p5-red">
-                        <p className="text-[10px] font-black text-black uppercase italic mb-1">所属档案 / BATTLE ARCHIVE</p>
-                        <p className="text-xl font-black italic">{selectedEvent.competition_name}</p>
+                        <p className="text-[10px] font-black text-black mb-1">所属赛事</p>
+                        <p className="text-xl font-black">{selectedEvent.competition_name}</p>
                       </div>
 
                       {selectedEvent.description && (
                         <div className="border-2 border-black p-4 bg-white shadow-[4px_4px_0_0_black]">
-                          <p className="text-[10px] font-black text-black uppercase italic mb-2 border-b border-black inline-block">情报摘要 / INTEL BRIEF</p>
-                          <p className="text-sm font-bold text-gray-800 leading-relaxed italic whitespace-pre-wrap">{selectedEvent.description}</p>
+                          <p className="text-[10px] font-black text-black mb-2 border-b border-black inline-block">简介</p>
+                          <p className="text-sm font-bold text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedEvent.description}</p>
                         </div>
                       )}
                     </div>
@@ -405,7 +405,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                             <Users className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="text-[10px] font-black text-p5-red uppercase italic">联络渠道 / CONTACT</p>
+                            <p className="text-[10px] font-black text-p5-red">联络渠道</p>
                             <p className="text-sm font-black">{selectedEvent.contact}</p>
                           </div>
                         </div>
@@ -422,7 +422,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ className = '' }) => {
                             <ExternalLink className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <p className="text-[10px] font-black text-black uppercase italic group-hover/link:text-p5-red">官方来源 / SOURCE</p>
+                            <p className="text-[10px] font-black text-black group-hover/link:text-p5-red">官方来源</p>
                             <p className="text-sm font-black truncate max-w-[150px]">{selectedEvent.website}</p>
                           </div>
                         </a>

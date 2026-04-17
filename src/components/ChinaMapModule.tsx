@@ -107,11 +107,11 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
                   <div style="padding: 12px; background: #000; color: #fff; border: 2px solid #d90614; font-family: sans-serif;">
                     <div style="font-weight: 900; margin-bottom: 4px; color: #d90614; font-size: 16px; border-bottom: 1px solid #d90614;">${params.data.name}</div>
                     <div style="font-weight: bold;">社团数量: ${params.data.value}个</div>
-                    <div style="color: #999; font-size: 10px; margin-top: 4px; font-style: italic;">CLICK TO INVESTIGATE / 点击查看详情</div>
+                    <div style="color: #999; font-size: 10px; margin-top: 4px;">点击查看详情</div>
                   </div>
                 `;
               }
-              return `<div style="padding: 8px; background: #000; color: #fff;">${params.name}<br/>INTEGRITY UNKNOWN / 暂无社团数据</div>`;
+              return `<div style="padding: 8px; background: #000; color: #fff;">${params.name}<br/>暂无社团数据</div>`;
             },
             backgroundColor: 'transparent',
             borderColor: 'transparent',
@@ -239,31 +239,31 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
   return (
     <div className={`relative group ${className}`}>
       {/* 装饰性背景层 */}
-      <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-1 z-0 shadow-lg"></div>
+      <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0 shadow-lg"></div>
 
-      <div className="relative z-10 bg-white border-4 border-black p-6 md:p-8 transform -skew-x-1 overflow-hidden">
+      <div className="relative z-10 bg-white border-4 border-black p-6 md:p-8 overflow-hidden">
         {/* 背景装饰 */}
         <div className="absolute top-0 right-0 w-64 h-64 p5-halftone opacity-5 -rotate-45 translate-x-32 -translate-y-32"></div>
 
         {/* 头部 */}
-        <div className="flex items-center justify-between mb-8 transform skew-x-1 border-b-4 border-black pb-4">
+        <div className="flex items-center justify-between mb-8 border-b-4 border-black pb-4">
           <div className="flex items-center space-x-4">
-            <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
-              <MapPin className="w-8 h-8 text-white transform -rotate-12" />
+            <div className="bg-p5-red p-3 border-2 border-black">
+              <MapPin className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter">OPERATIONAL MAP / 社团分布</h2>
-              <p className="text-xs font-black text-p5-red uppercase italic">DEPLOYMENT STATUS BY REGION / 各地区部署状态</p>
+              <h2 className="text-xl md:text-3xl font-black text-black tracking-tight">社团分布</h2>
+              <p className="text-xs font-black text-p5-red">各地区部署状态</p>
             </div>
           </div>
         </div>
 
-        <div className="relative transform skew-x-1">
+        <div className="relative">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50/80 backdrop-blur-sm z-20">
               <div className="text-center">
                 <div className="w-12 h-12 border-4 border-p5-red border-t-black rounded-full animate-spin mx-auto mb-4"></div>
-                <div className="text-lg font-black italic uppercase">Synchronizing... / 正在同步数据...</div>
+                <div className="text-lg font-black">正在同步数据...</div>
               </div>
             </div>
           )}
@@ -275,37 +275,37 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
         </div>
 
         {/* 地图说明 & 统计 */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 transform skew-x-1">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1 space-y-4">
-            <div className="bg-black text-white p-4 transform -rotate-2 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
+            <div className="bg-black text-white p-4 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
               <div className="flex items-center gap-3 mb-2">
                 <Search className="w-5 h-5 text-p5-red" />
-                <span className="font-black italic uppercase text-xs">Tactical Intel / 使用说明</span>
+                <span className="font-black text-xs">使用说明</span>
               </div>
-              <ul className="text-xs font-bold space-y-1 text-gray-300 italic">
-                <li>• 点击省份查看社团详情 / CLICK FOR INTEL</li>
-                <li>• 支持缩放与拖拽 / NAVIGATIONAL ZOOM</li>
+              <ul className="text-xs font-bold space-y-1 text-gray-300">
+                <li>• 点击省份查看社团详情</li>
+                <li>• 支持缩放与拖拽</li>
               </ul>
             </div>
           </div>
 
           <div className="md:col-span-2 grid grid-cols-2 gap-4">
             <div className="relative group/stat">
-              <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 -skew-x-6 z-0"></div>
-              <div className="relative z-10 bg-black p-4 transform -skew-x-6 border-2 border-white flex flex-col items-center justify-center">
-                <div className="text-3xl font-black text-white italic" style={{ textShadow: '2px 2px 0px #d90614' }}>
+              <div className="absolute inset-0 bg-p5-red translate-x-1 translate-y-1 z-0"></div>
+              <div className="relative z-10 bg-black p-4 border-2 border-white flex flex-col items-center justify-center">
+                <div className="text-3xl font-black text-white" style={{ textShadow: '2px 2px 0px #d90614' }}>
                   {Object.keys(clubData).length}
                 </div>
-                <div className="text-[10px] font-black text-p5-red uppercase italic">Provinces Secured / 覆盖省份</div>
+                <div className="text-[10px] font-black text-p5-red">覆盖省份</div>
               </div>
             </div>
             <div className="relative group/stat">
-              <div className="absolute inset-0 bg-white transform translate-x-1 translate-y-1 -skew-x-6 z-0"></div>
-              <div className="relative z-10 bg-black p-4 transform -skew-x-6 border-2 border-p5-red flex flex-col items-center justify-center">
-                <div className="text-3xl font-black text-white italic" style={{ textShadow: '2px 2px 0px #d90614' }}>
+              <div className="absolute inset-0 bg-white translate-x-1 translate-y-1 z-0"></div>
+              <div className="relative z-10 bg-black p-4 border-2 border-p5-red flex flex-col items-center justify-center">
+                <div className="text-3xl font-black text-white" style={{ textShadow: '2px 2px 0px #d90614' }}>
                   {Object.values(clubData).reduce((sum, data) => sum + data.count, 0)}
                 </div>
-                <div className="text-[10px] font-black text-gray-400 uppercase italic">Active Alliances / 社团总数</div>
+                <div className="text-[10px] font-black text-gray-400">社团总数</div>
               </div>
             </div>
           </div>
