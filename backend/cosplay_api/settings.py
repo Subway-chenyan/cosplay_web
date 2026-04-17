@@ -120,7 +120,7 @@ DATABASES = {
         'USER': config('DB_USER', default='cosplay_user'),
         'PASSWORD': config('DB_PASSWORD', default='cosplay_password_2024'),
         'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+        'PORT': config('DB_PORT', default='5433'),
     }
 }
 

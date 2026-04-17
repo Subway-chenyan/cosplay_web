@@ -8,7 +8,7 @@ import ClubCard from '../components/ClubCard'
 // import VideoFilters from '../components/VideoFilters'
 import SearchBar from '../components/SearchBar'
 import Pagination from '../components/Pagination'
-import { Loader, Tv, Sparkles, List, Info, Play } from 'lucide-react'
+import { Loader, Tv, Sparkles, Info, Play } from 'lucide-react'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
 import type { Video, Group } from '../types'
@@ -24,7 +24,6 @@ function HomePage() {
   const searchQueryRef = useRef(searchQuery)
 
   const [stats, setStats] = useState<{ total_videos: number; weekly_new_videos: number } | null>(null)
-  const [isAgentMode, setIsAgentMode] = useState(false)
   const [agentResults, setAgentResults] = useState<{
     text: string
     video_id_list: string[]
@@ -34,6 +33,9 @@ function HomePage() {
   } | null>(null)
   const [isAgentLoading, setIsAgentLoading] = useState(false)
   const [showAgentDebug, setShowAgentDebug] = useState(false)
+  
+  // 赛程折叠状态
+  const [isScheduleExpanded, setIsScheduleExpanded] = useState(false)
 
   const fetchStats = useCallback(async () => {
     try {
@@ -162,7 +164,7 @@ function HomePage() {
   }
 
   const handleSearch = async () => {
-    if (isAgentMode) {
+    if (false) {
       // Agent搜索模式
       setIsAgentLoading(true)
       try {
@@ -191,7 +193,7 @@ function HomePage() {
   }
 
   // 首次加载状态
-  if (loading && videos.length === 0 && !isAgentMode) {
+  if (loading && videos.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
@@ -202,7 +204,7 @@ function HomePage() {
     )
   }
 
-  // Agent搜索加载状态
+  // Agent搜索加载状态（已隐藏）
   if (isAgentLoading) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -244,26 +246,70 @@ function HomePage() {
         </div>
       </div>
 
+      {/* 当前赛程折叠模块 */}
+      <div className="relative group">
+        <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
+        <div className="relative z-10 bg-black border-4 border-p5-red p-6 transform -skew-x-2">
+          <div className="flex items-center justify-between mb-4 transform skew-x-2 cursor-pointer" onClick={() => setIsScheduleExpanded(!isScheduleExpanded)}>
+            <h2 className="text-2xl font-black text-white uppercase italic border-b-4 border-white">
+              CURRENT SCHEDULE / 当前赛程
+            </h2>
+            <div className="transform skew-x-12">
+              <span className="text-white font-black uppercase italic text-sm mr-2">
+                {isScheduleExpanded ? 'COLLAPSE' : 'EXPAND'}
+              </span>
+              <div className={`w-8 h-8 border-2 border-white transform transition-transform ${isScheduleExpanded ? 'rotate-45' : ''}`}>
+                <div className="w-full h-0.5 bg-white mt-3"></div>
+                {isScheduleExpanded && <div className="w-0.5 h-full bg-white ml-3"></div>}
+              </div>
+            </div>
+          </div>
+          
+          {isScheduleExpanded && (
+            <div className="mt-4 pt-4 border-t-2 border-white border-dashed transform skew-x-2">
+              <div id="current" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div id="guangzhou" className="bg-white p-4 transform -skew-x-12 border-2 border-black">
+                  <h3 className="font-black text-black italic mb-2">2026CJ广州预选赛</h3>
+                  <p className="text-xs font-bold text-gray-600 italic">4月2日 15:06</p>
+                  <p className="text-xs font-bold text-p5-red italic mt-1">已结束</p>
+                </div>
+                <div id="shanghai" className="bg-white p-4 transform -skew-x-12 border-2 border-black">
+                  <h3 className="font-black text-black italic mb-2">2026CJ上海预选赛</h3>
+                  <p className="text-xs font-bold text-gray-600 italic">4月15日 14:00</p>
+                  <p className="text-xs font-bold text-p5-red italic mt-1">进行中</p>
+                </div>
+                <div id="beijing" className="bg-white p-4 transform -skew-x-12 border-2 border-black">
+                  <h3 className="font-black text-black italic mb-2">2026CJ北京预选赛</h3>
+                  <p className="text-xs font-bold text-gray-600 italic">4月22日 14:00</p>
+                  <p className="text-xs font-bold text-p5-red italic mt-1">进行中</p>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <a 
+                  href="https://www.cosdrama.cn/competitions#current" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-p5-red text-white font-black uppercase italic transform -skew-x-12 border-2 border-white hover:bg-white hover:text-p5-red transition-all shadow-[4px_4px_0_0_black]"
+                >
+                  <span className="transform skew-x-12">查看全部赛程 / VIEW ALL SCHEDULES</span>
+                  <svg className="w-4 h-4 ml-2 transform skew-x-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="relative group">
         <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
         <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-2">
           <div className="flex items-center justify-between mb-6 transform skew-x-2">
             <h2 className="text-2xl font-black text-black uppercase italic border-b-4 border-p5-red">
-              {isAgentMode ? 'AI INVESTIGATION / 智能搜索' : 'DATABASE SEARCH / 搜索视频'}
+              DATABASE SEARCH / 搜索视频
             </h2>
-            <button
-              onClick={() => setIsAgentMode(!isAgentMode)}
-              className={`flex items-center space-x-2 px-6 py-2 transform -skew-x-12 transition-all font-black uppercase italic ${isAgentMode
-                ? 'bg-purple-600 text-white shadow-[4px_4px_0_0_black]'
-                : 'bg-black text-white hover:bg-p5-red'
-                }`}
-            >
-              <span className="transform skew-x-12 flex items-center">
-                {isAgentMode ? <Sparkles className="w-4 h-4 mr-2" /> : <List className="w-4 h-4 mr-2" />}
-                {isAgentMode ? 'Agent Mode' : 'Standard'}
-              </span>
-            </button>
           </div>
           <div className="transform skew-x-2">
             <SearchBar
@@ -272,23 +318,17 @@ function HomePage() {
               onClear={handleClearSearch}
               onSearch={handleSearch}
               placeholder={
-                isAgentMode
-                  ? 'Tell us what you are looking for... (e.g. 2025 ChinaJoy Gold Winners)'
-                  : 'Title, Group, Competition, Tag...'
+                'Title, Group, Competition, Tag...'
               }
               className="max-w-2xl"
             />
           </div>
-          {isAgentMode && (
-            <p className="text-xs text-gray-500 mt-4 font-bold uppercase tracking-widest bg-gray-100 p-2 transform skew-x-2">
-              💡 Agent mode supports natural language search for both videos and clubs.
-            </p>
-          )}
+          
         </div>
       </div>
 
       {/* Stats Cards */}
-      {!isAgentMode && (
+      {(
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           <div className="relative group">
             <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 -skew-x-12 z-0"></div>
@@ -329,159 +369,166 @@ function HomePage() {
       )} */}
 
       {/* Agent Search Results */}
-      {isAgentMode && agentResults && (
+      {false && agentResults && (
         <div className="space-y-8">
           {/* Agent搜索结果头部 - 显示LLM文本总结 */}
-          <div className="bg-black border-4 border-p5-red p-8 transform -skew-x-2 relative overflow-hidden shadow-[8px_8px_0_0_black]">
-            <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-20 rotate-12 translate-x-12 -translate-y-12"></div>
-            <div className="flex items-center space-x-3 mb-6 transform skew-x-2">
-              <Sparkles className="w-8 h-8 text-p5-red" />
-              <span className="text-2xl font-black text-white italic uppercase tracking-tighter p5-text-shadow-red">搜查报告 / INVESTIGATION REPORT</span>
-            </div>
-            <div className="text-white transform skew-x-2 relative z-10">
-              <p className="text-lg font-bold leading-relaxed italic border-l-4 border-p5-red pl-6">{agentResults.text}</p>
-            </div>
-
-            {(agentResults.video_id_list.length > 0 || agentResults.group_id_list.length > 0) && (
-              <div className="mt-8 pt-6 border-t-2 border-p5-red border-dashed transform skew-x-2">
-                <p className="text-p5-red font-black italic uppercase text-sm">
-                  已截获 {agentResults.video_id_list.length} 条记录 & {agentResults.group_id_list.length} 个组织情报 / ASSETS CAPTURED
-                </p>
-                {/* 调试状态标签 */}
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
-                    影像标记: {agentResults.video_id_list.length}
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
-                    解析视频: {agentResults.videos.length}
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
-                    组织标记: {agentResults.group_id_list.length}
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
-                    解析组织: {agentResults.groups.length}
-                  </span>
+          {agentResults && (
+            <>
+              <div className="bg-black border-4 border-p5-red p-8 transform -skew-x-2 relative overflow-hidden shadow-[8px_8px_0_0_black]">
+                <div className="absolute top-0 right-0 w-32 h-32 p5-halftone opacity-20 rotate-12 translate-x-12 -translate-y-12"></div>
+                <div className="flex items-center space-x-3 mb-6 transform skew-x-2">
+                  <Sparkles className="w-8 h-8 text-p5-red" />
+                  <span className="text-2xl font-black text-white italic uppercase tracking-tighter p5-text-shadow-red">搜查报告 / INVESTIGATION REPORT</span>
+                </div>
+                <div className="text-white transform skew-x-2 relative z-10">
+                  <p className="text-lg font-bold leading-relaxed italic border-l-4 border-p5-red pl-6">{agentResults?.text}</p>
                 </div>
 
-                {/* 调试信息面板 */}
-                {showAgentDebug && (
-                  <div className="mt-6 p-6 bg-white border-4 border-black transform -skew-x-1 shadow-[4px_4px_0_0_#d90614]">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 transform skew-x-1">
-                      <div>
-                        <h4 className="text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">影像特征 / VIDEO ID</h4>
-                        <div className="text-xs font-bold text-black break-all leading-tight">
-                          {agentResults.video_id_list.slice(0, 5).join(', ')}
-                          {agentResults.video_id_list.length > 5 && ' ...'}
+                {(() => {
+                  const hasResults = (agentResults?.video_id_list?.length ?? 0) > 0 || (agentResults?.group_id_list?.length ?? 0) > 0
+                  return hasResults
+                })() && (
+                  <div className="mt-8 pt-6 border-t-2 border-p5-red border-dashed transform skew-x-2">
+                    <p className="text-p5-red font-black italic uppercase text-sm">
+                      已截获 {(agentResults?.video_id_list?.length ?? 0)} 条记录 & {(agentResults?.group_id_list?.length ?? 0)} 个组织情报 / ASSETS CAPTURED
+                    </p>
+                    {/* 调试状态标签 */}
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                        影像标记: {(agentResults?.video_id_list?.length ?? 0)}
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                        解析视频: {agentResults?.videos.length}
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                        组织标记: {agentResults?.group_id_list.length}
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 bg-white text-black font-black text-xs uppercase italic transform -skew-x-12 border border-black shadow-[2px_2px_0_0_rgba(217,6,20,0.5)]">
+                        解析组织: {agentResults?.groups.length}
+                      </span>
+                    </div>
+
+                    {/* 调试信息面板 */}
+                    {showAgentDebug && (
+                      <div className="mt-6 p-6 bg-white border-4 border-black transform -skew-x-1 shadow-[4px_4px_0_0_#d90614]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 transform skew-x-1">
+                          <div>
+                            <h4 className="text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">影像特征 / VIDEO ID</h4>
+                            <div className="text-xs font-bold text-black break-all leading-tight">
+                              {agentResults?.video_id_list.slice(0, 5).join(', ')}
+                              {(agentResults?.video_id_list?.length ?? 0) > 5 && ' ...'}
+                            </div>
+                            <h4 className="mt-6 text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">核心数据 / DECODED VIDEO</h4>
+                            <ul className="space-y-1">
+                              {agentResults?.videos.slice(0, 5).map((v) => (
+                                <li key={v.id} className="text-xs font-bold text-black italic">
+                                  - {v.title}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">组织特征 / ALLIANCE ID</h4>
+                            <div className="text-xs font-bold text-black break-all leading-tight">
+                              {agentResults?.group_id_list.slice(0, 5).join(', ')}
+                              {(agentResults?.group_id_list?.length ?? 0) > 5 && ' ...'}
+                            </div>
+                            <h4 className="mt-6 text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">核心成员 / DECODED ALLIANCE</h4>
+                            <ul className="space-y-1">
+                              {agentResults?.groups.slice(0, 5).map((g) => (
+                                <li key={g.id} className="text-xs font-bold text-black italic">
+                                  - {g.name}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
-                        <h4 className="mt-6 text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">核心数据 / DECODED VIDEO</h4>
-                        <ul className="space-y-1">
-                          {agentResults.videos.slice(0, 5).map((v) => (
-                            <li key={v.id} className="text-xs font-bold text-black italic">
-                              - {v.title}
-                            </li>
-                          ))}
-                        </ul>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">组织特征 / ALLIANCE ID</h4>
-                        <div className="text-xs font-bold text-black break-all leading-tight">
-                          {agentResults.group_id_list.slice(0, 5).join(', ')}
-                          {agentResults.group_id_list.length > 5 && ' ...'}
-                        </div>
-                        <h4 className="mt-6 text-sm font-black text-p5-red uppercase italic border-b-2 border-black inline-block mb-3">核心成员 / DECODED ALLIANCE</h4>
-                        <ul className="space-y-1">
-                          {agentResults.groups.slice(0, 5).map((g) => (
-                            <li key={g.id} className="text-xs font-bold text-black italic">
-                              - {g.name}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    )}
+
+                    {/* 调试开关按钮 */}
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() => setShowAgentDebug((v) => !v)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-p5-red text-white font-black uppercase italic transform -skew-x-12 border-2 border-white hover:bg-white hover:text-black transition-all"
+                      >
+                        <Info className="w-5 h-5 transform skew-x-12" />
+                        <span className="transform skew-x-12">{showAgentDebug ? '隐藏核心数据 / HIDE DEBUG' : '解析核心数据 / DECODE INTEL'}</span>
+                      </button>
                     </div>
                   </div>
                 )}
+              </div>
 
-                {/* 调试开关按钮 */}
-                <div className="mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setShowAgentDebug((v) => !v)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-p5-red text-white font-black uppercase italic transform -skew-x-12 border-2 border-white hover:bg-white hover:text-black transition-all"
-                  >
-                    <Info className="w-5 h-5 transform skew-x-12" />
-                    <span className="transform skew-x-12">{showAgentDebug ? '隐藏核心数据 / HIDE DEBUG' : '解析核心数据 / DECODE INTEL'}</span>
-                  </button>
+              {/* 视频结果 - 基于video_id_list判断 */}
+              {(agentResults?.video_id_list?.length ?? 0) > 0 && (
+                <div>
+                  <h2 className="text-3xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block">
+                    关联影像 / RELATED VIDEOS
+                    <span className="ml-4 text-sm font-black text-gray-400">
+                      ({(agentResults?.video_id_list?.length ?? 0)} 条记录)
+                    </span>
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {agentResults?.videos.map((video) => (
+                      <VideoCard
+                        key={video.id}
+                        video={video}
+                        onClick={() => handleVideoClick(video.id)}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
 
-          {/* 视频结果 - 基于video_id_list判断 */}
-          {agentResults.video_id_list.length > 0 && (
-            <div>
-              <h2 className="text-3xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block">
-                关联影像 / RELATED VIDEOS
-                <span className="ml-4 text-sm font-black text-gray-400">
-                  ({agentResults.video_id_list.length} 条记录)
-                </span>
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {agentResults.videos.map((video) => (
-                  <VideoCard
-                    key={video.id}
-                    video={video}
-                    onClick={() => handleVideoClick(video.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 社团结果 - 基于group_id_list判断 */}
-          {agentResults.group_id_list.length > 0 && (
-            <div>
-              <h2 className="text-3xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block">
-                关联组织 / RELATED ALLIANCE
-                <span className="ml-4 text-sm font-black text-gray-400">
-                  ({agentResults.group_id_list.length} 个)
-                </span>
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {agentResults.groups.map((group) => (
-                  <ClubCard
-                    key={group.id}
-                    club={group}
-                    onClick={() => handleClubClick(group.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 无结果 - 基于ID列表判断 */}
-          {agentResults.video_id_list.length === 0 && agentResults.group_id_list.length === 0 && (
-            <div className="relative p-20 text-center group/no-results overflow-hidden">
-              <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
-              <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
-
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
-                  <Sparkles className="w-20 h-20 text-black transform -rotate-12" />
+              {/* 社团结果 - 基于group_id_list判断 */}
+              {(agentResults?.group_id_list?.length ?? 0) > 0 && (
+                <div>
+                  <h2 className="text-3xl font-black text-black uppercase italic mb-8 border-b-4 border-p5-red inline-block">
+                    关联组织 / RELATED ALLIANCE
+                    <span className="ml-4 text-sm font-black text-gray-400">
+                      ({agentResults?.group_id_list.length} 个)
+                    </span>
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {agentResults?.groups.map((group) => (
+                      <ClubCard
+                        key={group.id}
+                        club={group}
+                        onClick={() => handleClubClick(group.id)}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
-                  未截获记录 / NO RECORDS FOUND
-                </h3>
-                <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white">
-                  尝试调整搜寻关键词 / TRY ANOTHER KEYWORD
-                </p>
-              </div>
-            </div>
+              )}
+
+              {/* 无结果 - 基于ID列表判断 */}
+              {(agentResults?.video_id_list?.length ?? 0) === 0 && (agentResults?.group_id_list?.length ?? 0) === 0 && (
+                <div className="relative p-20 text-center group/no-results overflow-hidden">
+                  <div className="absolute inset-0 bg-black transform -skew-y-1 z-0 border-y-8 border-p5-red shadow-2xl"></div>
+                  <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
+
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
+                      <Sparkles className="w-20 h-20 text-black transform -rotate-12" />
+                    </div>
+                    <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+                      未截获记录 / NO RECORDS FOUND
+                    </h3>
+                    <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white">
+                      尝试调整搜寻关键词 / TRY ANOTHER KEYWORD
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
 
       {/* Regular Video Grid - 只在非Agent模式下显示 */}
-      {!isAgentMode && (
+      {(
         <div className="mt-12">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div className="relative group">
@@ -536,7 +583,7 @@ function HomePage() {
       )}
 
       {/* Pagination */}
-      {!isAgentMode && (
+      {(
         <Pagination
           currentPage={currentPage}
           totalCount={pagination.count}
