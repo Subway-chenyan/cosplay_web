@@ -1,5 +1,161 @@
-在开发的过程中，维护一个开发进度文档，每当完成一个大功能时进行记录，遇到未解决的问题时也进行记录；
-在涉及python环境创建时，优先使用uv进行管理
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Cosplay舞台剧视频数据库 - A full-stack web application for managing cosplay competition videos, groups, awards, and forums.
+
+**Tech Stack:**
+- **Backend**: Django 4.2 + Django REST Framework + PostgreSQL
+- **Frontend**: React 18 + TypeScript + Vite + Redux Toolkit + Tailwind CSS
+- **Storage**: Cloudflare R2 for user avatars
+- **Editor**: TipTap for forum posts with Persona 5 styling
+- **Auth**: JWT tokens + django-allauth (social login support)
+
+## Project Structure
+
+```
+cosplay_web/
+├── backend/                    # Django backend
+│   ├── manage.py              # Django management commands
+│   ├── cosplay_api/           # Project settings
+│   │   ├── settings.py        # Django configuration
+│   │   └── urls.py            # Main URL routing
+│   ├── apps/                  # Django apps (modular architecture)
+│   │   ├── authentication/    # JWT auth, social login
+│   │   ├── users/             # User profiles, avatar upload
+│   │   ├── videos/            # Video CRUD, filters, bulk import
+│   │   ├── groups/            # Club/group management
+│   │   ├── competitions/      # Competition, event, schedule
+│   │   ├── awards/            # Award records
+│   │   ├── tags/              # Tag categories and management
+│   │   ├── forum/             # Forum posts, comments, categories
+│   │   ├── map/               # China map visualization data
+│   │   └── feedback/          # User feedback system
+│   └── requirements.txt
+├── src/                       # React frontend
+│   ├── pages/                 # Page components
+│   ├── components/            # Reusable UI components
+│   ├── services/              # API service layer (axios)
+│   ├── store/                 # Redux slices
+│   ├── types/                 # TypeScript types
+│   └── styles/                # P5 theme CSS
+└── bilibili_video_agent/      # Python agent for Bilibili video processing
+```
+
+## Common Commands
+
+### Backend (Django)
+```bash
+cd backend
+
+# Create/activate virtual environment (prefer uv)
+uv venv
+source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Database migrations
+python manage.py makemigrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Run development server
+python manage.py runserver
+
+# Django Admin
+# http://localhost:8000/admin/
+# API Docs (Swagger): http://localhost:8000/api/docs/
+# API Schema: http://localhost:8000/api/schema/
+```
+
+### Frontend (React + Vite)
+```bash
+# Install dependencies
+npm install
+
+# Development server (runs on http://localhost:5173/)
+npm run dev
+
+# Build for production
+npm run build
+
+# Lint
+npm run lint
+
+# Build choreomaster data separately
+npm run build:choreomaster
+```
+
+### Bilibili Video Agent
+```bash
+cd bilibili_video_agent
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run agent (for video fetching/processing)
+python main.py
+```
+
+## Architecture Notes
+
+### Backend Architecture
+- **Modular Django apps**: Each domain (videos, groups, forum, etc.) is a separate app under `apps/`
+- **API design**: RESTful with DRF serializers, filters, and pagination
+- **Authentication**: JWT tokens via `rest_framework_simplejwt`, supports refresh tokens
+- **Social login**: django-allauth configured for Weibo and GitHub
+- **Caching**: Redis-based caching for group stats (see `apps/groups/cache_utils.py`)
+- **Async tasks**: Celery + Redis for background jobs
+- **Admin interface**: Fully configured Django Admin for content management
+
+### Frontend Architecture
+- **State management**: Redux Toolkit with slices for videos, groups, competitions, awards, forum
+- **API layer**: Centralized axios instance with interceptors for auth tokens
+- **Routing**: React Router v6 with protected routes
+- **Styling**: Tailwind CSS with custom Persona 5 theme (`src/styles/p5-theme.css`)
+- **Editor**: TipTap-based rich text editor with P5 styling for forum posts
+- **Security**: DOMPurify for XSS protection in forum content
+
+### Key Features Implemented
+- **Forum system**: Categories, posts, comments, edit/delete permissions, atomic view counting
+- **User system**: Avatar upload (R2), default avatar fallback, role-based access
+- **Video management**: Filters, search, bulk import from Excel
+- **Competition schedules**: Region-based event display with video links
+- **Feedback system**: Site suggestions and issue reporting
+
+### Important Configuration
+- **Environment variables**: Loaded from `.env` in project root (not in backend/)
+- **CORS**: Configured for frontend-backend communication
+- **R2 Storage**: User avatars stored in Cloudflare R2 bucket `cosdrama`
+- **API base URL**: Uses Vite proxy in dev (`/api`), direct URL in production
+
+## Development Guidelines
+
+### When creating new features:
+1. Backend: Create new Django app under `apps/` or add to existing app
+2. Add DRF serializers, views, and URL patterns
+3. Update OpenAPI schema with drf-spectacular decorators if needed
+4. Frontend: Create service in `src/services/`, add Redux slice if state needed
+5. Add page component in `src/pages/` or reusable component in `src/components/`
+
+### Python environment management:
+- Use `uv` for creating and managing Python virtual environments (preferred)
+
+### Development tracking:
+- Record completed features and unresolved issues in the development progress section below
+
+### Cloudflare R2 Configuration:
+- Bucket name: `cosdrama` (APAC region)
+- Used for: User avatar uploads
+- Credentials: Stored in `.env` file (AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY)
+- S3 API endpoint: Configured in Django settings
+
+---
 
 ## 开发进度记录
 ### 2026-01-16: 论坛功能 (Forum)
@@ -22,25 +178,3 @@
   - 反馈弹窗支持登录/匿名用户提交。
   - 管理员用户中心新增反馈管理面板，支持查看、回复、状态管理。
   - Django Admin 后台支持反馈管理。
-
-cloudflare r2
-令牌值
-OJC_2E8w7Tb4mMKgJN62XD7bzTkrUg1Jx6SaPLkg
-
-为 S3 客户端使用以下凭据：
-访问密钥 ID
-c79fe7cba857b322403cd705affc9dd4
-
-机密访问密钥
-25add5bb2bfeb7217d045bfcf232a8c70504dccdd0faf82ba5c139cee225abba
-
-名称：
-cosdrama
-
-创建时间：
-2026年1月16日
-位置：
-亚太地区 (APAC)
-
-S3 API：
-https://15a6c16650fc2ef46ddeb7c98842d0c7.r2.cloudflarestorage.com/cosdrama

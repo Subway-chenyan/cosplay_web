@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 // import { PaginatedResponse } from '../types'
 
 // 根据环境配置API基础URL
-const getBaseURL = () => {
+export const getBaseURL = () => {
   // 在开发环境中使用Vite代理
   if (import.meta.env.DEV) {
     return '/api'

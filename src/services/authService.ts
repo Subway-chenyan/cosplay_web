@@ -1,4 +1,4 @@
-import { api } from './api'
+import { api, getBaseURL } from './api'
 
 interface LoginData {
   username: string
@@ -19,14 +19,18 @@ interface UserInfo {
 }
 
 class AuthService {
+  storeTokens(access: string, refresh: string): void {
+    localStorage.setItem('access_token', access)
+    localStorage.setItem('refresh_token', refresh)
+  }
+
   // 登录
   async login(data: LoginData): Promise<TokenResponse> {
     const response = await api.post<TokenResponse>('/token/', data)
     
     // 保存token到localStorage
     if (response.access) {
-      localStorage.setItem('access_token', response.access)
-      localStorage.setItem('refresh_token', response.refresh)
+      this.storeTokens(response.access, response.refresh)
     }
     
     return response
@@ -55,6 +59,17 @@ class AuthService {
   logout(): void {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
+  }
+
+  getQQLoginUrl(callbackUrl?: string): string {
+    const params = new URLSearchParams()
+    if (callbackUrl) {
+      params.set('next', callbackUrl)
+    }
+
+    const query = params.toString()
+    const suffix = query ? `?${query}` : ''
+    return `${getBaseURL()}/auth/qq/login/${suffix}`
   }
 
   // 获取当前用户信息

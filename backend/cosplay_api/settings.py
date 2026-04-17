@@ -271,6 +271,24 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
+# QQ 互联 OAuth 配置
+QQ_CONNECT_APP_ID = config('QQ_CONNECT_APP_ID', default='')
+QQ_CONNECT_APP_KEY = config('QQ_CONNECT_APP_KEY', default='')
+QQ_CONNECT_SCOPE = config('QQ_CONNECT_SCOPE', default='get_user_info')
+QQ_CONNECT_CALLBACK_URL = config(
+    'QQ_CONNECT_CALLBACK_URL',
+    default='https://www.cosdrama.cn/api/auth/qq/callback',
+)
+qq_redirect_origins_default = ','.join(CORS_ALLOWED_ORIGINS)
+QQ_CONNECT_ALLOWED_REDIRECT_ORIGINS = [
+    origin.strip()
+    for origin in config(
+        'QQ_CONNECT_ALLOWED_REDIRECT_ORIGINS',
+        default=qq_redirect_origins_default,
+    ).split(',')
+    if origin.strip()
+]
+
 # CSRF Settings
 CSRF_TRUSTED_ORIGINS = [
     'https://data.cosdrama.cn',

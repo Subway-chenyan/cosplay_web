@@ -14,6 +14,7 @@ import ForumPostDetail from './pages/Forum/ForumPostDetail'
 import NewPost from './pages/Forum/NewPost'
 import EditPost from './pages/Forum/EditPost'
 import LoginPage from './pages/LoginPage'
+import QQLoginCallbackPage from './pages/QQLoginCallbackPage'
 import RegisterPage from './pages/RegisterPage'
 import UserCenterPage from './pages/UserCenterPage'
 
@@ -38,6 +39,7 @@ function App() {
         <Route path="/forum/edit/:id" element={<EditPost />} />
         {/* 认证相关路由（不需要 Layout） */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/qq/callback" element={<QQLoginCallbackPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/user-center" element={<UserCenterPage />} />
       </Routes>

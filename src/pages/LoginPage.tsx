@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { User, Lock, AlertCircle } from 'lucide-react'
 import Header from '../components/Header'
+import qqConnectLogo from '../assets/qq-connect-logo.png'
+import { authService } from '../services/authService'
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -12,6 +15,7 @@ function LoginPage() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [qqLoading, setQqLoading] = useState(false)
   const [message, setMessage] = useState('')
 
   useEffect(() => {
@@ -41,32 +45,28 @@ function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        localStorage.setItem('access_token', data.access)
-        localStorage.setItem('refresh_token', data.refresh)
-        navigate('/user-center', { replace: true })
-      } else {
-        if (data.detail) {
-          setError(data.detail)
-        } else {
-          setError('用户名或密码错误')
-        }
-      }
+      await authService.login(formData)
+      navigate('/user-center', { replace: true })
     } catch (err) {
-      setError('网络错误，请检查连接后重试')
+      if (axios.isAxiosError(err)) {
+        const detail =
+          err.response?.data?.detail ||
+          err.response?.data?.error
+
+        setError(detail || '用户名或密码错误')
+      } else {
+        setError('网络错误，请检查连接后重试')
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleQQLogin = () => {
+    setError('')
+    setQqLoading(true)
+    const callbackUrl = `${window.location.origin}/login/qq/callback`
+    window.location.href = authService.getQQLoginUrl(callbackUrl)
   }
 
   return (
@@ -169,6 +169,31 @@ function LoginPage() {
                     {loading ? '登录中...' : '立即登录 / LOGIN NOW'}
                   </span>
                 </div>
+              </button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t-2 border-black"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-4 text-sm font-black uppercase italic text-gray-600">
+                    或使用第三方账号登录
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleQQLogin}
+                disabled={qqLoading}
+                aria-label="使用 QQ 登录"
+                className="mx-auto block bg-transparent p-0 border-0 disabled:opacity-70"
+              >
+                <img
+                  src={qqConnectLogo}
+                  alt="QQ互联登录"
+                  className="h-10 w-auto"
+                />
               </button>
 
               {/* 注册链接 */}
