@@ -368,7 +368,7 @@ function CompetitionDetailPage() {
         >
           <span className="flex items-center transform skew-x-12">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="font-black uppercase italic">Back to Database / 返回比赛列表</span>
+            <span className="font-black italic">返回比赛列表</span>
           </span>
         </Link>
       </div>
@@ -396,7 +396,7 @@ function CompetitionDetailPage() {
               <Trophy className="w-10 h-10 text-white transform -rotate-12" />
             </div>
 
-            <h1 className="text-3xl md:text-6xl font-black text-white uppercase italic leading-none mb-4" style={{ textShadow: '4px 4px 0px #000000' }}>
+            <h1 className="text-3xl md:text-6xl font-black text-white italic leading-none mb-4" style={{ textShadow: '4px 4px 0px #000000' }}>
               {competition.name}
             </h1>
 
@@ -416,7 +416,7 @@ function CompetitionDetailPage() {
             <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
               <Calendar className="w-8 h-8 text-white transform -rotate-12" />
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-white uppercase italic border-b-8 border-p5-red" style={{ textShadow: '2px 2px 0px #000000' }}>
+            <h2 className="text-xl md:text-3xl font-black text-white italic border-b-8 border-p5-red" style={{ textShadow: '2px 2px 0px #000000' }}>
               赛程时间线
             </h2>
           </div>
@@ -439,14 +439,14 @@ function CompetitionDetailPage() {
               <div className="bg-black p-2 transform -rotate-6 border-2 border-p5-red">
                 <Filter className="w-6 h-6 text-white transform rotate-6" />
               </div>
-              <h2 className="text-2xl font-black text-black uppercase italic border-b-4 border-p5-red">
+              <h2 className="text-2xl font-black text-black italic border-b-4 border-p5-red">
                 筛选记录
               </h2>
             </div>
             {(selectedYear || selectedAward) && (
               <button
                 onClick={resetFilters}
-                className="bg-black text-white px-4 py-1 text-xs font-black uppercase italic transform -skew-x-12 hover:bg-p5-red transition-all"
+                className="bg-black text-white px-4 py-1 text-xs font-black italic transform -skew-x-12 hover:bg-p5-red transition-all"
               >
                 <span className="transform skew-x-12 inline-block flex items-center">
                   <X className="w-4 h-4 mr-1" /> 清除筛选
@@ -461,7 +461,7 @@ function CompetitionDetailPage() {
                 setViewMode('year')
                 setSelectedAward(null)
               }}
-              className={`px-6 py-2 transform -skew-x-12 font-black uppercase italic transition-all ${viewMode === 'year'
+              className={`px-6 py-2 transform -skew-x-12 font-black italic transition-all ${viewMode === 'year'
                 ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
                 : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
                 }`}
@@ -473,7 +473,7 @@ function CompetitionDetailPage() {
                 setViewMode('award')
                 setSelectedYear(null)
               }}
-              className={`px-6 py-2 transform -skew-x-12 font-black uppercase italic transition-all ${viewMode === 'award'
+              className={`px-6 py-2 transform -skew-x-12 font-black italic transition-all ${viewMode === 'award'
                 ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
                 : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
                 }`}
@@ -525,7 +525,7 @@ function CompetitionDetailPage() {
                           <div className={`${isSelected ? 'text-white' : 'text-p5-red'}`}>
                             {awardInfo.icon}
                           </div>
-                          <span className="font-black uppercase italic">{award.name}</span>
+                          <span className="font-black italic">{award.name}</span>
                         </div>
                         {isSelected && <ChevronRight className="w-5 h-5 text-p5-red" />}
                       </div>
@@ -543,7 +543,7 @@ function CompetitionDetailPage() {
         <div className="relative transform skew-x-1 py-4 px-8">
           <div className="flex items-center bg-black text-white p-4 border-l-8 border-p5-red shadow-[8px_8px_0_0_black] border-2 border-white">
             <Filter className="w-8 h-8 text-p5-red mr-6 animate-pulse" />
-            <span className="text-xl font-black uppercase italic tracking-tighter p5-text-shadow-red">
+            <span className="text-xl font-black italic tracking-tighter p5-text-shadow-red">
               当前筛选：
               {selectedYear && <span className="text-white ml-3 bg-p5-red px-3 py-0.5 transform -skew-x-12 inline-block">
                 <span className="transform skew-x-12 inline-block font-black">{selectedYear}年</span>
@@ -563,7 +563,7 @@ function CompetitionDetailPage() {
             <div className="bg-p5-red p-3 transform rotate-12 border-2 border-black">
               <Trophy className="w-8 h-8 text-white transform -rotate-12" />
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-white uppercase italic border-b-8 border-p5-red" style={{ textShadow: '2px 2px 0px #000000' }}>
+            <h2 className="text-xl md:text-3xl font-black text-white italic border-b-8 border-p5-red" style={{ textShadow: '2px 2px 0px #000000' }}>
               获奖作品
             </h2>
           </div>
@@ -602,11 +602,11 @@ function CompetitionDetailPage() {
                           <div className="text-p5-red transform rotate-12 scale-150 shrink-0">
                             {awardInfo.icon}
                           </div>
-                          <h3 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter whitespace-nowrap" style={{ textShadow: '2px 2px 0px #d90614' }}>
+                          <h3 className="text-xl md:text-3xl font-black text-black italic tracking-tighter whitespace-nowrap" style={{ textShadow: '2px 2px 0px #d90614' }}>
                             {awardInfo.label}
                           </h3>
                         </div>
-                        <div className="bg-black text-white px-3 md:px-6 py-1 font-black uppercase italic transform -skew-x-12 shadow-[4px_4px_0_0_#d90614] border border-white shrink-0">
+                        <div className="bg-black text-white px-3 md:px-6 py-1 font-black italic transform -skew-x-12 shadow-[4px_4px_0_0_#d90614] border border-white shrink-0">
                           <span className="transform skew-x-12 inline-block text-xs md:text-sm">
                             已发现 {totalCount} 条情报
                           </span>
@@ -681,7 +681,7 @@ function CompetitionDetailPage() {
                   <p className="text-xs font-black text-gray-500">{selectedYear} 年参赛作品</p>
                 </div>
               </div>
-              <div className="bg-black text-white px-6 py-1 font-black uppercase italic transform -skew-x-12">
+              <div className="bg-black text-white px-6 py-1 font-black italic transform -skew-x-12">
                 <span className="transform skew-x-12 inline-block">
                   {unawardedVideos.length} 条记录
                 </span>
@@ -758,7 +758,7 @@ function CompetitionDetailPage() {
                         <div className="text-6xl font-black text-black italic mb-4 leading-none" style={{ textShadow: '4px 4px 0px #d90614' }}>
                           {year}
                         </div>
-                        <div className="text-sm font-black text-gray-500 uppercase italic tracking-widest space-y-1">
+                        <div className="text-sm font-black text-gray-500 italic tracking-widest space-y-1">
                           <div className="flex items-center justify-center space-x-2">
                             <Play className="w-4 h-4 text-p5-red" />
                             <span>{yearVideos.length} 条情报</span>

@@ -48,49 +48,49 @@ const MenuBar = ({ editor }: MenuBarProps) => {
   const buttons = [
     {
       icon: <Bold className="w-4 h-4" />,
-      title: 'Bold',
+      title: '加粗',
       action: () => editor.chain().focus().toggleBold().run(),
       isActive: editor.isActive('bold'),
     },
     {
       icon: <Italic className="w-4 h-4" />,
-      title: 'Italic',
+      title: '斜体',
       action: () => editor.chain().focus().toggleItalic().run(),
       isActive: editor.isActive('italic'),
     },
     {
       icon: <Heading1 className="w-4 h-4" />,
-      title: 'Heading 1',
+      title: '一级标题',
       action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       isActive: editor.isActive('heading', { level: 1 }),
     },
     {
       icon: <Heading2 className="w-4 h-4" />,
-      title: 'Heading 2',
+      title: '二级标题',
       action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       isActive: editor.isActive('heading', { level: 2 }),
     },
     {
       icon: <List className="w-4 h-4" />,
-      title: 'Bullet List',
+      title: '无序列表',
       action: () => editor.chain().focus().toggleBulletList().run(),
       isActive: editor.isActive('bulletList'),
     },
     {
       icon: <ListOrdered className="w-4 h-4" />,
-      title: 'Ordered List',
+      title: '有序列表',
       action: () => editor.chain().focus().toggleOrderedList().run(),
       isActive: editor.isActive('orderedList'),
     },
     {
       icon: <Quote className="w-4 h-4" />,
-      title: 'Blockquote',
+      title: '引用',
       action: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: editor.isActive('blockquote'),
     },
     {
       icon: isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />,
-      title: 'Upload Image',
+      title: '上传图片',
       action: () => fileInputRef.current?.click(),
       isActive: false,
       disabled: isUploading

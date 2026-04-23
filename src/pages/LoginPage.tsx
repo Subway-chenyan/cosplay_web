@@ -82,7 +82,7 @@ function LoginPage() {
               <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
                 用户登录
               </h1>
-              <p className="text-gray-600 font-bold">欢迎回到 Cosplay 舞台剧视频数据库</p>
+              <p className="text-gray-600 font-bold">欢迎回到舞台剧视频数据库</p>
             </div>
           </div>
         </div>
@@ -116,8 +116,8 @@ function LoginPage() {
 
               {/* 用户名或邮箱 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  用户名 / USERNAME *
+                <label className="block text-sm font-black text-gray-700 mb-2 italic">
+                  用户名 *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -138,8 +138,8 @@ function LoginPage() {
 
               {/* 密码 */}
               <div>
-                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                  密码 / PASSWORD *
+                <label className="block text-sm font-black text-gray-700 mb-2 italic">
+                  密码 *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

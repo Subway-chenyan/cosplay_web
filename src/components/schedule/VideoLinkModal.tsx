@@ -91,8 +91,8 @@ export default function VideoLinkModal({ eventId, isOpen, onClose, onLink }: Vid
           <div className="bg-black text-white px-4 py-3 flex items-center justify-between border-b-4 border-p5-red">
             <div className="flex items-center gap-2 transform skew-x-1">
               <Video className="w-5 h-5 text-p5-red" />
-              <h3 className="font-black uppercase italic text-sm md:text-base">
-                关联视频 / LINK VIDEO
+              <h3 className="font-black italic text-sm md:text-base">
+                关联视频
               </h3>
             </div>
             <button
@@ -135,7 +135,7 @@ export default function VideoLinkModal({ eventId, isOpen, onClose, onLink }: Vid
 
             {!loading && !error && searchQuery && results.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-sm text-gray-500 font-bold italic">无搜索结果 / NO RESULTS</p>
+                <p className="text-sm text-gray-500 font-bold italic">没有搜索结果</p>
               </div>
             )}
 
@@ -164,7 +164,7 @@ export default function VideoLinkModal({ eventId, isOpen, onClose, onLink }: Vid
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black uppercase italic text-black truncate group-hover/res:text-p5-red transition-colors">
+                      <p className="text-xs font-black italic text-black truncate group-hover/res:text-p5-red transition-colors">
                         {video.title}
                       </p>
                       <p className="text-[10px] text-gray-400 font-bold">{video.bv_number}</p>

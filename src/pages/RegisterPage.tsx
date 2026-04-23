@@ -90,7 +90,7 @@ function RegisterPage() {
               <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
                 用户注册
               </h1>
-              <p className="text-gray-600 font-bold">加入 Cosplay 舞台剧视频数据库</p>
+              <p className="text-gray-600 font-bold">加入舞台剧视频数据库</p>
             </div>
           </div>
         </div>
@@ -222,8 +222,8 @@ function RegisterPage() {
               >
                 <div className="absolute inset-0 bg-p5-red transform translate-x-1.5 translate-y-1.5 -skew-x-6 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform"></div>
                 <div className="relative bg-white border-3 border-black px-6 py-4 transform -skew-x-6 group-hover:-skew-x-3 transition-transform">
-                  <span className="block text-xl font-black uppercase italic transform skew-x-6 group-hover:skew-x-3 transition-transform">
-                    {loading ? '注册中...' : '立即注册 / SIGN UP NOW'}
+                  <span className="block text-xl font-black italic transform skew-x-6 group-hover:skew-x-3 transition-transform">
+                    {loading ? '注册中...' : '立即注册'}
                   </span>
                 </div>
               </button>

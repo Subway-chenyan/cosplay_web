@@ -83,9 +83,9 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
           <div className="transform skew-x-1">
             {/* 标题栏 */}
             <div className="flex justify-between items-center mb-6 pb-4 border-b-4 border-black">
-              <h2 className="text-xl md:text-2xl font-black uppercase italic flex items-center">
+              <h2 className="text-xl md:text-2xl font-black italic flex items-center">
                 <MessageSquare className="w-5 h-5 md:w-6 md:h-6 mr-2" />
-                问题反馈 / FEEDBACK
+                问题反馈
               </h2>
               <button
                 onClick={onClose}
@@ -113,8 +113,8 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
             {/* 反馈类型 */}
             <div className="mb-4">
-              <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                反馈类型 / TYPE
+              <label className="block text-sm font-black text-gray-700 mb-2 italic">
+                反馈类型
               </label>
               <select
                 value={feedbackType}
@@ -130,8 +130,8 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
             {/* 反馈内容 */}
             <div className="mb-4">
-              <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                反馈内容 / CONTENT *
+              <label className="block text-sm font-black text-gray-700 mb-2 italic">
+                反馈内容 *
               </label>
               <textarea
                 value={content}
@@ -144,8 +144,8 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
             {/* 联系方式（可选） */}
             <div className="mb-6">
-              <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                联系方式 / CONTACT (可选)
+              <label className="block text-sm font-black text-gray-700 mb-2 italic">
+                联系方式（可选）
               </label>
               <input
                 type="text"
@@ -160,14 +160,14 @@ function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             <div className="flex space-x-3">
               <button
                 onClick={onClose}
-                className="flex-1 px-4 py-3 bg-gray-200 text-black font-black uppercase italic border-2 border-black hover:bg-gray-300 transition-colors"
+                className="flex-1 px-4 py-3 bg-gray-200 text-black font-black italic border-2 border-black hover:bg-gray-300 transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex-1 px-4 py-3 bg-p5-red text-white font-black uppercase italic border-2 border-black hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 bg-p5-red text-white font-black italic border-2 border-black hover:bg-red-700 transition-colors disabled:opacity-50"
               >
                 {submitting ? '提交中...' : '提交反馈'}
               </button>
@@ -193,7 +193,7 @@ function Footer() {
             {/* 左侧：开发者信息 */}
             <div className="text-center md:text-left">
               <p className="text-white font-black text-lg uppercase italic mb-2">
-                COSPLAY DRAMA
+                舞台剧视频库
               </p>
               <p className="text-gray-400 font-bold text-sm">
                 开发者: <span className="text-p5-red">沉言</span>
@@ -213,9 +213,9 @@ function Footer() {
                 className="group relative"
               >
                 <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
-                <div className="relative flex items-center px-4 py-2 bg-white border-2 border-black font-black uppercase italic text-sm hover:bg-gray-100 transition-colors">
+                <div className="relative flex items-center px-4 py-2 bg-white border-2 border-black font-black italic text-sm hover:bg-gray-100 transition-colors">
                   <Github className="w-4 h-4 mr-2" />
-                  GitHub
+                  项目仓库
                 </div>
               </a>
 
@@ -225,7 +225,7 @@ function Footer() {
                 className="group relative"
               >
                 <div className="absolute inset-0 bg-white transform translate-x-1 translate-y-1 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
-                <div className="relative flex items-center px-4 py-2 bg-p5-red text-white border-2 border-black font-black uppercase italic text-sm hover:bg-red-700 transition-colors">
+                <div className="relative flex items-center px-4 py-2 bg-p5-red text-white border-2 border-black font-black italic text-sm hover:bg-red-700 transition-colors">
                   <MessageSquare className="w-4 h-4 mr-2" />
                   问题反馈
                 </div>
@@ -234,11 +234,11 @@ function Footer() {
 
             {/* 右侧：版权信息 */}
             <div className="text-center md:text-right">
-              <p className="text-gray-500 font-bold text-xs uppercase">
-                &copy; {new Date().getFullYear()} COSPLAY DRAMA
+              <p className="text-gray-500 font-bold text-xs">
+                &copy; {new Date().getFullYear()} 舞台剧视频库
               </p>
               <p className="text-gray-600 font-bold text-xs mt-1">
-                Built with React + Django
+                基于前后端分离架构构建
               </p>
             </div>
           </div>

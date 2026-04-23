@@ -306,10 +306,10 @@ class QQLoginView(APIView):
 
     def get(self, request):
         redirect_target = _get_login_redirect_target(request)
-        if not settings.QQ_CONNECT_APP_ID or not settings.QQ_CONNECT_APP_KEY:
+        if not settings.QQ_CONNECT_APP_ID:
             return _redirect_oauth_result(redirect_target, {
                 'error': 'qq_not_configured',
-                'detail': 'QQ 登录尚未配置，请先在 .env 中填写 QQ_CONNECT_APP_ID 和 QQ_CONNECT_APP_KEY',
+                'detail': 'QQ 登录尚未配置，请先在 .env 中填写 QQ_CONNECT_APP_ID',
             })
 
         state = _build_qq_state(redirect_target)
@@ -361,6 +361,12 @@ class QQCallbackView(APIView):
             return _redirect_oauth_result(redirect_target, {
                 'error': 'missing_code',
                 'detail': 'QQ 登录回调缺少授权码',
+            })
+
+        if not settings.QQ_CONNECT_APP_ID or not settings.QQ_CONNECT_APP_KEY:
+            return _redirect_oauth_result(redirect_target, {
+                'error': 'qq_not_configured',
+                'detail': 'QQ 登录尚未完整配置，请先在 .env 中填写 QQ_CONNECT_APP_ID 和 QQ_CONNECT_APP_KEY',
             })
 
         try:

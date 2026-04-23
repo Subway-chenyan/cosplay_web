@@ -50,8 +50,8 @@ const ForumHome = () => {
       <div className="relative mb-12">
         <div className="absolute -inset-2 bg-p5-red transform -skew-x-12 -rotate-1 shadow-[4px_4px_0_0_black]"></div>
         <div className="relative bg-white p-4 transform -skew-x-12 border-2 border-black inline-block">
-          <h1 className="text-4xl font-black text-black italic uppercase tracking-tighter">
-            Forum / 交流论坛
+          <h1 className="text-4xl font-black text-black italic tracking-tighter">
+            交流论坛
           </h1>
         </div>
       </div>
@@ -66,7 +66,7 @@ const ForumHome = () => {
                 !filters.category && !filters.author ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
               }`}
             >
-              <span className="font-black italic uppercase">全部 / ALL</span>
+              <span className="font-black italic">全部</span>
               <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${!filters.category && !filters.author ? 'text-white' : 'text-black'}`} />
             </button>
 
@@ -79,7 +79,7 @@ const ForumHome = () => {
               >
                 <div className="flex items-center gap-2">
                   <User className={`w-4 h-4 ${filters.author ? 'text-white' : 'text-p5-red'}`} />
-                  <span className="font-black italic uppercase block leading-none">我的帖子 / MY POSTS</span>
+                  <span className="font-black italic block leading-none">我的帖子</span>
                 </div>
                 <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${filters.author ? 'text-white' : 'text-black'}`} />
               </button>
@@ -98,8 +98,7 @@ const ForumHome = () => {
                 }`}
               >
                 <div>
-                  <span className="font-black italic uppercase block leading-none">{cat.name}</span>
-                  <span className="text-xs opacity-70 italic uppercase">{cat.slug}</span>
+                  <span className="font-black italic block leading-none">{cat.name}</span>
                 </div>
                 <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${filters.category === cat.id ? 'text-white' : 'text-black'}`} />
               </button>
@@ -109,9 +108,9 @@ const ForumHome = () => {
               to="/forum/new"
               className="mt-8 w-full block text-center px-6 py-4 bg-black text-white transform skew-x-12 border-2 border-p5-red hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(217,6,20,0.5)] group"
             >
-              <div className="transform -skew-x-12 flex items-center justify-center font-black italic uppercase">
+              <div className="transform -skew-x-12 flex items-center justify-center font-black italic">
                 <Plus className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform" />
-                发帖 / NEW POST
+                发布帖子
               </div>
             </Link>
           </div>

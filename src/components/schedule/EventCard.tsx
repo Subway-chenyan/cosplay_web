@@ -80,26 +80,26 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
           {/* Header row: date + status + stage */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className={`${isFinal ? 'bg-amber-700' : 'bg-black'} text-white px-2 py-0.5 text-xs font-black uppercase italic transform -skew-x-12 inline-flex items-center gap-1`}>
+              <div className={`${isFinal ? 'bg-amber-700' : 'bg-black'} text-white px-2 py-0.5 text-xs font-black italic transform -skew-x-12 inline-flex items-center gap-1`}>
                 <Calendar className="w-3 h-3" />
                 <span className="transform skew-x-12 inline-block">
                   {formatDateRange(event.start_date, event.end_date)}
                 </span>
               </div>
-              <div className="bg-green-600 text-white px-2 py-0.5 text-[10px] font-black uppercase italic transform -skew-x-6 inline-flex items-center gap-1">
+              <div className="bg-green-600 text-white px-2 py-0.5 text-[10px] font-black italic transform -skew-x-6 inline-flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
                 <span className="transform skew-x-6 inline-block">已结束</span>
               </div>
             </div>
             {event.stage_display && (
-              <span className={`text-[10px] font-black uppercase italic ${accentText} border ${accentBorder} px-1.5 py-0.5 transform -skew-x-6`}>
+              <span className={`text-[10px] font-black italic ${accentText} border ${accentBorder} px-1.5 py-0.5 transform -skew-x-6`}>
                 {event.stage_display}
               </span>
             )}
           </div>
 
           {/* Title */}
-          <h4 className={`text-base md:text-lg font-black ${isFinal ? 'text-amber-800' : 'text-black'} uppercase italic border-b-2 ${accentBorder} inline-block pr-2 mb-2 leading-tight`}>
+          <h4 className={`text-base md:text-lg font-black ${isFinal ? 'text-amber-800' : 'text-black'} italic border-b-2 ${accentBorder} inline-block pr-2 mb-2 leading-tight`}>
             {event.title}
           </h4>
 
@@ -117,10 +117,10 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
               <div className={`${isFinal ? 'bg-amber-500' : 'bg-p5-red'} p-1 transform rotate-12 border border-black`}>
                 <Video className="w-3.5 h-3.5 text-white transform -rotate-12" />
               </div>
-              <span className="text-xs font-black uppercase italic text-black">
-                参赛作品 / ENTRIES
+              <span className="text-xs font-black italic text-black">
+                参赛作品
               </span>
-              <span className="text-[10px] font-black text-gray-400 uppercase italic">
+              <span className="text-[10px] font-black text-gray-400 italic">
                 ({event.videos.length} 个视频)
               </span>
               <div className="flex-1 border-b border-gray-200"></div>
@@ -132,7 +132,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
                   {team && (
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <Users className="w-3 h-3 text-p5-red" />
-                      <span className="text-[11px] font-black uppercase italic text-p5-red border-b border-p5-red/30">
+                      <span className="text-[11px] font-black italic text-p5-red border-b border-p5-red/30">
                         {team}
                       </span>
                     </div>
@@ -144,7 +144,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
                           href={v.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] bg-black text-white px-2 py-0.5 font-bold uppercase transform -skew-x-6 hover:bg-p5-red transition-colors inline-flex items-center gap-0.5"
+                          className="text-[10px] bg-black text-white px-2 py-0.5 font-bold transform -skew-x-6 hover:bg-p5-red transition-colors inline-flex items-center gap-0.5"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <span className="transform skew-x-6 inline-block">{v.title || v.bv_number}</span>
@@ -177,7 +177,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
                   e.stopPropagation()
                   onLinkVideo(event.id)
                 }}
-                className="text-[10px] font-black uppercase italic bg-p5-red text-white px-2 py-1 transform -skew-x-6 hover:bg-black transition-colors inline-flex items-center gap-1"
+                className="text-[10px] font-black italic bg-p5-red text-white px-2 py-1 transform -skew-x-6 hover:bg-black transition-colors inline-flex items-center gap-1"
               >
                 <span className="transform skew-x-6 inline-flex items-center gap-1">
                   <Video className="w-3 h-3" />
@@ -206,28 +206,28 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
         {/* Date badge */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className={`${isFinal ? 'bg-amber-700' : 'bg-black'} text-white px-2 py-0.5 text-xs font-black uppercase italic transform -skew-x-12 inline-flex items-center gap-1`}>
+            <div className={`${isFinal ? 'bg-amber-700' : 'bg-black'} text-white px-2 py-0.5 text-xs font-black italic transform -skew-x-12 inline-flex items-center gap-1`}>
               <Calendar className="w-3 h-3" />
               <span className="transform skew-x-12 inline-block">
                 {formatDateRange(event.start_date, event.end_date)}
               </span>
             </div>
             {past && (
-              <div className="bg-gray-500 text-white px-1.5 py-0.5 text-[10px] font-black uppercase italic transform -skew-x-6 inline-flex items-center gap-0.5">
+              <div className="bg-gray-500 text-white px-1.5 py-0.5 text-[10px] font-black italic transform -skew-x-6 inline-flex items-center gap-0.5">
                 <CheckCircle className="w-2.5 h-2.5" />
                 <span className="transform skew-x-6 inline-block">已结束</span>
               </div>
             )}
           </div>
           {event.stage_display && (
-            <span className={`text-[10px] font-black uppercase italic ${accentText} border ${accentBorder} px-1.5 py-0.5 transform -skew-x-6`}>
+            <span className={`text-[10px] font-black italic ${accentText} border ${accentBorder} px-1.5 py-0.5 transform -skew-x-6`}>
               {event.stage_display}
             </span>
           )}
         </div>
 
         {/* Title */}
-        <h4 className={`text-sm md:text-base font-black ${isFinal ? 'text-amber-800' : 'text-black'} uppercase italic border-b-2 ${accentBorder} inline-block pr-2 mb-2 leading-tight`}>
+        <h4 className={`text-sm md:text-base font-black ${isFinal ? 'text-amber-800' : 'text-black'} italic border-b-2 ${accentBorder} inline-block pr-2 mb-2 leading-tight`}>
           {event.title}
         </h4>
 
@@ -253,7 +253,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
             href={event.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-p5-red hover:underline font-bold uppercase italic flex items-center gap-1 mb-2"
+            className="text-xs text-p5-red hover:underline font-bold italic flex items-center gap-1 mb-2"
             onClick={(e) => e.stopPropagation()}
           >
             <ExternalLink className="w-3 h-3" />
@@ -266,8 +266,8 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
           <div className="mt-auto pt-2 border-t border-gray-200">
             <div className="flex items-center gap-1 mb-1">
               <Video className="w-3 h-3 text-p5-red" />
-              <span className="text-[10px] font-black uppercase italic text-gray-500">
-                关联视频 / LINKED VIDEOS
+              <span className="text-[10px] font-black italic text-gray-500">
+                关联视频
               </span>
             </div>
             <div className="flex flex-wrap gap-1">
@@ -277,7 +277,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
                     href={v.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] bg-black text-white px-1.5 py-0.5 font-bold uppercase transform -skew-x-6 hover:bg-p5-red transition-colors inline-flex items-center gap-0.5"
+                    className="text-[10px] bg-black text-white px-1.5 py-0.5 font-bold transform -skew-x-6 hover:bg-p5-red transition-colors inline-flex items-center gap-0.5"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <span className="transform skew-x-6 inline-block">{v.title || v.bv_number}</span>
@@ -308,7 +308,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
                 e.stopPropagation()
                 onLinkVideo(event.id)
               }}
-              className="text-[10px] font-black uppercase italic bg-p5-red text-white px-2 py-1 transform -skew-x-6 hover:bg-black transition-colors inline-flex items-center gap-1"
+              className="text-[10px] font-black italic bg-p5-red text-white px-2 py-1 transform -skew-x-6 hover:bg-black transition-colors inline-flex items-center gap-1"
             >
               <span className="transform skew-x-6 inline-flex items-center gap-1">
                 <Video className="w-3 h-3" />
