@@ -93,10 +93,10 @@ const ForumPostDetail = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={() => setReplyTo({ id: comment.id, name: comment.author_name })}
-                  className="text-[10px] font-black italic uppercase hover:text-p5-red flex items-center gap-1"
+                  className="text-[10px] font-black italic hover:text-p5-red flex items-center gap-1"
                 >
                   <CornerDownRight className="w-3 h-3" />
-                  回复 / REPLY
+                  回复
                 </button>
               </div>
             </div>
@@ -116,26 +116,26 @@ const ForumPostDetail = () => {
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => navigate('/forum')}
-              className="text-p5-red font-black italic uppercase hover:translate-x-1 transition-transform inline-block"
+              className="text-p5-red font-black italic hover:translate-x-1 transition-transform inline-block"
             >
-              ← 返回 / BACK TO FORUM
+              ← 返回论坛
             </button>
             {currentUser && currentPost && String(currentUser.id) === String(currentPost.author) && (
               <button
                 onClick={() => navigate(`/forum/edit/${id}`)}
-                className="bg-white text-black px-4 py-1 font-black italic uppercase text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
+                className="bg-white text-black px-4 py-1 font-black italic text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
               >
                 <div className="flex items-center gap-1 transform -skew-x-12">
                   <Edit3 className="w-3 h-3" />
-                  编辑 / EDIT
+                  编辑帖子
                 </div>
               </button>
             )}
           </div>
           <div className="bg-p5-red inline-block px-3 py-1 transform -skew-x-12 mb-4">
-            <span className="text-xs font-black italic uppercase">{currentPost.category_name}</span>
+            <span className="text-xs font-black italic">{currentPost.category_name}</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none mb-6">
+          <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter leading-none mb-6">
             {currentPost.title}
           </h1>
           <div className="flex items-center gap-6 text-xs font-bold italic opacity-70">
@@ -169,8 +169,8 @@ const ForumPostDetail = () => {
           <div className="relative mb-12">
             <div className="absolute -inset-1 bg-p5-red transform skew-x-12"></div>
             <div className="relative bg-black px-4 py-2 transform skew-x-12 inline-block">
-              <h2 className="text-xl font-black text-white italic uppercase transform -skew-x-12">
-                Comments / 讨论区
+              <h2 className="text-xl font-black text-white italic transform -skew-x-12">
+                讨论区
               </h2>
             </div>
           </div>
@@ -186,21 +186,21 @@ const ForumPostDetail = () => {
             <textarea
               value={commentContent}
               onChange={(e) => setCommentContent(e.target.value)}
-              placeholder="说点什么吧... (Say something...)"
+              placeholder="说点什么吧..."
               className="w-full bg-white border-2 border-black p-4 focus:outline-none focus:border-p5-red min-h-[120px]"
             />
             <div className="mt-4 flex justify-end">
               <button
                 onClick={handleSubmitComment}
                 disabled={isSubmitting}
-                className="bg-p5-red text-white px-8 py-3 font-black italic uppercase flex items-center gap-2 hover:bg-black transition-colors shadow-[4px_4px_0_0_black]"
+                className="bg-p5-red text-white px-8 py-3 font-black italic flex items-center gap-2 hover:bg-black transition-colors shadow-[4px_4px_0_0_black]"
               >
                 {isSubmitting ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-                发送 / POST
+                发送评论
               </button>
             </div>
           </div>

@@ -91,7 +91,7 @@ function ScheduleVideoCard({ video }: { video: EventVideo }) {
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100">
               <ImageIcon className="w-8 h-8 text-gray-400 mb-1" />
-              <span className="text-[10px] text-gray-400 font-bold">NO IMAGE</span>
+              <span className="text-[10px] text-gray-400 font-bold">暂无封面</span>
             </div>
           )}
 

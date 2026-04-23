@@ -31,10 +31,10 @@ function Header() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center group">
               <div className="w-10 h-10 bg-p5-red transform rotate-12 flex items-center justify-center border-2 border-white shadow-[2px_2px_0_0_white] group-hover:rotate-0 transition-transform overflow-hidden">
-                <img src="/assets/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                <img src="/assets/logo.png" alt="网站标志" className="w-8 h-8 object-contain" />
               </div>
               <div className="ml-4 bg-white px-2 py-1 transform -skew-x-12 border-2 border-black">
-                <span className="text-xl font-black text-black uppercase tracking-tighter">Cosplay舞台剧</span>
+                <span className="text-xl font-black text-black tracking-tighter">舞台剧视频库</span>
               </div>
             </Link>
           </div>
@@ -55,7 +55,7 @@ function Header() {
                     }`}></div>
 
                   {/* Text */}
-                  <span className={`relative z-10 text-sm font-black uppercase italic transform skew-x-12 inline-block transition-colors ${active ? 'text-white' : 'text-white group-hover:text-black'
+                  <span className={`relative z-10 text-sm font-black italic transform skew-x-12 inline-block transition-colors ${active ? 'text-white' : 'text-white group-hover:text-black'
                     }`}>
                     {item.name}
                   </span>
@@ -77,7 +77,7 @@ function Header() {
                 >
                   <div className={`absolute inset-0 transform -skew-x-12 transition-all duration-200 ${isActive('/user-center') ? 'bg-p5-red translate-x-0' : 'bg-white -translate-x-full group-hover:translate-x-0'
                     }`}></div>
-                  <span className="relative z-10 text-sm font-black uppercase italic transform skew-x-12 inline-block flex items-center transition-colors text-white group-hover:text-black">
+                  <span className="relative z-10 text-sm font-black italic transform skew-x-12 inline-block flex items-center transition-colors text-white group-hover:text-black">
                     <User className="w-4 h-4 mr-1" />
                     用户中心
                   </span>
@@ -89,7 +89,7 @@ function Header() {
                     className="relative px-4 py-2 transition-all duration-200 group overflow-hidden"
                   >
                     <div className="absolute inset-0 transform -skew-x-12 bg-white -translate-x-full group-hover:translate-x-0 transition-all duration-200"></div>
-                    <span className="relative z-10 text-sm font-black uppercase italic transform skew-x-12 inline-block transition-colors text-white group-hover:text-black">
+                    <span className="relative z-10 text-sm font-black italic transform skew-x-12 inline-block transition-colors text-white group-hover:text-black">
                       登录
                     </span>
                   </Link>
@@ -98,7 +98,7 @@ function Header() {
                     className="relative px-4 py-2 transition-all duration-200 group overflow-hidden"
                   >
                     <div className="absolute inset-0 transform -skew-x-12 bg-p5-red -translate-x-full group-hover:translate-x-0 transition-all duration-200"></div>
-                    <span className="relative z-10 text-sm font-black uppercase italic transform skew-x-12 inline-block transition-colors text-white">
+                    <span className="relative z-10 text-sm font-black italic transform skew-x-12 inline-block transition-colors text-white">
                       注册
                     </span>
                   </Link>
@@ -136,7 +136,7 @@ function Header() {
                     className={`px-4 py-3 transform -skew-x-6 border-l-8 transition-all ${active ? 'bg-p5-red border-white text-white' : 'border-p5-red text-white hover:bg-gray-900'
                       }`}
                   >
-                    <span className="text-lg font-black uppercase italic block transform skew-x-6">
+                    <span className="text-lg font-black italic block transform skew-x-6">
                       {item.name}
                     </span>
                   </Link>
@@ -152,7 +152,7 @@ function Header() {
                     className={`block px-4 py-3 transform -skew-x-6 border-l-8 transition-all ${isActive('/user-center') ? 'bg-p5-red border-white text-white' : 'border-p5-red text-white hover:bg-gray-900'
                       }`}
                   >
-                    <span className="text-lg font-black uppercase italic block transform skew-x-6 flex items-center">
+                    <span className="text-lg font-black italic block transform skew-x-6 flex items-center">
                       <User className="w-5 h-5 mr-2" />
                       用户中心
                     </span>
@@ -164,7 +164,7 @@ function Header() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-4 py-3 transform -skew-x-6 border-l-8 border-p5-red text-white hover:bg-gray-900 transition-all"
                     >
-                      <span className="text-lg font-black uppercase italic block transform skew-x-6">
+                      <span className="text-lg font-black italic block transform skew-x-6">
                         登录
                       </span>
                     </Link>
@@ -173,7 +173,7 @@ function Header() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-4 py-3 transform -skew-x-6 border-l-8 border-p5-red text-white hover:bg-gray-900 transition-all"
                     >
-                      <span className="text-lg font-black uppercase italic block transform skew-x-6">
+                      <span className="text-lg font-black italic block transform skew-x-6">
                         注册
                       </span>
                     </Link>

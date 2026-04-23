@@ -88,8 +88,8 @@ const EditPost = () => {
         <div className="flex justify-between items-center mb-12">
           <div className="relative">
             <div className="absolute -inset-2 bg-p5-red transform -skew-x-12"></div>
-            <h1 className="relative text-3xl font-black italic uppercase tracking-tighter bg-white text-black px-4 py-1 transform -skew-x-12">
-              Edit Post / 编辑帖子
+            <h1 className="relative text-3xl font-black italic tracking-tighter bg-white text-black px-4 py-1 transform -skew-x-12">
+              编辑帖子
             </h1>
           </div>
           <div className="flex items-center gap-4">
@@ -112,7 +112,7 @@ const EditPost = () => {
         {error && (
           <div className="mb-8 bg-p5-red p-4 border-2 border-white flex items-center gap-3 animate-bounce">
             <AlertCircle className="w-6 h-6" />
-            <span className="font-bold italic uppercase">{error}</span>
+            <span className="font-bold italic">{error}</span>
           </div>
         )}
 
@@ -122,8 +122,8 @@ const EditPost = () => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="在这里输入标题... (Title goes here...)"
-              className="w-full bg-transparent border-b-4 border-white p-4 text-3xl font-black italic uppercase placeholder:opacity-30 focus:outline-none focus:border-p5-red transition-colors"
+              placeholder="在这里输入标题..."
+              className="w-full bg-transparent border-b-4 border-white p-4 text-3xl font-black italic placeholder:opacity-30 focus:outline-none focus:border-p5-red transition-colors"
             />
           </div>
 
@@ -145,8 +145,7 @@ const EditPost = () => {
                   onChange={() => setCategoryId(cat.id)}
                   className="hidden"
                 />
-                <span className="font-black italic uppercase block">{cat.name}</span>
-                <span className="text-[10px] opacity-50 uppercase italic">{cat.slug}</span>
+                <span className="font-black italic block">{cat.name}</span>
               </label>
             ))}
           </div>
@@ -155,7 +154,7 @@ const EditPost = () => {
             <P5Editor
               content={content}
               onChange={setContent}
-              placeholder="修改你的内容... (Update your content...)"
+              placeholder="修改你的内容..."
             />
           </div>
 
@@ -163,7 +162,7 @@ const EditPost = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative px-12 py-4 bg-white text-black font-black italic uppercase text-xl hover:bg-p5-red hover:text-white transition-all shadow-[8px_8px_0_0_#d90614]"
+              className="group relative px-12 py-4 bg-white text-black font-black italic text-xl hover:bg-p5-red hover:text-white transition-all shadow-[8px_8px_0_0_#d90614]"
             >
               <div className="flex items-center gap-2">
                 {isSubmitting ? (
@@ -171,7 +170,7 @@ const EditPost = () => {
                 ) : (
                   <>
                     <Send className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                    保存修改 / SAVE CHANGES
+                    保存修改
                   </>
                 )}
               </div>

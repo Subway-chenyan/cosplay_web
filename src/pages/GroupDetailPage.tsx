@@ -302,10 +302,10 @@ function GroupDetailPage() {
                   href={group.bilibili}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    className="inline-flex items-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   <div className="w-4 h-4 bg-white rounded text-pink-500 text-xs font-bold flex items-center justify-center">
-                    B
+                    哔
                   </div>
                   <span>哔哩哔哩</span>
                 </a>

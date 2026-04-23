@@ -79,7 +79,7 @@ export default function RegionAccordion({
         <div className={`relative z-10 flex items-center justify-between border-2 ${isFinal ? 'border-amber-700' : 'border-black'} px-4 py-3 transform -skew-x-2 transition-colors ${isOpen ? `${accentBg} text-white` : `bg-white text-black ${hoverBg}`}`}>
           <div className="flex items-center gap-3 transform skew-x-2">
             <MapPin className={`w-4 h-4 ${isOpen ? 'text-white' : accentText}`} />
-            <span className={`font-black uppercase italic text-sm md:text-base ${isFinal ? 'tracking-wider' : ''}`}>
+            <span className={`font-black italic text-sm md:text-base ${isFinal ? 'tracking-wider' : ''}`}>
               {region}
             </span>
             <span className={`text-xs font-black italic px-2 py-0.5 transform -skew-x-12 ${isOpen ? `bg-white ${accentText}` : `${badgeBg} text-white`}`}>

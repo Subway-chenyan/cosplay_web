@@ -60,8 +60,8 @@ const NewPost = () => {
         <div className="flex justify-between items-center mb-12">
           <div className="relative">
             <div className="absolute -inset-2 bg-p5-red transform -skew-x-12"></div>
-            <h1 className="relative text-3xl font-black italic uppercase tracking-tighter bg-white text-black px-4 py-1 transform -skew-x-12">
-              New Post / 发布新帖
+            <h1 className="relative text-3xl font-black italic tracking-tighter bg-white text-black px-4 py-1 transform -skew-x-12">
+              发布新帖
             </h1>
           </div>
           <button
@@ -77,15 +77,15 @@ const NewPost = () => {
           <div className="mb-8 bg-p5-red p-8 border-2 border-white transform -rotate-1 shadow-[8px_8px_0_0_white]">
             <div className="flex items-center gap-4 mb-4">
               <AlertCircle className="w-8 h-8" />
-              <span className="text-2xl font-black italic uppercase">需要登录 / Login Required</span>
+              <span className="text-2xl font-black italic">需要登录</span>
             </div>
             <p className="mb-6 text-lg">您需要登录后才能发布帖子。请点击下方按钮前往登录页面。</p>
             <button
               onClick={() => navigate('/login')}
-              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 font-black italic uppercase hover:bg-p5-red hover:text-white transition-all transform hover:scale-105 border-2 border-black"
+              className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 font-black italic hover:bg-p5-red hover:text-white transition-all transform hover:scale-105 border-2 border-black"
             >
               <LogIn className="w-5 h-5" />
-              前往登录 / Go to Login
+              前往登录
             </button>
           </div>
         )}
@@ -93,7 +93,7 @@ const NewPost = () => {
         {error && isAuthenticated && (
           <div className="mb-8 bg-p5-red p-4 border-2 border-white flex items-center gap-3 animate-bounce">
             <AlertCircle className="w-6 h-6" />
-            <span className="font-bold italic uppercase">{error}</span>
+            <span className="font-bold italic">{error}</span>
           </div>
         )}
 
@@ -105,8 +105,8 @@ const NewPost = () => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="在这里输入标题... (Title goes here...)"
-              className="w-full bg-transparent border-b-4 border-white p-4 text-3xl font-black italic uppercase placeholder:opacity-30 focus:outline-none focus:border-p5-red transition-colors"
+              placeholder="在这里输入标题..."
+              className="w-full bg-transparent border-b-4 border-white p-4 text-3xl font-black italic placeholder:opacity-30 focus:outline-none focus:border-p5-red transition-colors"
             />
           </div>
 
@@ -129,8 +129,7 @@ const NewPost = () => {
                   onChange={() => setCategoryId(cat.id)}
                   className="hidden"
                 />
-                <span className="font-black italic uppercase block">{cat.name}</span>
-                <span className="text-[10px] opacity-50 uppercase italic">{cat.slug}</span>
+                <span className="font-black italic block">{cat.name}</span>
               </label>
             ))}
           </div>
@@ -140,7 +139,7 @@ const NewPost = () => {
             <P5Editor
               content={content}
               onChange={setContent}
-              placeholder="开始你的创作... (Start your creation...)"
+              placeholder="开始你的创作..."
             />
           </div>
 
@@ -149,7 +148,7 @@ const NewPost = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative px-12 py-4 bg-white text-black font-black italic uppercase text-xl hover:bg-p5-red hover:text-white transition-all shadow-[8px_8px_0_0_#d90614]"
+              className="group relative px-12 py-4 bg-white text-black font-black italic text-xl hover:bg-p5-red hover:text-white transition-all shadow-[8px_8px_0_0_#d90614]"
             >
               <div className="flex items-center gap-2">
                 {isSubmitting ? (
@@ -157,7 +156,7 @@ const NewPost = () => {
                 ) : (
                   <>
                     <Send className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                    发布帖子 / SEND IT!
+                    发布帖子
                   </>
                 )}
               </div>

@@ -10,12 +10,14 @@ class UserSerializer(serializers.ModelSerializer):
     """
     groups = serializers.SerializerMethodField()
     performed_videos = serializers.SerializerMethodField()
+    is_qq_user = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'nickname', 'bio', 'avatar',
             'role', 'groups', 'performed_videos',
+            'is_qq_user',
             'role_application_pending', 'role_application_reason',
             'role_application_date', 'is_active', 'date_joined',
             'created_at', 'updated_at'
@@ -31,6 +33,10 @@ class UserSerializer(serializers.ModelSerializer):
         """获取用户参演视频"""
         videos = obj.performed_videos.all()
         return [{'id': str(v.id), 'title': v.title, 'bv_number': v.bv_number} for v in videos]
+
+    def get_is_qq_user(self, obj):
+        """标记是否为 QQ 第三方登录用户。"""
+        return obj.social_account_links.filter(provider='qq').exists()
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

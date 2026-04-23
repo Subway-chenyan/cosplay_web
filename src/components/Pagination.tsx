@@ -42,7 +42,7 @@ const Pagination = ({ currentPage, totalCount, pageSize, onPageChange }: Paginat
                 disabled={currentPage === 1}
                 className="px-4 py-2 bg-black text-white transform -skew-x-12 border-2 border-white hover:bg-p5-red disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black italic shadow-[2px_2px_0_0_black]"
             >
-                <span className="transform skew-x-12 inline-block">上一页 / PREV</span>
+                <span className="transform skew-x-12 inline-block">上一页</span>
             </button>
 
             {getPageNumbers().map((page, index) => (
@@ -71,7 +71,7 @@ const Pagination = ({ currentPage, totalCount, pageSize, onPageChange }: Paginat
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-black text-white transform -skew-x-12 border-2 border-white hover:bg-p5-red disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black italic shadow-[2px_2px_0_0_black]"
             >
-                <span className="transform skew-x-12 inline-block">下一页 / NEXT</span>
+                <span className="transform skew-x-12 inline-block">下一页</span>
             </button>
         </div>
     )

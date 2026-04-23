@@ -17,6 +17,7 @@ interface UserProfile {
   role_application_pending: boolean
   role_application_reason: string
   role_application_date: string
+  is_qq_user?: boolean
   groups: Array<{ id: string; name: string; description: string }>
   performed_videos: Array<{ id: string; title: string; bv_number: string }>
 }
@@ -341,20 +342,22 @@ function UserCenterPage() {
     )
   }
 
+  const isQQUser = Boolean(profile.is_qq_user)
+
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-gray-50 px-3 py-6 sm:px-4 sm:py-8">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* 页面标题 */}
           <div className="relative group">
-            <div className="absolute inset-0 bg-p5-red transform translate-x-3 translate-y-3 -skew-x-3 z-0"></div>
-            <div className="relative z-10 bg-white border-4 border-black p-6 transform -skew-x-3">
-              <div className="transform skew-x-3 flex items-center justify-between">
-                <div className="flex items-center space-x-6">
+            <div className="absolute inset-0 z-0 bg-p5-red translate-x-2 translate-y-2 sm:translate-x-3 sm:translate-y-3 sm:-skew-x-3"></div>
+            <div className="relative z-10 bg-white border-4 border-black p-4 sm:p-6 sm:-skew-x-3">
+              <div className="flex flex-col gap-4 sm:skew-x-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4 sm:gap-6">
                   {/* 头像展示与上传 */}
                   <div className="relative group/avatar">
-                    <div className="w-24 h-24 bg-black border-4 border-p5-red transform rotate-3 overflow-hidden shadow-[4px_4px_0_0_black] flex items-center justify-center">
+                    <div className="flex h-20 w-20 items-center justify-center overflow-hidden border-4 border-p5-red bg-black shadow-[3px_3px_0_0_black] rotate-3 sm:h-24 sm:w-24 sm:shadow-[4px_4px_0_0_black]">
                       {profile.avatar ? (
                         <img src={profile.avatar} alt={profile.username} className="w-full h-full object-cover" />
                       ) : (
@@ -368,34 +371,34 @@ function UserCenterPage() {
                         </div>
                       )}
                     </div>
-                    <label className="absolute -bottom-2 -right-2 bg-p5-red p-2 border-2 border-black cursor-pointer hover:bg-black transition-colors shadow-[2px_2px_0_0_white]">
+                    <label className="absolute -bottom-2 -right-2 cursor-pointer border-2 border-black bg-p5-red p-2 shadow-[2px_2px_0_0_white] transition-colors hover:bg-black">
                       <Upload className="w-4 h-4 text-white" />
                       <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={uploadingAvatar} />
                     </label>
                   </div>
 
-                  <div>
-                    <h1 className="text-2xl md:text-5xl font-black text-black uppercase italic tracking-tighter">
-                      用户中心 / USER CENTER
+                  <div className="min-w-0">
+                    <h1 className="text-3xl font-black leading-none text-black sm:text-5xl">
+                      用户中心
                     </h1>
-                    <p className="text-gray-600 font-bold mt-1 text-xl italic uppercase">
+                    <p className="mt-2 break-all text-lg font-bold text-gray-600 sm:text-xl">
                       {profile.nickname || profile.username}
                     </p>
                   </div>
                 </div>
-                <div className="text-right flex items-center space-x-3">
-                  <div className="inline-block bg-black text-white px-4 py-2 transform -skew-x-12">
-                    <span className="block transform skew-x-12 font-black uppercase italic">
+                <div className="flex items-center justify-between gap-3 sm:justify-end">
+                  <div className="inline-block bg-black px-4 py-2 text-white -skew-x-12">
+                    <span className="block skew-x-12 font-black">
                       {getRoleDisplayName(profile.role)}
                     </span>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="bg-p5-red text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-black transition-colors flex items-center"
+                    className="flex min-h-[44px] items-center justify-center border-2 border-black bg-p5-red px-4 py-2 font-black text-white transition-colors hover:bg-black"
                     title="退出登录"
                   >
-                    <LogOut className="w-4 h-4 mr-1" />
-                    <span className="hidden sm:inline">退出</span>
+                    <LogOut className="mr-1 h-4 w-4" />
+                    <span>退出登录</span>
                   </button>
                 </div>
               </div>
@@ -419,23 +422,23 @@ function UserCenterPage() {
           {/* 用户信息卡片 */}
           <div className="relative">
             <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
-            <div className="relative z-10 bg-white border-4 border-black p-8">
+            <div className="relative z-10 bg-white border-4 border-black p-5 sm:p-8">
               {/* 头部：编辑按钮 */}
-              <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-black">
-                <h2 className="text-2xl font-black uppercase italic flex items-center">
-                  <User className="w-6 h-6 mr-2" />
-                  基本信息 / BASIC INFO
+              <div className="mb-6 flex flex-col gap-3 border-b-2 border-black pb-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="flex items-center text-xl font-black sm:text-2xl">
+                  <User className="mr-2 h-6 w-6" />
+                  基本信息
                 </h2>
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="bg-p5-red text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-red-700 flex items-center"
+                    className="flex min-h-[44px] w-full items-center justify-center border-2 border-black bg-p5-red px-4 py-2 font-black text-white hover:bg-red-700 sm:w-auto"
                   >
-                    <Edit3 className="w-4 h-4 mr-2" />
+                    <Edit3 className="mr-2 h-4 w-4" />
                     编辑
                   </button>
                 ) : (
-                  <div className="space-x-2">
+                  <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
                     <button
                       onClick={() => {
                         setIsEditing(false)
@@ -446,16 +449,16 @@ function UserCenterPage() {
                           performed_video_ids: profile.performed_videos?.map((v: Video) => v.id) || [],
                         })
                       }}
-                      className="bg-gray-500 text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-gray-600"
+                      className="min-h-[44px] border-2 border-black bg-gray-500 px-4 py-2 font-black text-white hover:bg-gray-600"
                     >
                       取消
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="bg-p5-red text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-red-700 flex items-center disabled:opacity-50"
+                      className="flex min-h-[44px] items-center justify-center border-2 border-black bg-p5-red px-4 py-2 font-black text-white hover:bg-red-700 disabled:opacity-50"
                     >
-                      <Save className="w-4 h-4 mr-2" />
+                      <Save className="mr-2 h-4 w-4" />
                       {saving ? '保存中...' : '保存'}
                     </button>
                   </div>
@@ -463,36 +466,40 @@ function UserCenterPage() {
               </div>
 
               <div className="space-y-6">
-                {/* 用户名（只读） */}
-                <div>
-                  <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                    用户名 / USERNAME
-                  </label>
-                  <input
-                    type="text"
-                    value={profile.username}
-                    disabled
-                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-100 font-bold cursor-not-allowed"
-                  />
-                </div>
+                {!isQQUser && (
+                  <>
+                    {/* 用户名（只读） */}
+                    <div>
+                      <label className="mb-2 block text-sm font-black text-gray-700">
+                        用户名
+                      </label>
+                      <input
+                        type="text"
+                        value={profile.username}
+                        disabled
+                        className="w-full cursor-not-allowed border-2 border-gray-300 bg-gray-100 px-4 py-3 font-bold"
+                      />
+                    </div>
 
-                {/* 邮箱（只读） */}
-                <div>
-                  <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                    邮箱 / EMAIL
-                  </label>
-                  <input
-                    type="email"
-                    value={profile.email}
-                    disabled
-                    className="w-full px-4 py-3 border-2 border-gray-300 bg-gray-100 font-bold cursor-not-allowed"
-                  />
-                </div>
+                    {/* 邮箱（只读） */}
+                    <div>
+                      <label className="mb-2 block text-sm font-black text-gray-700">
+                        邮箱
+                      </label>
+                      <input
+                        type="email"
+                        value={profile.email}
+                        disabled
+                        className="w-full cursor-not-allowed border-2 border-gray-300 bg-gray-100 px-4 py-3 font-bold"
+                      />
+                    </div>
+                  </>
+                )}
 
                 {/* 昵称（可编辑） */}
                 <div>
-                  <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                    昵称 / NICKNAME
+                  <label className="mb-2 block text-sm font-black text-gray-700">
+                    昵称
                   </label>
                   <input
                     type="text"
@@ -506,8 +513,8 @@ function UserCenterPage() {
 
                 {/* 个人简介（可编辑） */}
                 <div>
-                  <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                    个人简介 / BIO
+                  <label className="mb-2 block text-sm font-black text-gray-700">
+                    个人简介
                   </label>
                   <textarea
                     value={isEditing ? editForm.bio : (profile.bio || '未设置')}
@@ -521,13 +528,13 @@ function UserCenterPage() {
 
                 {/* 所属社团（可编辑） */}
                 <div>
-                  <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                    所属社团 / GROUPS
+                  <label className="mb-2 block text-sm font-black text-gray-700">
+                    所属社团
                   </label>
                   {isEditing ? (
                     <button
                       onClick={() => setShowGroupModal(true)}
-                      className="w-full px-4 py-3 border-2 border-black bg-white font-bold text-left hover:bg-gray-50 transition-colors"
+                      className="min-h-[44px] w-full border-2 border-black bg-white px-4 py-3 text-left font-bold transition-colors hover:bg-gray-50"
                     >
                       {editForm.group_ids.length > 0
                         ? `已选择 ${editForm.group_ids.length} 个社团`
@@ -556,13 +563,13 @@ function UserCenterPage() {
 
                 {/* 参演视频（可编辑） */}
                 <div>
-                  <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                    参演视频 / PERFORMED VIDEOS
+                  <label className="mb-2 block text-sm font-black text-gray-700">
+                    参演视频
                   </label>
                   {isEditing ? (
                     <button
                       onClick={() => setShowVideoModal(true)}
-                      className="w-full px-4 py-3 border-2 border-black bg-white font-bold text-left hover:bg-gray-50 transition-colors"
+                      className="min-h-[44px] w-full border-2 border-black bg-white px-4 py-3 text-left font-bold transition-colors hover:bg-gray-50"
                     >
                       {editForm.performed_video_ids.length > 0
                         ? `已选择 ${editForm.performed_video_ids.length} 个视频`
@@ -596,15 +603,15 @@ function UserCenterPage() {
           {/* 权限管理卡片 */}
           <div className="relative">
             <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
-            <div className="relative z-10 bg-white border-4 border-black p-8">
-              <h2 className="text-2xl font-black uppercase italic flex items-center mb-6 pb-4 border-b-2 border-black">
-                <Shield className="w-6 h-6 mr-2" />
-                权限管理 / PERMISSION
+            <div className="relative z-10 bg-white border-4 border-black p-5 sm:p-8">
+              <h2 className="mb-6 flex items-center border-b-2 border-black pb-4 text-xl font-black sm:text-2xl">
+                <Shield className="mr-2 h-6 w-6" />
+                权限管理
               </h2>
 
               <div className="space-y-4">
                 {/* 当前权限 */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="font-black text-lg">当前权限</p>
                     <p className="text-gray-600 font-bold">{getRoleDisplayName(profile.role)}</p>
@@ -614,8 +621,8 @@ function UserCenterPage() {
                       : 'bg-gray-200 text-gray-700'
                     }`}>
                     {profile.role === 'admin' || profile.role === 'editor' || profile.role === 'contributor'
-                      ? '已认证 / VERIFIED'
-                      : '未认证 / UNVERIFIED'}
+                      ? '已认证'
+                      : '未认证'}
                   </div>
                 </div>
 
@@ -641,15 +648,15 @@ function UserCenterPage() {
                       {!showApplicationForm ? (
                         <button
                           onClick={() => setShowApplicationForm(true)}
-                          className="w-full bg-p5-red text-white px-6 py-3 font-black uppercase italic border-2 border-black hover:bg-red-700"
+                          className="w-full border-2 border-black bg-p5-red px-6 py-3 font-black text-white hover:bg-red-700"
                         >
-                          申请成为贡献者 / APPLY FOR CONTRIBUTOR
+                          申请成为贡献者
                         </button>
                       ) : (
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
-                              申请理由 / REASON *
+                            <label className="mb-2 block text-sm font-black text-gray-700">
+                              申请理由 *
                             </label>
                             <textarea
                               value={applicationReason}
@@ -659,20 +666,20 @@ function UserCenterPage() {
                               placeholder="请说明您希望成为贡献者的原因（至少 10 个字）"
                             />
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="grid grid-cols-2 gap-2">
                             <button
                               onClick={() => {
                                 setShowApplicationForm(false)
                                 setApplicationReason('')
                               }}
-                              className="flex-1 bg-gray-500 text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-gray-600"
+                              className="min-h-[44px] border-2 border-black bg-gray-500 px-4 py-2 font-black text-white hover:bg-gray-600"
                             >
                               取消
                             </button>
                             <button
                               onClick={handleApplyForContributor}
                               disabled={submittingApplication}
-                              className="flex-1 bg-p5-red text-white px-4 py-2 font-black uppercase italic border-2 border-black hover:bg-red-700 disabled:opacity-50"
+                              className="min-h-[44px] border-2 border-black bg-p5-red px-4 py-2 font-black text-white hover:bg-red-700 disabled:opacity-50"
                             >
                               {submittingApplication ? '提交中...' : '提交申请'}
                             </button>
@@ -689,10 +696,10 @@ function UserCenterPage() {
           {profile.role === 'admin' && (
             <div className="relative">
               <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
-              <div className="relative z-10 bg-white border-4 border-black p-8">
-                <h2 className="text-2xl font-black uppercase italic flex items-center mb-6 pb-4 border-b-2 border-black">
-                  <Shield className="w-6 h-6 mr-2" />
-                  待审批申请 / PENDING APPLICATIONS
+              <div className="relative z-10 bg-white border-4 border-black p-5 sm:p-8">
+                <h2 className="mb-6 flex items-center border-b-2 border-black pb-4 text-xl font-black sm:text-2xl">
+                  <Shield className="mr-2 h-6 w-6" />
+                  待审批申请
                 </h2>
                 <RoleApprovalPanel
                   token={localStorage.getItem('access_token') || ''}
@@ -706,10 +713,10 @@ function UserCenterPage() {
           {profile.role === 'admin' && (
             <div className="relative">
               <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
-              <div className="relative z-10 bg-white border-4 border-black p-8">
-                <h2 className="text-2xl font-black uppercase italic flex items-center mb-6 pb-4 border-b-2 border-black">
-                  <MessageSquare className="w-6 h-6 mr-2" />
-                  用户反馈 / USER FEEDBACK
+              <div className="relative z-10 bg-white border-4 border-black p-5 sm:p-8">
+                <h2 className="mb-6 flex items-center border-b-2 border-black pb-4 text-xl font-black sm:text-2xl">
+                  <MessageSquare className="mr-2 h-6 w-6" />
+                  用户反馈
                 </h2>
                 <FeedbackPanel
                   token={localStorage.getItem('access_token') || ''}
@@ -722,10 +729,10 @@ function UserCenterPage() {
           {(profile.role === 'contributor' || profile.role === 'editor' || profile.role === 'admin') && (
             <div className="relative">
               <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-2 z-0"></div>
-              <div className="relative z-10 bg-white border-4 border-black p-8">
-                <h2 className="text-2xl font-black uppercase italic flex items-center mb-6 pb-4 border-b-2 border-black">
-                  <Database className="w-6 h-6 mr-2" />
-                  数据管理 / DATA MANAGEMENT
+              <div className="relative z-10 bg-white border-4 border-black p-5 sm:p-8">
+                <h2 className="mb-6 flex items-center border-b-2 border-black pb-4 text-xl font-black sm:text-2xl">
+                  <Database className="mr-2 h-6 w-6" />
+                  数据管理
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* 数据导入（贡献者及以上可见） */}
@@ -736,7 +743,7 @@ function UserCenterPage() {
                     <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-3 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
                     <div className="relative z-10">
                       <Upload className="w-12 h-12 text-p5-red mb-4" />
-                      <h3 className="text-xl font-black mb-2">数据导入 / DATA IMPORT</h3>
+                      <h3 className="text-xl font-black mb-2">数据导入</h3>
                       <p className="text-gray-600 font-bold text-sm">导入 Bilibili 视频数据和社团信息</p>
                     </div>
                   </a>
@@ -750,7 +757,7 @@ function UserCenterPage() {
                       <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-3 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
                       <div className="relative z-10">
                         <FileText className="w-12 h-12 text-p5-red mb-4" />
-                        <h3 className="text-xl font-black mb-2">数据管理 / DATA MANAGEMENT</h3>
+                        <h3 className="text-xl font-black mb-2">数据管理</h3>
                         <p className="text-gray-600 font-bold text-sm">管理数据库中的视频、社团和标签信息</p>
                       </div>
                     </a>
@@ -765,7 +772,7 @@ function UserCenterPage() {
       {/* 模态框 */}
       <SearchableMultiSelectModal
         isOpen={showGroupModal}
-        title="选择所属社团 / SELECT GROUPS"
+        title="选择所属社团"
         options={availableGroups.map(g => ({ id: g.id, name: g.name, description: g.description }))}
         selectedIds={editForm.group_ids}
         onSelect={(ids) => setEditForm({ ...editForm, group_ids: ids })}
@@ -774,7 +781,7 @@ function UserCenterPage() {
       />
       <SearchableMultiSelectModal
         isOpen={showVideoModal}
-        title="选择参演视频 / SELECT VIDEOS"
+        title="选择参演视频"
         options={availableVideos.map(v => ({ id: v.id, name: v.title, description: `BV: ${v.bv_number}` }))}
         selectedIds={editForm.performed_video_ids}
         onSelect={(ids) => setEditForm({ ...editForm, performed_video_ids: ids })}

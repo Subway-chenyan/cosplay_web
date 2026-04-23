@@ -29,13 +29,13 @@ function getStageIcon(stage: string, isFinal?: boolean) {
 function getStageLabel(stage: string): string {
   switch (stage) {
     case 'preliminary':
-      return '初赛 / PRELIMINARY'
+      return '初赛'
     case 'advancing':
-      return '复赛 / ADVANCING'
+      return '复赛'
     case 'final':
-      return '决赛 / FINAL'
+      return '决赛'
     default:
-      return '其他 / OTHER'
+      return '其他'
   }
 }
 
@@ -85,12 +85,12 @@ export default function StageGroup({
           {getStageIcon(stage, isFinal)}
         </div>
         <div>
-          <h3 className={`text-lg md:text-xl font-black uppercase italic tracking-tighter ${isFinal ? 'text-amber-700' : 'text-black'}`}
+          <h3 className={`text-lg md:text-xl font-black italic tracking-tighter ${isFinal ? 'text-amber-700' : 'text-black'}`}
             style={{ textShadow: isFinal ? '1px 1px 0px rgba(0,0,0,0.15)' : '1px 1px 0px rgba(217,6,20,0.15)' }}
           >
             {stageDisplay || getStageLabel(stage)}
           </h3>
-          <p className="text-[10px] font-black text-gray-500 uppercase italic">
+          <p className="text-[10px] font-black text-gray-500 italic">
             {events.length} 场赛事
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function StageGroup({
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px flex-1 bg-gray-300"></div>
-            <span className="text-[10px] font-black uppercase italic text-gray-500 px-2">
+            <span className="text-[10px] font-black italic text-gray-500 px-2">
               已完成（{completedEvents.length}）
             </span>
             <div className="h-px flex-1 bg-gray-300"></div>
@@ -128,7 +128,7 @@ export default function StageGroup({
           {completedEvents.length > 0 && (
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px flex-1 bg-gray-300"></div>
-              <span className="text-[10px] font-black uppercase italic text-gray-500 px-2">
+              <span className="text-[10px] font-black italic text-gray-500 px-2">
                 即将开始（{upcomingEvents.length}）
               </span>
               <div className="h-px flex-1 bg-gray-300"></div>

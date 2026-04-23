@@ -95,21 +95,21 @@ function GroupsPage() {
         <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-x-2">
           <div className="transform skew-x-2">
             <h1 className="text-3xl md:text-5xl font-black text-black mb-4 uppercase italic border-b-8 border-p5-red inline-block" style={{ textShadow: '4px 4px 0px #d90614' }}>
-              社团档案 / ALLIANCE RECORD
+              社团档案
             </h1>
             <p className="block text-xl font-black italic bg-black text-white px-4 py-1 transform -skew-x-12 w-fit mb-8">
-              搜集同步中 / DATABASE RECORDING
+              搜集同步中
             </p>
 
             {/* Search Bar */}
             <div className="mt-8 max-w-3xl border-t-4 border-black border-dashed pt-8">
-              <h2 className="text-xl font-black text-black uppercase italic mb-4">查找盟友 / SEARCH ALLY</h2>
+              <h2 className="text-xl font-black text-black italic mb-4">查找社团</h2>
               <SearchBar
                 value={inputValue}
                 onChange={handleInputChange}
                 onClear={handleClearSearch}
                 onSearch={handleSearch}
-                placeholder="搜索名称、描述、地区... / SEARCH..."
+                placeholder="搜索名称、描述、地区..."
                 className="max-w-2xl"
               />
             </div>
@@ -121,8 +121,8 @@ function GroupsPage() {
       <div className="relative p-6 bg-white border-4 border-black shadow-[12px_12px_0_0_black] overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 p5-halftone opacity-10 -rotate-45 translate-x-32 -translate-y-32"></div>
         <div className="relative z-10">
-          <h2 className="text-2xl font-black text-black uppercase italic mb-6 border-l-8 border-p5-red pl-4">
-            势力范围 / OPERATIONAL MAP
+          <h2 className="text-2xl font-black text-black italic mb-6 border-l-8 border-p5-red pl-4">
+            社团分布地图
           </h2>
           <ChinaMapModule className="mb-0" onProvinceSelect={handleProvinceSelect} />
         </div>
@@ -141,18 +141,18 @@ function GroupsPage() {
                   <MapPin className="w-10 h-10 text-p5-red animate-bounce" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-black text-p5-red uppercase italic tracking-tighter">已锁定地区 / LOCATION IDENTIFIED :</span>
-                  <h2 className="text-2xl md:text-5xl font-black text-white uppercase italic leading-none p5-text-shadow-red">
-                    {selectedProvince} <span className="text-p5-red">/</span> {filteredGroups.length} <span className="text-lg md:text-2xl">个已知社团 / GROUPS FOUND</span>
+                  <span className="text-sm font-black text-p5-red italic tracking-tighter">已锁定地区：</span>
+                  <h2 className="text-2xl md:text-5xl font-black text-white italic leading-none p5-text-shadow-red">
+                    {selectedProvince} <span className="text-p5-red">/</span> {filteredGroups.length} <span className="text-lg md:text-2xl">个社团</span>
                   </h2>
                 </div>
               </div>
 
               <button
                 onClick={clearProvinceFilter}
-                className="bg-p5-red text-white px-8 py-3 font-black uppercase italic border-4 border-white hover:bg-white hover:text-black transition-all transform -skew-x-12 shadow-[4px_4px_0_0_rgba(0,0,0,0.5)] active:translate-y-1"
+                className="bg-p5-red text-white px-8 py-3 font-black italic border-4 border-white hover:bg-white hover:text-black transition-all transform -skew-x-12 shadow-[4px_4px_0_0_rgba(0,0,0,0.5)] active:translate-y-1"
               >
-                <span className="transform skew-x-12 inline-block">中止搜寻 / TERMINATE SCAN</span>
+                <span className="transform skew-x-12 inline-block">清除筛选</span>
               </button>
             </div>
           </div>
@@ -179,11 +179,11 @@ function GroupsPage() {
                 <div className="bg-white p-6 transform rotate-12 border-4 border-black shadow-[8px_8px_0_0_#d90614] mb-8">
                   <Users className="w-20 h-20 text-black transform -rotate-12" />
                 </div>
-                <h3 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
-                  无关联社团 / NO ALLIANCE FOUND
+                <h3 className="text-4xl font-black text-white italic tracking-tighter mb-4" style={{ textShadow: '4px 4px 0px #d90614' }}>
+                  未找到匹配社团
                 </h3>
-                <p className="bg-p5-red text-white px-8 py-2 font-black uppercase italic transform -skew-x-12 border-2 border-white">
-                  该区域无匹配情报 / ZERO ASSETS DETECTED
+                <p className="bg-p5-red text-white px-8 py-2 font-black italic transform -skew-x-12 border-2 border-white">
+                  当前条件下没有匹配结果
                 </p>
               </div>
             </div>
@@ -207,8 +207,8 @@ function GroupsPage() {
       {groups.length > 0 && (
         <div className="text-center mt-12 mb-8">
           <div className="inline-block bg-black text-white px-6 py-1 transform -skew-x-12 border-2 border-p5-red shadow-[4px_4px_0_0_black]">
-            <span className="transform skew-x-12 inline-block font-black italic uppercase tracking-tighter">
-              情报扫描完毕: <span className="text-p5-red">{groups.length}</span> / <span className="text-p5-red">{pagination.count}</span> ALLIANCES VIEWED
+            <span className="transform skew-x-12 inline-block font-black italic tracking-tighter">
+              已显示 <span className="text-p5-red">{groups.length}</span> / <span className="text-p5-red">{pagination.count}</span> 个社团
             </span>
           </div>
         </div>
