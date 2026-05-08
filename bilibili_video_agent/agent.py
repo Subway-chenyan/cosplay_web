@@ -14,10 +14,12 @@ from langgraph.graph import StateGraph, START, END
 # LLM
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
+from langchain_community.chat_models import ChatOpenAI as CommunityChatOpenAI
 
 # Project modules
 from .bilibili_api import search_videos_by_date, get_video_info
-from .db import get_db
+from .database import get_db
 
 load_dotenv(dotenv_path='.env')
 
@@ -49,11 +51,54 @@ class StageDramaMeta(BaseModel):
 
 # 统一在下方的 _get_llm 中处理多种 API Key 的回退逻辑
 
-def _get_llm() -> ChatOpenAI:
+def _get_llm():
+    """获取LLM客户端，支持多种模型服务"""
+    # 优先尝试DeepSeek
+    deepseek_key = os.getenv("DEEPSEEK_API_KEY")
+    if deepseek_key:
+        try:
+            from langchain_openai import ChatOpenAI as OpenAI
+            return OpenAI(
+                model="deepseek-chat",
+                temperature=0,
+                api_key=deepseek_key,
+                base_url="https://api.deepseek.com/v1"
+            )
+        except Exception as e:
+            logger.warning(f"DeepSeek初始化失败: {e}")
+
+    # 回退到OpenAI/SiliconFlow
     openai_key = os.getenv("openai_api_key")
-    if not openai_key:
-        raise RuntimeError("openai_api_key 未设置。请在环境变量中配置后重试。")
-    return ChatOpenAI(model="Qwen/Qwen3-Next-80B-A3B-Instruct", temperature=0, api_key=openai_key, base_url="https://api.siliconflow.cn/v1")
+    if openai_key:
+        try:
+            from langchain_openai import ChatOpenAI
+            return ChatOpenAI(
+                model="Qwen/Qwen3-Next-80B-A3B-Instruct",
+                temperature=0,
+                api_key=openai_key,
+                base_url="https://api.siliconflow.cn/v1"
+            )
+        except Exception as e:
+            logger.warning(f"OpenAI初始化失败: {e}")
+
+    # 最后尝试Azure OpenAI
+    azure_key = os.getenv("AZURE_OPENAI_API_KEY")
+    azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+    if azure_key and azure_endpoint and azure_deployment:
+        try:
+            from langchain_openai import AzureChatOpenAI
+            return AzureChatOpenAI(
+                azure_deployment=azure_deployment,
+                azure_endpoint=azure_endpoint,
+                api_key=azure_key,
+                api_version="2024-02-01",
+                temperature=0
+            )
+        except Exception as e:
+            logger.warning(f"Azure OpenAI初始化失败: {e}")
+
+    raise RuntimeError("未找到可用的LLM API密钥。请配置 DEEPSEEK_API_KEY 或 openai_api_key。")
 
 
 # -----------------------------
