@@ -1,8 +1,11 @@
 import { useEditor, EditorContent } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
+import Placeholder from '@tiptap/extension-placeholder'
 import MenuBar from './MenuBar'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { forumService } from '../../../services/forumService'
 
 interface P5EditorProps {
   content: string
@@ -10,13 +13,40 @@ interface P5EditorProps {
   placeholder?: string
 }
 
-const P5Editor = ({ content, onChange }: P5EditorProps) => {
+const P5Editor = ({ content, onChange, placeholder = '开始创作...' }: P5EditorProps) => {
+  const editorRef = useRef<Editor | null>(null)
+
+  const insertImageFile = async (file: File) => {
+    const activeEditor = editorRef.current
+    if (!activeEditor || !file.type.startsWith('image/')) return false
+    const response = await forumService.uploadAttachment(file)
+    activeEditor.chain().focus().setImage({ src: response.file_url || response.file }).run()
+    return true
+  }
+
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+        link: {
+          autolink: true,
+          openOnClick: false,
+          linkOnPaste: true,
+          HTMLAttributes: {
+            rel: 'noopener noreferrer nofollow',
+            target: '_blank',
+          },
+        },
+      }),
+      Placeholder.configure({
+        placeholder,
+        emptyEditorClass: 'is-editor-empty',
+      }),
       Image.configure({
-        inline: true,
-        allowBase64: true,
+        inline: false,
+        allowBase64: false,
       }),
     ],
     content,
@@ -25,10 +55,33 @@ const P5Editor = ({ content, onChange }: P5EditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none focus:outline-none min-h-[300px] p-4 text-white font-medium',
+        class: 'p5-rich-editor focus:outline-none min-h-[320px] p-5 text-white font-medium',
+      },
+      handlePaste: (_view, event) => {
+        const file = Array.from(event.clipboardData?.files || []).find((item) => item.type.startsWith('image/'))
+        if (!file) return false
+        event.preventDefault()
+        insertImageFile(file).catch(() => alert('图片上传失败，请重试'))
+        return true
+      },
+      handleDrop: (_view, event) => {
+        const file = Array.from(event.dataTransfer?.files || []).find((item) => item.type.startsWith('image/'))
+        if (!file) return false
+        event.preventDefault()
+        insertImageFile(file).catch(() => alert('图片上传失败，请重试'))
+        return true
       },
     },
   })
+
+  useEffect(() => {
+    editorRef.current = editor
+    return () => {
+      if (editorRef.current === editor) {
+        editorRef.current = null
+      }
+    }
+  }, [editor])
 
   // 当外部内容更改且与编辑器内容不一致时，更新编辑器内容
   useEffect(() => {
@@ -44,7 +97,7 @@ const P5Editor = ({ content, onChange }: P5EditorProps) => {
 
       <div className="relative z-10 bg-black/90 border-2 border-white overflow-hidden transform rotate-1 transition-transform group-hover:rotate-0">
         <MenuBar editor={editor} />
-        <EditorContent editor={editor} />
+        <EditorContent editor={editor} className="p5-editor-shell" />
       </div>
 
       {/* 装饰性角标 */}

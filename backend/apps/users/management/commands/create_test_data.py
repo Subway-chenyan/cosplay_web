@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from apps.videos.models import Video
 from apps.groups.models import Group
 from apps.tags.models import Tag, VideoTag
-from apps.competitions.models import Competition
+from apps.competitions.models import Competition, CompetitionYear
 from apps.awards.models import Award, AwardRecord
 
 User = get_user_model()
@@ -458,13 +458,18 @@ class Command(BaseCommand):
                 if competition_awards:
                     # 随机选择一个奖项
                     award = random.choice(competition_awards)
+                    competition_year, _ = CompetitionYear.objects.get_or_create(
+                        competition=video.competition,
+                        year=video.year or 2024,
+                    )
                     
                     # 创建获奖记录
                     AwardRecord.objects.create(
                         award=award,
                         video=video,
                         group=video.group,
-                        year=video.year or 2024,
+                        competition_year=competition_year,
+                        drama_name=video.title,
                         description=f'{video.title} 获得 {award.name}'
                     )
 

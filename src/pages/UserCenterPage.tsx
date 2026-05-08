@@ -762,6 +762,20 @@ function UserCenterPage() {
                       </div>
                     </a>
                   )}
+
+                  {profile.role === 'admin' && (
+                    <a
+                      href="/forum/admin"
+                      className="relative group block p-6 border-4 border-black bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-3 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
+                      <div className="relative z-10">
+                        <MessageSquare className="w-12 h-12 text-p5-red mb-4" />
+                        <h3 className="text-xl font-black mb-2">论坛管理</h3>
+                        <p className="text-gray-600 font-bold text-sm">管理帖子、评论和论坛分类</p>
+                      </div>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

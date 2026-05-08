@@ -13,6 +13,7 @@ import ForumHome from './pages/Forum/ForumHome'
 import ForumPostDetail from './pages/Forum/ForumPostDetail'
 import NewPost from './pages/Forum/NewPost'
 import EditPost from './pages/Forum/EditPost'
+import ForumAdmin from './pages/Forum/ForumAdmin'
 import LoginPage from './pages/LoginPage'
 import QQLoginCallbackPage from './pages/QQLoginCallbackPage'
 import RegisterPage from './pages/RegisterPage'
@@ -92,6 +93,7 @@ function App() {
             <Route path="/management" element={<ManagementPage />} />
             <Route path="/choreo" element={<ChoreoMasterPage />} />
             <Route path="/forum" element={<ForumHome />} />
+            <Route path="/forum/admin" element={<ForumAdmin />} />
             <Route path="/forum/post/:id" element={<ForumPostDetail />} />
           </Route>
           <Route path="/forum/new" element={<NewPost />} />

@@ -74,4 +74,229 @@
   .p5-text-shadow-white {
     text-shadow: 2px 2px 0px #ffffff;
   }
+
+  .p5-editor-shell {
+    background: rgba(0, 0, 0, 0.88);
+  }
+
+  .p5-rich-editor {
+    color: #ffffff;
+    caret-color: #d90614;
+    line-height: 1.75;
+    word-break: break-word;
+  }
+
+  .p5-rich-editor:focus {
+    outline: none;
+  }
+
+  .p5-rich-editor p {
+    margin: 0.85rem 0;
+    font-size: 1rem;
+  }
+
+  .p5-rich-editor h1,
+  .p5-rich-editor h2,
+  .p5-rich-editor h3 {
+    margin: 1.25rem 0 0.75rem;
+    color: #ffffff;
+    font-weight: 900;
+    line-height: 1.15;
+  }
+
+  .p5-rich-editor h1 {
+    font-size: 2rem;
+  }
+
+  .p5-rich-editor h2 {
+    font-size: 1.55rem;
+  }
+
+  .p5-rich-editor h3 {
+    font-size: 1.25rem;
+  }
+
+  .p5-rich-editor strong {
+    font-weight: 900;
+    color: #ffffff;
+  }
+
+  .p5-rich-editor em {
+    font-style: italic;
+  }
+
+  .p5-rich-editor u {
+    text-decoration-thickness: 0.12em;
+    text-underline-offset: 0.18em;
+  }
+
+  .p5-rich-editor s {
+    color: rgba(255, 255, 255, 0.58);
+    text-decoration-color: #d90614;
+    text-decoration-thickness: 0.12em;
+  }
+
+  .p5-rich-editor ul,
+  .p5-rich-editor ol {
+    margin: 0.85rem 0;
+    padding-left: 1.6rem;
+  }
+
+  .p5-rich-editor ul {
+    list-style: disc;
+  }
+
+  .p5-rich-editor ol {
+    list-style: decimal;
+  }
+
+  .p5-rich-editor li {
+    margin: 0.35rem 0;
+    padding-left: 0.25rem;
+  }
+
+  .p5-rich-editor blockquote {
+    margin: 1rem 0;
+    border-left: 5px solid #d90614;
+    background: rgba(217, 6, 20, 0.15);
+    padding: 0.8rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 700;
+  }
+
+  .p5-rich-editor code {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.1rem 0.35rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9em;
+    color: #ffffff;
+  }
+
+  .p5-rich-editor pre {
+    margin: 1rem 0;
+    border: 2px solid #ffffff;
+    background: #101010;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .p5-rich-editor pre code {
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .p5-rich-editor a {
+    color: #ffffff;
+    text-decoration: underline;
+    text-decoration-color: #d90614;
+    text-decoration-thickness: 0.16em;
+    text-underline-offset: 0.18em;
+  }
+
+  .p5-rich-editor img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border: 4px solid #ffffff;
+    box-shadow: 6px 6px 0 #d90614;
+  }
+
+  .p5-rich-editor hr {
+    margin: 1.5rem 0;
+    border: 0;
+    border-top: 3px solid #d90614;
+  }
+
+  .p5-rich-editor .is-empty::before,
+  .p5-rich-editor.is-editor-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+  }
+
+  .p5-rendered-content {
+    color: #111111;
+    line-height: 1.8;
+    word-break: break-word;
+  }
+
+  .p5-rendered-content h1,
+  .p5-rendered-content h2,
+  .p5-rendered-content h3 {
+    margin: 1.25rem 0 0.75rem;
+    font-weight: 900;
+    line-height: 1.15;
+  }
+
+  .p5-rendered-content h1 {
+    font-size: 2rem;
+  }
+
+  .p5-rendered-content h2 {
+    font-size: 1.55rem;
+  }
+
+  .p5-rendered-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .p5-rendered-content p {
+    margin: 0.85rem 0;
+  }
+
+  .p5-rendered-content ul,
+  .p5-rendered-content ol {
+    margin: 0.85rem 0;
+    padding-left: 1.6rem;
+  }
+
+  .p5-rendered-content ul {
+    list-style: disc;
+  }
+
+  .p5-rendered-content ol {
+    list-style: decimal;
+  }
+
+  .p5-rendered-content blockquote {
+    margin: 1rem 0;
+    border-left: 5px solid #d90614;
+    background: rgba(217, 6, 20, 0.08);
+    padding: 0.8rem 1rem;
+    font-weight: 700;
+  }
+
+  .p5-rendered-content code {
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.1rem 0.35rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .p5-rendered-content pre {
+    margin: 1rem 0;
+    border: 2px solid #111111;
+    background: #101010;
+    color: #ffffff;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .p5-rendered-content img {
+    max-width: 100%;
+    height: auto;
+    border: 4px solid #111111;
+  }
+
+  .p5-rendered-content a {
+    color: #d90614;
+    text-decoration: underline;
+    text-decoration-thickness: 0.14em;
+    text-underline-offset: 0.18em;
+  }
 }

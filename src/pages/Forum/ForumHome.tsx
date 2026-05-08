@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { AppDispatch, RootState } from '../../store/store'
 import { fetchCategories, fetchPosts, setFilters } from '../../store/slices/forumSlice'
-import { MessageSquare, Eye, Plus, ChevronRight, User } from 'lucide-react'
+import { MessageSquare, Eye, Plus, User, Pin, Lock, Star, Search, X } from 'lucide-react'
 
 const ForumHome = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { categories, posts, loading, filters } = useSelector((state: RootState) => state.forum)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [searchInput, setSearchInput] = useState(filters.search || '')
 
   useEffect(() => {
     dispatch(fetchCategories())
@@ -44,117 +45,157 @@ const ForumHome = () => {
     dispatch(setFilters({ category: undefined, author: currentUser.id }))
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* 标题装饰 */}
-      <div className="relative mb-12">
-        <div className="absolute -inset-2 bg-p5-red transform -skew-x-12 -rotate-1 shadow-[4px_4px_0_0_black]"></div>
-        <div className="relative bg-white p-4 transform -skew-x-12 border-2 border-black inline-block">
-          <h1 className="text-4xl font-black text-black italic tracking-tighter">
-            交流论坛
-          </h1>
-        </div>
-      </div>
+  const handleSearch = (e?: FormEvent) => {
+    e?.preventDefault()
+    dispatch(setFilters({ search: searchInput.trim() || undefined }))
+  }
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* 侧边栏: 分区 */}
-        <aside className="lg:w-1/4">
-          <div className="sticky top-24 space-y-4">
+  const clearSearch = () => {
+    setSearchInput('')
+    dispatch(setFilters({ search: undefined }))
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-6 lg:py-10">
+      <section className="mx-auto max-w-6xl">
+        <div className="mb-5 rounded-2xl border border-white/15 bg-black/55 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.24)] backdrop-blur md:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+            <form onSubmit={handleSearch} className="flex-1">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <label className="relative flex-1">
+                  <span className="sr-only">搜索帖子</span>
+                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" />
+                  <input
+                    type="search"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="搜索标题、正文或作者..."
+                    className="h-12 w-full rounded-xl border border-white/10 bg-white px-12 text-base font-bold text-zinc-950 shadow-inner outline-none transition focus:border-p5-red focus:ring-4 focus:ring-p5-red/20"
+                  />
+                  {searchInput && (
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      className="absolute right-3 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-p5-red focus:outline-none focus:ring-2 focus:ring-p5-red"
+                      aria-label="清空搜索"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </label>
+                <button
+                  type="submit"
+                  className="h-12 rounded-xl bg-white px-6 font-black text-zinc-950 transition hover:bg-p5-red hover:text-white focus:outline-none focus:ring-4 focus:ring-p5-red/30"
+                >
+                  检索
+                </button>
+              </div>
+            </form>
+
+            <Link
+              to="/forum/new"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-p5-red px-6 font-black text-white shadow-[0_12px_30px_rgba(217,6,20,0.28)] transition hover:-translate-y-0.5 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-p5-red/30"
+            >
+              <Plus className="h-5 w-5" />
+              发布帖子
+            </Link>
+          </div>
+
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
             <button
               onClick={() => handleCategoryClick(undefined)}
-              className={`w-full text-left px-6 py-4 transform -skew-x-12 border-2 border-black transition-all flex items-center justify-between group ${
-                !filters.category && !filters.author ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
+              className={`h-10 shrink-0 rounded-full px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-p5-red ${
+                !filters.category && !filters.author
+                  ? 'bg-white text-zinc-950'
+                  : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              <span className="font-black italic">全部</span>
-              <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${!filters.category && !filters.author ? 'text-white' : 'text-black'}`} />
+              全部
             </button>
 
             {currentUser && (
               <button
                 onClick={handleMyPostsClick}
-                className={`w-full text-left px-6 py-4 transform -skew-x-12 border-2 border-black transition-all flex items-center justify-between group ${
-                  filters.author ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
+                className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-p5-red ${
+                  filters.author
+                    ? 'bg-white text-zinc-950'
+                    : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <User className={`w-4 h-4 ${filters.author ? 'text-white' : 'text-p5-red'}`} />
-                  <span className="font-black italic block leading-none">我的帖子</span>
-                </div>
-                <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${filters.author ? 'text-white' : 'text-black'}`} />
+                <User className="h-4 w-4" />
+                我的帖子
               </button>
             )}
-
-            <div className="pt-4 pb-2">
-              <div className="h-0.5 bg-black/10 transform -skew-x-12"></div>
-            </div>
 
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryClick(cat.id)}
-                className={`w-full text-left px-6 py-4 transform -skew-x-12 border-2 border-black transition-all flex items-center justify-between group ${
-                  filters.category === cat.id ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-gray-100'
+                className={`h-10 shrink-0 rounded-full px-4 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-p5-red ${
+                  filters.category === cat.id
+                    ? 'bg-white text-zinc-950'
+                    : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
-                <div>
-                  <span className="font-black italic block leading-none">{cat.name}</span>
-                </div>
-                <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${filters.category === cat.id ? 'text-white' : 'text-black'}`} />
+                {cat.name}
               </button>
             ))}
-
-            <Link
-              to="/forum/new"
-              className="mt-8 w-full block text-center px-6 py-4 bg-black text-white transform skew-x-12 border-2 border-p5-red hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(217,6,20,0.5)] group"
-            >
-              <div className="transform -skew-x-12 flex items-center justify-center font-black italic">
-                <Plus className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform" />
-                发布帖子
-              </div>
-            </Link>
           </div>
-        </aside>
+        </div>
 
-        {/* 主内容: 帖子列表 */}
-        <main className="lg:w-3/4">
+        <div>
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="w-16 h-16 border-4 border-p5-red border-t-white rounded-full animate-spin"></div>
+            <div className="flex h-64 items-center justify-center">
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/25 border-t-p5-red"></div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {posts.length === 0 ? (
-                <div className="bg-white border-2 border-black p-12 text-center transform -rotate-1">
-                  <p className="text-2xl font-black text-black italic">还没有帖子... 快来抢沙发！</p>
+                <div className="rounded-2xl border border-white/20 bg-white p-12 text-center shadow-[0_18px_45px_rgba(0,0,0,0.16)]">
+                  <p className="text-xl font-black text-zinc-950">还没有帖子，来开第一局吧。</p>
                 </div>
               ) : (
                 posts.map((post) => (
                   <Link
                     key={post.id}
                     to={`/forum/post/${post.id}`}
-                    className="block bg-white border-2 border-black hover:border-p5-red transition-all transform hover:-translate-y-1 hover:translate-x-1 shadow-[4px_4px_0_0_black] hover:shadow-[8px_8px_0_0_#d90614] group"
+                    className="group block rounded-2xl border border-white/70 bg-white/95 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 hover:border-p5-red hover:shadow-[0_18px_48px_rgba(0,0,0,0.2)] focus:outline-none focus:ring-4 focus:ring-p5-red/25"
                   >
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-p5-red text-white text-[10px] px-2 py-0.5 transform -skew-x-12 font-bold italic">
-                          {post.category_name}
-                        </span>
-                        <span className="text-gray-500 text-xs italic">
-                          @{post.author_name} · {new Date(post.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <h2 className="text-xl font-black text-black group-hover:text-p5-red transition-colors mb-4 italic uppercase">
-                        {post.title}
-                      </h2>
-                      <div className="flex items-center gap-6 text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          <span className="text-xs font-bold">{post.view_count}</span>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-3 flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-p5-red/10 px-3 py-1 text-xs font-black text-p5-red">
+                            {post.category_name}
+                          </span>
+                          {post.is_pinned && <Pin className="h-4 w-4 text-p5-red" aria-label="置顶" />}
+                          {post.is_featured && <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" aria-label="精选" />}
+                          {post.is_locked && <Lock className="h-4 w-4 text-zinc-500" aria-label="锁定" />}
+                          <span className="text-xs font-bold text-zinc-500">
+                            @{post.author_name} · {new Date(post.created_at).toLocaleDateString()}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" />
-                          <span className="text-xs font-bold">{post.comment_count}</span>
+                        <h2 className="line-clamp-2 text-xl font-black leading-snug text-zinc-950 transition group-hover:text-p5-red">
+                          {post.title}
+                        </h2>
+                        {post.tags?.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {post.tags.slice(0, 3).map((tag) => (
+                              <span key={tag.id} className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-bold text-zinc-600">
+                                #{tag.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-4 text-zinc-500 md:pt-1">
+                        <div className="inline-flex items-center gap-1.5">
+                          <Eye className="h-4 w-4" />
+                          <span className="text-sm font-black">{post.view_count}</span>
+                        </div>
+                        <div className="inline-flex items-center gap-1.5">
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="text-sm font-black">{post.reply_count}</span>
                         </div>
                       </div>
                     </div>
@@ -163,8 +204,8 @@ const ForumHome = () => {
               )}
             </div>
           )}
-        </main>
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

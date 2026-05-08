@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { fetchPostDetail, clearCurrentPost } from '../../store/slices/forumSlice'
 import { forumService } from '../../services/forumService'
-import { MessageSquare, User, Calendar, CornerDownRight, Send, Edit3 } from 'lucide-react'
+import { ModerationPayload } from '../../types/forum'
+import { MessageSquare, User, Calendar, CornerDownRight, Send, Edit3, Lock, Pin, Star, Heart, Flag, EyeOff } from 'lucide-react'
 import DOMPurify from 'dompurify'
 
 const ForumPostDetail = () => {
@@ -15,10 +16,9 @@ const ForumPostDetail = () => {
   const [commentContent, setCommentContent] = useState('')
   const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [isModerating, setIsModerating] = useState(false)
 
   useEffect(() => {
-    fetchCurrentUser()
     if (id) {
       dispatch(fetchPostDetail(parseInt(id)))
     }
@@ -26,22 +26,6 @@ const ForumPostDetail = () => {
       dispatch(clearCurrentPost())
     }
   }, [dispatch, id])
-
-  const fetchCurrentUser = async () => {
-    const token = localStorage.getItem('access_token')
-    if (!token) return
-    try {
-      const response = await fetch('/api/users/me/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setCurrentUser(data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
-    }
-  }
 
   const handleSubmitComment = async () => {
     if (!id || !commentContent.trim() || isSubmitting) return
@@ -61,6 +45,53 @@ const ForumPostDetail = () => {
       alert('评论发送失败，请检查是否已登录')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const refreshPost = () => {
+    if (id) dispatch(fetchPostDetail(parseInt(id)))
+  }
+
+  const handleModerate = async (payload: ModerationPayload) => {
+    if (!id || isModerating) return
+    setIsModerating(true)
+    try {
+      await forumService.moderatePost(parseInt(id), payload)
+      refreshPost()
+    } catch (error) {
+      console.error('Failed to moderate post:', error)
+      alert('管理操作失败')
+    } finally {
+      setIsModerating(false)
+    }
+  }
+
+  const handleReactPost = async () => {
+    if (!id) return
+    try {
+      await forumService.reactToPost(parseInt(id))
+      refreshPost()
+    } catch (error) {
+      alert('点赞失败，请检查是否已登录')
+    }
+  }
+
+  const handleReportPost = async () => {
+    if (!id) return
+    try {
+      await forumService.report({ post: parseInt(id), reason: 'other', description: '用户从帖子详情页提交举报' })
+      alert('举报已提交，管理员会尽快处理')
+    } catch (error) {
+      alert('举报失败，请检查是否已登录')
+    }
+  }
+
+  const handleHideComment = async (commentId: number) => {
+    try {
+      await forumService.hideComment(commentId)
+      refreshPost()
+    } catch (error) {
+      alert('隐藏评论失败')
     }
   }
 
@@ -90,9 +121,19 @@ const ForumPostDetail = () => {
                 <span className="text-[10px] text-gray-500 italic">{new Date(comment.created_at).toLocaleString()}</span>
               </div>
               <p className="text-gray-800 text-sm leading-relaxed">{comment.content}</p>
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex justify-end gap-3">
+                {comment.can_moderate && (
+                  <button
+                    onClick={() => handleHideComment(comment.id)}
+                    className="text-[10px] font-black italic hover:text-p5-red flex items-center gap-1"
+                  >
+                    <EyeOff className="w-3 h-3" />
+                    隐藏
+                  </button>
+                )}
                 <button
                   onClick={() => setReplyTo({ id: comment.id, name: comment.author_name })}
+                  disabled={currentPost.is_locked}
                   className="text-[10px] font-black italic hover:text-p5-red flex items-center gap-1"
                 >
                   <CornerDownRight className="w-3 h-3" />
@@ -120,7 +161,42 @@ const ForumPostDetail = () => {
             >
               ← 返回论坛
             </button>
-            {currentUser && currentPost && String(currentUser.id) === String(currentPost.author) && (
+            <div className="flex items-center gap-2">
+            {currentPost.can_moderate && (
+              <>
+                <button
+                  onClick={() => handleModerate({ is_pinned: !currentPost.is_pinned })}
+                  disabled={isModerating}
+                  className="bg-white text-black px-3 py-1 font-black italic text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
+                >
+                  <span className="flex items-center gap-1 transform -skew-x-12">
+                    <Pin className="w-3 h-3" />
+                    {currentPost.is_pinned ? '取消置顶' : '置顶'}
+                  </span>
+                </button>
+                <button
+                  onClick={() => handleModerate({ is_featured: !currentPost.is_featured })}
+                  disabled={isModerating}
+                  className="bg-white text-black px-3 py-1 font-black italic text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
+                >
+                  <span className="flex items-center gap-1 transform -skew-x-12">
+                    <Star className="w-3 h-3" />
+                    {currentPost.is_featured ? '取消精华' : '精华'}
+                  </span>
+                </button>
+                <button
+                  onClick={() => handleModerate({ is_locked: !currentPost.is_locked })}
+                  disabled={isModerating}
+                  className="bg-white text-black px-3 py-1 font-black italic text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
+                >
+                  <span className="flex items-center gap-1 transform -skew-x-12">
+                    <Lock className="w-3 h-3" />
+                    {currentPost.is_locked ? '解锁' : '锁定'}
+                  </span>
+                </button>
+              </>
+            )}
+            {currentPost.can_edit && (
               <button
                 onClick={() => navigate(`/forum/edit/${id}`)}
                 className="bg-white text-black px-4 py-1 font-black italic text-xs border-2 border-p5-red hover:bg-p5-red hover:text-white transition-all transform skew-x-12"
@@ -131,6 +207,7 @@ const ForumPostDetail = () => {
                 </div>
               </button>
             )}
+            </div>
           </div>
           <div className="bg-p5-red inline-block px-3 py-1 transform -skew-x-12 mb-4">
             <span className="text-xs font-black italic">{currentPost.category_name}</span>
@@ -149,8 +226,14 @@ const ForumPostDetail = () => {
             </div>
             <div className="flex items-center gap-2">
               <MessageSquare className="w-3 h-3 text-p5-red" />
-              {currentPost.comments.length}
+              {currentPost.reply_count}
             </div>
+            {currentPost.is_locked && (
+              <div className="flex items-center gap-2">
+                <Lock className="w-3 h-3 text-p5-red" />
+                已锁定
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -159,9 +242,30 @@ const ForumPostDetail = () => {
       <div className="container mx-auto max-w-4xl px-4 -mt-8 relative z-20">
         <div className="bg-white border-4 border-black p-8 md:p-12 shadow-[12px_12px_0_0_rgba(0,0,0,1)] min-h-[400px]">
           <div
-            className="prose prose-lg max-w-none prose-p:leading-relaxed prose-headings:font-black prose-headings:italic prose-headings:uppercase prose-img:border-4 prose-img:border-black"
+            className="p5-rendered-content max-w-none"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentPost.content) }}
           />
+          <div className="mt-10 flex flex-wrap items-center gap-3 border-t-2 border-black pt-6">
+            <button
+              onClick={handleReactPost}
+              className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 font-black italic hover:bg-p5-red transition-colors"
+            >
+              <Heart className="w-4 h-4" />
+              {currentPost.like_count}
+            </button>
+            <button
+              onClick={handleReportPost}
+              className="inline-flex items-center gap-2 border-2 border-black px-4 py-2 font-black italic hover:border-p5-red hover:text-p5-red transition-colors"
+            >
+              <Flag className="w-4 h-4" />
+              举报
+            </button>
+            {currentPost.tags?.map((tag) => (
+              <span key={tag.id} className="px-3 py-1 text-xs font-black italic border-2 border-black" style={{ color: tag.color }}>
+                #{tag.name}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* 评论区 */}
@@ -183,16 +287,23 @@ const ForumPostDetail = () => {
                 <button onClick={() => setReplyTo(null)}>取消</button>
               </div>
             )}
-            <textarea
-              value={commentContent}
-              onChange={(e) => setCommentContent(e.target.value)}
-              placeholder="说点什么吧..."
-              className="w-full bg-white border-2 border-black p-4 focus:outline-none focus:border-p5-red min-h-[120px]"
-            />
+            {currentPost.is_locked ? (
+              <div className="bg-white border-2 border-black p-4 font-black italic text-gray-500 flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                该帖子已锁定
+              </div>
+            ) : (
+              <textarea
+                value={commentContent}
+                onChange={(e) => setCommentContent(e.target.value)}
+                placeholder="说点什么吧..."
+                className="w-full bg-white border-2 border-black p-4 focus:outline-none focus:border-p5-red min-h-[120px]"
+              />
+            )}
             <div className="mt-4 flex justify-end">
               <button
                 onClick={handleSubmitComment}
-                disabled={isSubmitting}
+                disabled={isSubmitting || currentPost.is_locked}
                 className="bg-p5-red text-white px-8 py-3 font-black italic flex items-center gap-2 hover:bg-black transition-colors shadow-[4px_4px_0_0_black]"
               >
                 {isSubmitting ? (

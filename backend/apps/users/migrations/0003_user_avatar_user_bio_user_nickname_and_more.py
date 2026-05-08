@@ -47,7 +47,11 @@ class Migration(migrations.Migration):
             name='role_application_reason',
             field=models.TextField(blank=True, verbose_name='申请理由'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='user',
+            name='groups',
+        ),
+        migrations.AddField(
             model_name='user',
             name='groups',
             field=models.ManyToManyField(blank=True, related_name='members', to='groups.group', verbose_name='所属社团'),
