@@ -13,6 +13,7 @@ import io
 
 import json
 import os
+import re
 import tempfile
 import uuid
 from datetime import datetime, timedelta
@@ -29,6 +30,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import threading
 import pandas as pd
+import requests
 
 # 导入upload_data模块
 import sys
@@ -104,7 +106,7 @@ def download_template(request):
         # 检查用户权限
         if not request.user.can_import_data():
             return Response({
-                'error': '权限不足，需要贡献者及以上权限'
+                'error': '权限不足，需要编辑及以上权限'
             }, status=status.HTTP_403_FORBIDDEN)
 
         import_type = request.GET.get('type', 'video')
@@ -210,7 +212,7 @@ def start_import(request):
         # 检查用户权限
         if not request.user.can_import_data():
             return Response({
-                'error': '权限不足，需要贡献者及以上权限'
+                'error': '权限不足，需要编辑及以上权限'
             }, status=status.HTTP_403_FORBIDDEN)
         
         # 获取参数
@@ -279,7 +281,7 @@ def get_import_status(request, task_id):
         # 检查用户权限
         if not request.user.can_import_data():
             return Response({
-                'error': '权限不足，需要贡献者及以上权限'
+                'error': '权限不足，需要编辑及以上权限'
             }, status=status.HTTP_403_FORBIDDEN)
         
         task = IMPORT_TASKS.get(task_id)
@@ -380,19 +382,95 @@ class VideoViewSet(viewsets.ModelViewSet):
         """
         根据动作获取权限
         """
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        if self.action in ['create', 'update', 'partial_update', 'destroy', 'link_event', 'unlink_event']:
             permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]
+
+    def ensure_can_manage_video(self, video):
+        """确认当前用户可以管理该视频。"""
+        if self.request.user.can_manage_data():
+            return
+        if not video.group or not self.request.user.can_manage_group(video.group):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('只能管理自己管理社团的视频')
     
     def perform_create(self, serializer):
+        group = serializer.validated_data.get('group')
+        if not self.request.user.can_manage_data():
+            if not group or not self.request.user.can_manage_group(group):
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied('只能为自己管理的社团上传视频')
         serializer.save(uploaded_by=self.request.user)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        target_group = serializer.validated_data.get('group', instance.group)
+        if not self.request.user.can_manage_data():
+            if not instance.group or not self.request.user.can_manage_group(instance.group):
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied('只能编辑自己管理社团的视频')
+            if target_group and not self.request.user.can_manage_group(target_group):
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied('不能把视频转移到未管理的社团')
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if not self.request.user.can_manage_data():
+            if not instance.group or not self.request.user.can_manage_group(instance.group):
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied('只能删除自己管理社团的视频')
+        instance.delete()
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='bilibili-metadata')
+    def bilibili_metadata(self, request):
+        """根据 B 站链接获取视频基础信息。"""
+        url = (request.data.get('url') or '').strip()
+        bv_match = re.search(r'(BV[0-9A-Za-z]+)', url)
+        if not bv_match:
+            return Response({'error': '请提供有效的 B 站视频链接'}, status=status.HTTP_400_BAD_REQUEST)
+
+        bvid = bv_match.group(1)
+        api_url = 'https://api.bilibili.com/x/web-interface/view'
+        try:
+            resp = requests.get(
+                api_url,
+                params={'bvid': bvid},
+                headers={
+                    'User-Agent': 'Mozilla/5.0',
+                    'Referer': f'https://www.bilibili.com/video/{bvid}/',
+                },
+                timeout=10,
+            )
+            resp.raise_for_status()
+            payload = resp.json()
+        except Exception as exc:
+            return Response({'error': f'获取 B 站视频信息失败: {exc}'}, status=status.HTTP_502_BAD_GATEWAY)
+
+        if payload.get('code') != 0 or not payload.get('data'):
+            return Response({'error': payload.get('message') or '未找到该 B 站视频'}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = payload['data']
+        pubdate = data.get('pubdate')
+        year = None
+        if pubdate:
+            year = datetime.fromtimestamp(pubdate).year
+
+        return Response({
+            'bv_number': bvid,
+            'title': data.get('title') or '',
+            'description': data.get('desc') or '',
+            'thumbnail': data.get('pic') or '',
+            'url': f'https://www.bilibili.com/video/{bvid}/',
+            'year': year,
+        })
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def link_event(self, request, pk=None):
         """关联赛事到视频"""
         video = self.get_object()
+        self.ensure_can_manage_video(video)
         event_id = request.data.get('event_id')
 
         if not event_id:
@@ -413,6 +491,7 @@ class VideoViewSet(viewsets.ModelViewSet):
     def unlink_event(self, request, pk=None):
         """取消关联赛事"""
         video = self.get_object()
+        self.ensure_can_manage_video(video)
         event_id = request.data.get('event_id')
 
         if not event_id:
@@ -440,6 +519,11 @@ class VideoViewSet(viewsets.ModelViewSet):
         """
         批量导入数据
         """
+        if not request.user.can_import_data():
+            return Response({
+                'error': '权限不足，需要编辑及以上权限'
+            }, status=status.HTTP_403_FORBIDDEN)
+
         serializer = BulkImportSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -600,6 +684,11 @@ class VideoViewSet(viewsets.ModelViewSet):
         """
         下载导入模板
         """
+        if not request.user.can_import_data():
+            return Response({
+                'error': '权限不足，需要编辑及以上权限'
+            }, status=status.HTTP_403_FORBIDDEN)
+
         import_type = request.query_params.get('type', 'video')
         template_info = get_import_template(import_type)
         

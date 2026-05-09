@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar, Upload, Trophy, X } from 'lucide-react'
+import { Search, Plus, Edit, Save, AlertCircle, CheckCircle, Lock, Loader2, Users, Calendar, Upload, Trophy, X, Trash2 } from 'lucide-react'
 import { groupService } from '../services/groupService'
 import { competitionService } from '../services/competitionService'
 import { videoService } from '../services/videoService'
 import { eventService } from '../services/eventService'
 import { authService } from '../services/authService'
 import { api } from '../services/api'
-import { Group, Event } from '../types'
+import { Group, Event, GroupManager, UserSearchResult, Video } from '../types'
 // import { provinceNameMap } from '../data/chinaGeoJSON'
 import { chinaDivisions } from '../data/chinaDivisions'
 
@@ -115,7 +115,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
       {isOpen && (
         <div className="absolute z-50 w-full mt-2 bg-white border-4 border-black shadow-[8px_8px_0_0_black] max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
           {loading ? (
-            <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">LOADING / 加载中...</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">加载中...</div>
           ) : options.length > 0 ? (
             options.map((item) => (
               <div
@@ -133,7 +133,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
               </div>
             ))
           ) : (
-            <div className="px-4 py-3 text-gray-500 font-black italic">NO DATA / 暂无选项</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic">暂无选项</div>
           )}
         </div>
       )}
@@ -259,7 +259,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       {isOpen && (optionsList || (searchFunction && searchQuery.length > 0)) && (
         <div className="absolute z-50 w-full mt-2 bg-white border-4 border-black shadow-[8px_8px_0_0_black] max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
           {loading ? (
-            <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">SEARCHING / 搜索中...</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic animate-pulse">搜索中...</div>
           ) : options.length > 0 ? (
             options.map((item, index) => (
               <div
@@ -271,7 +271,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
               </div>
             ))
           ) : (
-            <div className="px-4 py-3 text-gray-500 font-black italic">NO RESULTS / 未找到相关结果</div>
+            <div className="px-4 py-3 text-gray-500 font-black italic">未找到相关结果</div>
           )}
         </div>
       )}
@@ -284,10 +284,24 @@ const ManagementPage: React.FC = () => {
   const [groupMode, setGroupMode] = useState<'create' | 'edit'>('create')
   const [eventMode, setEventMode] = useState<'create' | 'edit'>('create')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [resultDialog, setResultDialog] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [currentUserRole, setCurrentUserRole] = useState<string>('')
+  const [managedGroups, setManagedGroups] = useState<Group[]>([])
   const [loginForm, setLoginForm] = useState({ username: '', password: '' })
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [bilibiliUrl, setBilibiliUrl] = useState('')
+  const [isFetchingBilibili, setIsFetchingBilibili] = useState(false)
+  const [videoMode, setVideoMode] = useState<'create' | 'edit'>('create')
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [managedVideos, setManagedVideos] = useState<Video[]>([])
+  const [loadingManagedVideos, setLoadingManagedVideos] = useState(false)
+  const [groupManagers, setGroupManagers] = useState<GroupManager[]>([])
+  const [managerSearchQuery, setManagerSearchQuery] = useState('')
+  const [managerSearchResults, setManagerSearchResults] = useState<UserSearchResult[]>([])
+  const [managerSearching, setManagerSearching] = useState(false)
+  const [managerUpdating, setManagerUpdating] = useState(false)
 
   // 视频表单状态
   const [videoForm, setVideoForm] = useState({
@@ -351,6 +365,18 @@ const ManagementPage: React.FC = () => {
   const [availableCities, setAvailableCities] = useState<{ name: string, id: string }[]>([])
 
   const provinceOptions = useMemo(() => Object.keys(chinaDivisions).map(name => ({ name, id: name })), [])
+  const isContributor = currentUserRole === 'contributor'
+  const canManageGroupBindings = !isContributor && (currentUserRole === 'admin' || currentUserRole === '')
+  const visibleTabs = isContributor
+    ? [
+      { id: 'video', label: '视频管理', sub: '视频资料' },
+      { id: 'group', label: '社团管理', sub: '社团资料' }
+    ]
+    : [
+      { id: 'video', label: '视频管理', sub: '视频资料' },
+      { id: 'group', label: '社团管理', sub: '社团资料' },
+      { id: 'event', label: '赛事管理', sub: '赛事档案' }
+    ]
 
   // 当省份改变时，获取对应城市
   useEffect(() => {
@@ -367,7 +393,31 @@ const ManagementPage: React.FC = () => {
 
   // 检查认证状态
   useEffect(() => {
-    setIsAuthenticated(authService.isAuthenticated())
+    const initAuth = async () => {
+      const hasToken = authService.isAuthenticated()
+      setIsAuthenticated(hasToken)
+      if (!hasToken) return
+
+      try {
+        const user = await authService.getCurrentUser() as any
+        setCurrentUserRole(user.role || '')
+        if (user.role === 'contributor') {
+          setGroupMode('edit')
+          const groups = await groupService.getManagedGroups()
+          setManagedGroups(groups.results || [])
+          if ((groups.results || []).length === 1) {
+            const group = groups.results[0]
+            setVideoForm(prev => ({ ...prev, group: group.id }))
+            handleGroupSelect(group.id, group)
+            setGroupMode('edit')
+            loadManagedVideos(group.id)
+          }
+        }
+      } catch (error) {
+        setCurrentUserRole('')
+      }
+    }
+    initAuth()
   }, [])
 
   // 处理管理密钥验证
@@ -380,6 +430,7 @@ const ManagementPage: React.FC = () => {
       if (result.valid && result.token) {
         localStorage.setItem('access_token', result.token)
         setIsAuthenticated(true)
+        setCurrentUserRole('')
         showMessage('success', '验证成功，欢迎使用管理功能')
       } else {
         showMessage('error', result.message || '验证失败')
@@ -396,6 +447,8 @@ const ManagementPage: React.FC = () => {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     setIsAuthenticated(false)
+    setCurrentUserRole('')
+    setManagedGroups([])
     setLoginForm({ username: '', password: '' })
     showMessage('success', '已退出登录')
   }
@@ -403,6 +456,7 @@ const ManagementPage: React.FC = () => {
   // 显示消息
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text })
+    setResultDialog({ type, text })
     setTimeout(() => setMessage(null), 5000)
   }
 
@@ -422,6 +476,168 @@ const ManagementPage: React.FC = () => {
     setSelectedEvents([])
     setVideoEventSearch('')
     setVideoEventResults([])
+    setBilibiliUrl('')
+    setVideoMode('create')
+    setSelectedVideo(null)
+  }
+
+  const loadManagedVideos = async (groupId?: string) => {
+    const targetGroupId = groupId || videoForm.group || groupForm.id
+    if (!targetGroupId) {
+      setManagedVideos([])
+      return
+    }
+
+    setLoadingManagedVideos(true)
+    try {
+      const response = await videoService.getGroupVideos(targetGroupId, 1, 100)
+      setManagedVideos(response.results || [])
+    } catch (error) {
+      setManagedVideos([])
+    } finally {
+      setLoadingManagedVideos(false)
+    }
+  }
+
+  const loadGroupManagers = async (groupId: string) => {
+    if (!canManageGroupBindings || !groupId) {
+      setGroupManagers([])
+      return
+    }
+
+    try {
+      const response = await groupService.getGroupManagers(groupId)
+      setGroupManagers(response.results || [])
+    } catch (error: any) {
+      setGroupManagers([])
+      showMessage('error', error?.response?.data?.detail || '加载社团管理员失败')
+    }
+  }
+
+  const handleManagerSearch = async (query: string) => {
+    setManagerSearchQuery(query)
+    const keyword = query.trim()
+    if (!keyword) {
+      setManagerSearchResults([])
+      return
+    }
+
+    setManagerSearching(true)
+    try {
+      const response = await authService.searchUsers(keyword)
+      setManagerSearchResults(response.results || [])
+    } catch (error: any) {
+      setManagerSearchResults([])
+      showMessage('error', error?.response?.data?.detail || '搜索用户失败')
+    } finally {
+      setManagerSearching(false)
+    }
+  }
+
+  const handleAddGroupManager = async (userId: string) => {
+    if (!groupForm.id) {
+      showMessage('error', '请先选择社团')
+      return
+    }
+
+    setManagerUpdating(true)
+    try {
+      const response = await groupService.addGroupManager(groupForm.id, userId)
+      setGroupManagers(response.managers || [])
+      setManagerSearchQuery('')
+      setManagerSearchResults([])
+      showMessage('success', '已新增社团管理员绑定')
+    } catch (error: any) {
+      showMessage('error', error?.response?.data?.detail || '新增绑定失败')
+    } finally {
+      setManagerUpdating(false)
+    }
+  }
+
+  const handleRemoveGroupManager = async (manager: GroupManager) => {
+    if (!groupForm.id) return
+    const name = manager.nickname || manager.username
+    if (!window.confirm(`确定移除「${name}」的社团管理员绑定吗？`)) return
+
+    setManagerUpdating(true)
+    try {
+      await groupService.removeGroupManager(groupForm.id, manager.id)
+      await loadGroupManagers(groupForm.id)
+      showMessage('success', '已移除社团管理员绑定')
+    } catch (error: any) {
+      showMessage('error', error?.response?.data?.detail || '移除绑定失败')
+    } finally {
+      setManagerUpdating(false)
+    }
+  }
+
+  const handleVideoEditSelect = (video: Video) => {
+    setSelectedVideo(video)
+    setVideoMode('edit')
+    setBilibiliUrl(video.url || '')
+    setSelectedEvents((video.events || []).map(event => ({
+      id: event.id,
+      title: event.title,
+      competition_name: event.competition_name || '',
+      region: event.region || '',
+      stage_display: event.stage_display || '',
+    })))
+    setVideoForm({
+      bv_number: video.bv_number,
+      title: video.title,
+      description: video.description || '',
+      url: video.url || '',
+      thumbnail: video.thumbnail || '',
+      year: video.year || new Date().getFullYear(),
+      group: video.group || '',
+      competition: video.competition || '',
+      uploaded_by_username: video.uploaded_by_username || ''
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleVideoDelete = async (video: Video) => {
+    if (!window.confirm(`确定删除视频「${video.title}」吗？`)) return
+
+    setLoading(true)
+    try {
+      await videoService.deleteVideo(video.id)
+      showMessage('success', '视频已删除')
+      if (selectedVideo?.id === video.id) {
+        resetVideoForm()
+      }
+      await loadManagedVideos(video.group || videoForm.group)
+    } catch (error: any) {
+      showMessage('error', error?.response?.data?.detail || '删除视频失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFetchBilibiliMetadata = async () => {
+    if (!bilibiliUrl.trim()) {
+      showMessage('error', '请先粘贴 B 站视频链接')
+      return
+    }
+
+    setIsFetchingBilibili(true)
+    try {
+      const metadata = await videoService.fetchBilibiliMetadata(bilibiliUrl.trim())
+      setVideoForm(prev => ({
+        ...prev,
+        bv_number: metadata.bv_number || prev.bv_number,
+        title: metadata.title || prev.title,
+        description: metadata.description || prev.description,
+        url: metadata.url || bilibiliUrl.trim(),
+        thumbnail: metadata.thumbnail || prev.thumbnail,
+        year: metadata.year || prev.year,
+      }))
+      showMessage('success', '已获取 B 站视频信息，可继续修改后提交')
+    } catch (error: any) {
+      showMessage('error', error?.response?.data?.error || '获取 B 站视频信息失败')
+    } finally {
+      setIsFetchingBilibili(false)
+    }
   }
 
   // 搜索赛事用于绑定
@@ -458,6 +674,9 @@ const ManagementPage: React.FC = () => {
     setGroupLogoFile(null)
     setGroupLogoPreview(null)
     setSelectedGroupForEdit(null)
+    setGroupManagers([])
+    setManagerSearchQuery('')
+    setManagerSearchResults([])
   }
 
   const resetEventForm = () => {
@@ -554,6 +773,15 @@ const ManagementPage: React.FC = () => {
     })
     setGroupLogoPreview(group.logo || null)
     setGroupLogoFile(null)
+    setManagerSearchQuery('')
+    setManagerSearchResults([])
+    if (canManageGroupBindings) {
+      loadGroupManagers(group.id)
+    }
+    if (isContributor) {
+      setVideoForm(prev => ({ ...prev, group: group.id }))
+      loadManagedVideos(group.id)
+    }
   }
 
   // 处理社团Logo文件选择
@@ -572,6 +800,14 @@ const ManagementPage: React.FC = () => {
   // 提交视频表单
   const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!videoForm.url.trim() || !videoForm.bv_number.trim() || !videoForm.title.trim()) {
+      showMessage('error', '请先粘贴 B 站链接并补全视频标题/BV号')
+      return
+    }
+    if (!videoForm.group) {
+      showMessage('error', '请选择视频所属社团')
+      return
+    }
     setLoading(true)
 
     try {
@@ -588,18 +824,35 @@ const ManagementPage: React.FC = () => {
         // 不传递uploaded_by_username，让后端处理
       }
 
-      const created = await videoService.createVideo(submitData)
+      const saved = videoMode === 'edit' && selectedVideo
+        ? await videoService.updateVideo(selectedVideo.id, submitData)
+        : await videoService.createVideo(submitData)
 
-      // 自动绑定选中的赛事
-      if (selectedEvents.length > 0) {
-        try {
-          for (const ev of selectedEvents) {
-            await videoService.linkEvent(created.id, ev.id)
+      try {
+        const originalEventIds = new Set((selectedVideo?.events || []).map(event => event.id))
+        const selectedEventIds = new Set(selectedEvents.map(event => event.id))
+
+        if (videoMode === 'edit' && selectedVideo) {
+          for (const event of selectedVideo.events || []) {
+            if (!selectedEventIds.has(event.id)) {
+              await videoService.unlinkEvent(saved.id, event.id)
+            }
           }
-        } catch { /* silent */ }
+        }
+
+        for (const ev of selectedEvents) {
+          if (videoMode === 'create' || !originalEventIds.has(ev.id)) {
+            await videoService.linkEvent(saved.id, ev.id)
+          }
+        }
+      } catch (eventError) {
+        console.error('Error syncing video events:', eventError)
+        showMessage('error', '视频已保存，但赛事绑定同步失败，请重新编辑视频确认')
+        return
       }
 
-      showMessage('success', '视频信息添加成功！')
+      showMessage('success', videoMode === 'edit' ? '视频信息更新成功！' : '视频信息添加成功！')
+      await loadManagedVideos(saved.group || videoForm.group)
       resetVideoForm()
     } catch (error) {
       console.error('Error creating video:', error)
@@ -612,6 +865,11 @@ const ManagementPage: React.FC = () => {
   // 提交社团表单
   const handleGroupSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (isContributor && groupMode === 'create') {
+      showMessage('error', '创建新社团需要在用户中心提交审核申请')
+      return
+    }
 
     // 前端验证
     if (!groupForm.name?.trim()) {
@@ -746,8 +1004,8 @@ const ManagementPage: React.FC = () => {
               <div className="mx-auto flex items-center justify-center h-16 w-16 bg-black transform rotate-12 border-4 border-p5-red shadow-[4px_4px_0_0_#d90614] mb-6">
                 <Lock className="h-8 w-8 text-p5-red transform -rotate-12" />
               </div>
-              <h2 className="text-3xl font-black text-black uppercase italic mb-2 leading-none">ADMIN OVERRIDE / 管理验证</h2>
-              <p className="text-sm text-gray-500 font-bold border-b-2 border-p5-red inline-block pb-1">IDENTIFICATION REQUIRED FOR SYSTEM ACCESS</p>
+              <h2 className="text-3xl font-black text-black uppercase italic mb-2 leading-none">管理验证</h2>
+              <p className="text-sm text-gray-500 font-bold border-b-2 border-p5-red inline-block pb-1">请输入管理密钥以继续</p>
             </div>
 
             {/* 错误信息显示 */}
@@ -779,7 +1037,7 @@ const ManagementPage: React.FC = () => {
                   value={loginForm.username}
                   onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
                   onKeyPress={(e) => e.key === 'Enter' && handleVerifyManagementKey()}
-                  placeholder="ENTER ACCESS CODE..."
+                  placeholder="请输入管理密钥..."
                   className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50"
                 />
               </div>
@@ -794,12 +1052,12 @@ const ManagementPage: React.FC = () => {
                   {isLoggingIn ? (
                     <>
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                      VERIFYING...
+                      验证中...
                     </>
                   ) : (
                     <>
                       <Lock className="mr-3 h-6 w-6" />
-                      SYSTEM LOGIN / 验证权限
+                      验证权限
                     </>
                   )}
                 </div>
@@ -813,6 +1071,51 @@ const ManagementPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-transparent py-12">
+      {resultDialog && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="result-dialog-title"
+          onMouseDown={() => setResultDialog(null)}
+        >
+          <div
+            className="relative w-full max-w-md border-4 border-black bg-white p-6 shadow-[10px_10px_0_0_#d90614] sm:p-8"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setResultDialog(null)}
+              className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center border-2 border-black bg-white text-black transition-colors hover:bg-black hover:text-white"
+              aria-label="关闭提示"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className={`mb-5 inline-flex h-14 w-14 items-center justify-center border-4 border-black ${resultDialog.type === 'success' ? 'bg-green-500' : 'bg-p5-red'} text-white shadow-[4px_4px_0_0_black]`}>
+              {resultDialog.type === 'success' ? (
+                <CheckCircle className="h-8 w-8" />
+              ) : (
+                <AlertCircle className="h-8 w-8" />
+              )}
+            </div>
+
+            <h3 id="result-dialog-title" className="mb-3 text-3xl font-black italic text-black">
+              {resultDialog.type === 'success' ? '操作成功' : '操作失败'}
+            </h3>
+            <p className="mb-8 text-base font-bold leading-relaxed text-gray-700">
+              {resultDialog.text}
+            </p>
+            <button
+              type="button"
+              onClick={() => setResultDialog(null)}
+              className="w-full border-4 border-black bg-p5-red px-6 py-3 font-black italic text-white transition-colors hover:bg-black"
+            >
+              知道了
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto px-4">
         <div className="relative group mb-12">
           <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-y-1 z-0 shadow-2xl"></div>
@@ -822,10 +1125,10 @@ const ManagementPage: React.FC = () => {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 transform skew-y-1">
               <div>
                 <h1 className="text-3xl md:text-5xl font-black text-black uppercase italic tracking-tighter mb-2 p5-text-shadow-red">
-                  CORE OVERRIDE / 数据管理
+                  数据管理
                 </h1>
                 <p className="bg-black text-white px-4 py-1 inline-block font-black italic transform -skew-x-12">
-                  SYSTEM COMMAND CENTER / 进行视频和社团信息的高度度管控
+                  管理视频、社团和赛事信息
                 </p>
               </div>
 
@@ -835,7 +1138,7 @@ const ManagementPage: React.FC = () => {
               >
                 <span className="flex items-center transform skew-x-12">
                   <Lock className="h-6 w-6 mr-3" />
-                  ABORT SESSION / 退出登录
+                  退出登录
                 </span>
               </button>
             </div>
@@ -846,14 +1149,10 @@ const ManagementPage: React.FC = () => {
           {/* Side Navigation Tabs */}
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-black p-4 transform -skew-x-6 border-2 border-white shadow-[4px_4px_0_0_#d90614] mb-8">
-              <span className="text-white font-black italic uppercase tracking-widest text-xs">Menu Select / 功能选择</span>
+              <span className="text-white font-black italic uppercase tracking-widest text-xs">功能选择</span>
             </div>
 
-            {[
-              { id: 'video', label: '视频管理', sub: 'VIDEO INTEL' },
-              { id: 'group', label: '社团管理', sub: 'ALLIANCE DATA' },
-              { id: 'event', label: '赛事管理', sub: 'BATTLE ARCHIVE' }
-            ].map((tab) => (
+            {visibleTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -902,15 +1201,93 @@ const ManagementPage: React.FC = () => {
                         <Plus className="w-8 h-8 text-white transform -rotate-12" />
                       </div>
                       <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
-                        DATA ENTRY / 添加新视频
+                        {videoMode === 'edit' ? '编辑视频' : '添加新视频'}
                       </h2>
                     </div>
 
+                    {isContributor && (
+                      <div className="mb-10 border-4 border-black bg-gray-50 p-5 shadow-[4px_4px_0_0_black]">
+                        <div className="mb-4 flex flex-col gap-3 border-b-4 border-p5-red pb-3 md:flex-row md:items-center md:justify-between">
+                          <h3 className="text-lg font-black italic text-black">已上传视频</h3>
+                          <button
+                            type="button"
+                            onClick={() => loadManagedVideos()}
+                            className="border-2 border-black bg-white px-4 py-2 text-sm font-black hover:bg-black hover:text-white"
+                          >
+                            刷新列表
+                          </button>
+                        </div>
+
+                        {loadingManagedVideos ? (
+                          <div className="py-6 text-center font-black text-gray-500">加载中...</div>
+                        ) : managedVideos.length > 0 ? (
+                          <div className="space-y-3">
+                            {managedVideos.map(video => (
+                              <div key={video.id} className="flex flex-col gap-3 border-2 border-black bg-white p-4 md:flex-row md:items-center md:justify-between">
+                                <div className="min-w-0">
+                                  <p className="truncate font-black text-black">{video.title}</p>
+                                  <p className="mt-1 text-xs font-bold text-gray-500">
+                                    {video.bv_number} · {video.year || '年份未填'}
+                                  </p>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleVideoEditSelect(video)}
+                                    className="inline-flex items-center border-2 border-black bg-white px-3 py-2 text-sm font-black hover:bg-black hover:text-white"
+                                  >
+                                    <Edit className="mr-1 h-4 w-4" />
+                                    编辑
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleVideoDelete(video)}
+                                    className="inline-flex items-center border-2 border-black bg-p5-red px-3 py-2 text-sm font-black text-white hover:bg-black"
+                                  >
+                                    <Trash2 className="mr-1 h-4 w-4" />
+                                    删除
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-6 text-center font-bold text-gray-500">当前社团还没有上传视频</div>
+                        )}
+                      </div>
+                    )}
+
                     <form onSubmit={handleVideoSubmit} className="space-y-8">
+                      <div className="border-4 border-black bg-gray-50 p-6 shadow-[4px_4px_0_0_black]">
+                        <label className="mb-3 block text-xs font-black uppercase italic text-p5-red">
+                          B站视频链接 *
+                        </label>
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto]">
+                          <input
+                            type="url"
+                            value={bilibiliUrl}
+                            onChange={(e) => {
+                              setBilibiliUrl(e.target.value)
+                              setVideoForm({ ...videoForm, url: e.target.value })
+                            }}
+                            className="w-full border-4 border-black bg-white p-4 font-bold focus:border-p5-red focus:ring-0"
+                            placeholder="https://www.bilibili.com/video/BV..."
+                          />
+                          <button
+                            type="button"
+                            onClick={handleFetchBilibiliMetadata}
+                            disabled={isFetchingBilibili}
+                            className="min-h-[56px] border-4 border-black bg-p5-red px-6 font-black uppercase italic text-white transition-all hover:bg-black disabled:opacity-50"
+                          >
+                            {isFetchingBilibili ? '获取中...' : '自动填充'}
+                          </button>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            BV Number / BV号 *
+                            BV号 *
                           </label>
                           <input
                             type="text"
@@ -924,7 +1301,7 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Calendar Year / 年份 *
+                            年份 *
                           </label>
                           <input
                             type="number"
@@ -940,7 +1317,7 @@ const ManagementPage: React.FC = () => {
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Intel Title / 视频标题 *
+                          视频标题 *
                         </label>
                         <input
                           type="text"
@@ -948,27 +1325,27 @@ const ManagementPage: React.FC = () => {
                           value={videoForm.title}
                           onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
                           className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="ENTER VIDEO TITLE..."
+                          placeholder="请输入视频标题..."
                         />
                       </div>
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Description / 视频描述
+                          视频描述
                         </label>
                         <textarea
                           rows={4}
                           value={videoForm.description}
                           onChange={(e) => setVideoForm({ ...videoForm, description: e.target.value })}
                           className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="ENTER INTEL DESCRIPTION..."
+                          placeholder="请输入视频描述..."
                         />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Source Link / 视频链接
+                            视频链接
                           </label>
                           <input
                             type="url"
@@ -981,7 +1358,7 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Thumbnail / 缩略图链接
+                            缩略图链接
                           </label>
                           <input
                             type="url"
@@ -993,42 +1370,34 @@ const ManagementPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="relative">
-                        <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Uploader / 上传者用户名
-                        </label>
-                        <input
-                          type="text"
-                          value={videoForm.uploaded_by_username}
-                          onChange={(e) => setVideoForm({ ...videoForm, uploaded_by_username: e.target.value })}
-                          className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="ENTER USERNAME..."
-                        />
-                      </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Alliance / 社团 *
+                            社团 *
                           </label>
                           <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
                             <SearchableSelect
-                              placeholder="SEARCH ALLIANCE..."
-                              onChange={(value) => setVideoForm({ ...videoForm, group: value })}
-                              searchFunction={videoService.searchGroups.bind(videoService)}
+                              placeholder="搜索社团..."
+                              onChange={(value) => {
+                                setVideoForm({ ...videoForm, group: value })
+                                if (isContributor) loadManagedVideos(value)
+                              }}
+                              searchFunction={isContributor ? undefined : videoService.searchGroups.bind(videoService)}
+                              optionsList={isContributor ? managedGroups : undefined}
                               displayField="name"
                               valueField="id"
+                              value={videoForm.group}
                             />
                           </div>
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Battle / 比赛 *
+                            比赛 *
                           </label>
                           <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
                             <SearchableSelect
-                              placeholder="SEARCH BATTLE..."
+                              placeholder="搜索比赛..."
                               onChange={(value) => setVideoForm({ ...videoForm, competition: value })}
                               searchFunction={competitionService.searchCompetitions.bind(competitionService)}
                               displayField="name"
@@ -1045,7 +1414,7 @@ const ManagementPage: React.FC = () => {
                             <Trophy className="w-5 h-5 text-white" />
                           </div>
                           <h3 className="text-sm font-black text-black uppercase italic tracking-tighter">
-                            BIND EVENTS / 绑定赛事
+                            绑定赛事
                           </h3>
                           {selectedEvents.length > 0 && (
                             <span className="text-[10px] font-bold text-p5-red bg-p5-red/10 px-2 py-0.5">
@@ -1135,7 +1504,7 @@ const ManagementPage: React.FC = () => {
                           onClick={resetVideoForm}
                           className="px-6 py-2 border-4 border-black text-black font-black uppercase italic hover:bg-black hover:text-white transition-all transform -skew-x-12"
                         >
-                          <span className="transform skew-x-12 inline-block">RESET / 重置</span>
+                          <span className="transform skew-x-12 inline-block">{videoMode === 'edit' ? '取消编辑' : '重置'}</span>
                         </button>
                         <button
                           type="submit"
@@ -1146,12 +1515,12 @@ const ManagementPage: React.FC = () => {
                             {loading ? (
                               <>
                                 <Loader2 className="h-5 w-5 mr-3 animate-spin" />
-                                DEPLOYING...
+                                提交中...
                               </>
                             ) : (
                               <>
                                 <Save className="h-5 w-5 mr-3" />
-                                EXECUTE / 添加视频
+                                {videoMode === 'edit' ? '更新视频' : '添加视频'}
                               </>
                             )}
                           </span>
@@ -1169,10 +1538,11 @@ const ManagementPage: React.FC = () => {
                           <Users className="w-8 h-8 text-white transform rotate-6" />
                         </div>
                         <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow-red">
-                          ALLIANCE / 社团信息管理
+                          社团信息管理
                         </h2>
                       </div>
                       <div className="flex space-x-4 mt-6 md:mt-0">
+                        {!isContributor && (
                         <button
                           onClick={() => {
                             setGroupMode('create')
@@ -1185,9 +1555,10 @@ const ManagementPage: React.FC = () => {
                         >
                           <span className="transform skew-x-12 flex items-center">
                             <Plus className="h-5 w-5 mr-2" />
-                            NEW / 新增社团
+                            新增社团
                           </span>
                         </button>
+                        )}
                         <button
                           onClick={() => {
                             setGroupMode('edit')
@@ -1200,7 +1571,7 @@ const ManagementPage: React.FC = () => {
                         >
                           <span className="transform skew-x-12 flex items-center">
                             <Edit className="h-5 w-5 mr-2" />
-                            MODIFY / 修改社团
+                            修改社团
                           </span>
                         </button>
                       </div>
@@ -1210,17 +1581,121 @@ const ManagementPage: React.FC = () => {
                       <div className="mb-10 p-6 bg-black transform -skew-x-2 border-l-8 border-p5-red shadow-xl relative z-20">
                         <div className="transform skew-x-2">
                           <label className="block text-sm font-black text-p5-red uppercase mb-3 tracking-widest">
-                            TARGET SELECTION / 选择要编辑的社团
+                            选择要编辑的社团
                           </label>
                           <div className="border-4 border-white shadow-[4px_4px_0_0_rgba(255,255,255,0.2)]">
                             <SearchableSelect
-                              placeholder="SEARCH ALLIANCE TO REPROGRAM..."
+                              placeholder="搜索要编辑的社团..."
                               onChange={handleGroupSelect}
-                              searchFunction={groupService.searchGroups.bind(groupService)}
+                              searchFunction={isContributor ? undefined : groupService.searchGroups.bind(groupService)}
+                              optionsList={isContributor ? managedGroups : undefined}
                               displayField="name"
                               valueField="id"
+                              value={groupForm.id}
                             />
                           </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {canManageGroupBindings && groupMode === 'edit' && selectedGroupForEdit && (
+                      <div className="mb-10 border-4 border-black bg-gray-50 p-6 shadow-[6px_6px_0_0_black]">
+                        <div className="mb-5 flex flex-col gap-3 border-b-4 border-p5-red pb-4 md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <p className="text-xs font-black text-p5-red uppercase italic tracking-widest">管理员绑定</p>
+                            <h3 className="text-2xl font-black italic text-black">社团管理员</h3>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => loadGroupManagers(selectedGroupForEdit.id)}
+                            disabled={managerUpdating}
+                            className="border-2 border-black bg-white px-4 py-2 text-sm font-black hover:bg-black hover:text-white disabled:opacity-50"
+                          >
+                            刷新绑定
+                          </button>
+                        </div>
+
+                        <div className="mb-6 space-y-3">
+                          {groupManagers.length > 0 ? (
+                            groupManagers.map(manager => (
+                              <div key={manager.id} className="flex flex-col gap-3 border-2 border-black bg-white p-4 md:flex-row md:items-center md:justify-between">
+                                <div className="min-w-0">
+                                  <p className="truncate font-black text-black">
+                                    {manager.nickname || manager.username}
+                                    <span className="ml-2 text-xs text-gray-500">@{manager.username}</span>
+                                  </p>
+                                  <p className="mt-1 text-xs font-bold text-gray-500">
+                                    {manager.email || '未填写邮箱'} · {manager.role}
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveGroupManager(manager)}
+                                  disabled={managerUpdating}
+                                  className="inline-flex items-center justify-center border-2 border-black bg-p5-red px-3 py-2 text-sm font-black text-white hover:bg-black disabled:opacity-50"
+                                >
+                                  <Trash2 className="mr-1 h-4 w-4" />
+                                  移除
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="border-2 border-dashed border-gray-400 bg-white p-5 text-center font-bold text-gray-500">
+                              当前社团还没有绑定管理员
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="border-2 border-black bg-white p-4">
+                          <label className="mb-3 block text-xs font-black uppercase italic text-p5-red">
+                            搜索用户并新增绑定
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={managerSearchQuery}
+                              onChange={(e) => handleManagerSearch(e.target.value)}
+                              className="w-full border-4 border-black bg-gray-50 p-4 pr-12 font-black focus:border-p5-red focus:ring-0"
+                              placeholder="输入用户名 / 昵称 / 邮箱..."
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                              {managerSearching ? (
+                                <Loader2 className="h-5 w-5 animate-spin text-black" />
+                              ) : (
+                                <Search className="h-5 w-5 text-black" />
+                              )}
+                            </div>
+                          </div>
+
+                          {managerSearchResults.length > 0 && (
+                            <div className="mt-4 max-h-72 overflow-y-auto border-2 border-black">
+                              {managerSearchResults.map(user => {
+                                const alreadyBound = groupManagers.some(manager => manager.id === user.id)
+                                return (
+                                  <div key={user.id} className="flex flex-col gap-3 border-b-2 border-black p-4 last:border-b-0 md:flex-row md:items-center md:justify-between">
+                                    <div className="min-w-0">
+                                      <p className="truncate font-black text-black">
+                                        {user.nickname || user.username}
+                                        <span className="ml-2 text-xs text-gray-500">@{user.username}</span>
+                                      </p>
+                                      <p className="mt-1 text-xs font-bold text-gray-500">
+                                        {user.email || '未填写邮箱'} · {user.role}
+                                      </p>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAddGroupManager(user.id)}
+                                      disabled={managerUpdating || alreadyBound}
+                                      className={`inline-flex items-center justify-center border-2 border-black px-3 py-2 text-sm font-black disabled:opacity-50 ${alreadyBound ? 'bg-gray-200 text-gray-500' : 'bg-black text-white hover:bg-p5-red'}`}
+                                    >
+                                      <Plus className="mr-1 h-4 w-4" />
+                                      {alreadyBound ? '已绑定' : '绑定'}
+                                    </button>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -1229,7 +1704,7 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Alliance Name / 社团名称 *
+                            社团名称 *
                           </label>
                           <input
                             type="text"
@@ -1237,13 +1712,13 @@ const ManagementPage: React.FC = () => {
                             value={groupForm.name || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, name: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="NAME OF THE COVEN..."
+                            placeholder="请输入社团名称..."
                           />
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Founded Date / 成立日期
+                            成立日期
                           </label>
                           <input
                             type="date"
@@ -1256,20 +1731,20 @@ const ManagementPage: React.FC = () => {
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Alliance Intel / 社团描述
+                          社团描述
                         </label>
                         <textarea
                           rows={3}
                           value={groupForm.description || ''}
                           onChange={(e) => setGroupForm({ ...groupForm, description: e.target.value })}
                           className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="BRIEFLY DESCRIBE THIS ALLIANCE..."
+                          placeholder="请简单介绍这个社团..."
                         />
                       </div>
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Emblem Upload / 社团Logo上传
+                          社团 Logo 上传
                         </label>
                         <div className="w-full p-4 border-4 border-black font-black focus-within:border-p5-red transition-colors bg-gray-50 shadow-[4px_4px_0_0_black] flex flex-col items-center">
                           {groupLogoPreview ? (
@@ -1293,12 +1768,12 @@ const ManagementPage: React.FC = () => {
                               </button>
                             </div>
                           ) : (
-                            <div className="mb-4 text-gray-400 italic">No emblem selected / 未选择Logo</div>
+                            <div className="mb-4 text-gray-400 italic">未选择 Logo</div>
                           )}
                           <label className="cursor-pointer bg-black text-white px-6 py-2 font-black uppercase italic hover:bg-p5-red transition-colors transform -skew-x-12">
                             <span className="transform skew-x-12 flex items-center">
                               <Upload className="w-5 h-5 mr-2" />
-                              SELECT IMAGE / 选择图片
+                              选择图片
                             </span>
                             <input
                               type="file"
@@ -1313,11 +1788,11 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Province / 省份
+                            省份
                           </label>
                           <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
                             <SearchableSelect
-                              placeholder="SELECT REGION..."
+                              placeholder="选择省份..."
                               value={groupForm.province}
                               onChange={(value) => setGroupForm({ ...groupForm, province: value, city: '' })}
                               optionsList={provinceOptions}
@@ -1329,11 +1804,11 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            City / 城市
+                            城市
                           </label>
                           <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
                             <SearchableSelect
-                              placeholder={groupForm.province ? "SELECT CITY..." : "SELECT PROVINCE FIRST..."}
+                              placeholder={groupForm.province ? "选择城市..." : "请先选择省份..."}
                               value={groupForm.city}
                               onChange={(value) => setGroupForm({ ...groupForm, city: value })}
                               optionsList={availableCities}
@@ -1346,14 +1821,14 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Base Address / 详细地址
+                            详细地址
                           </label>
                           <input
                             type="text"
                             value={groupForm.location || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, location: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="STREET ADDRESS..."
+                            placeholder="请输入详细地址..."
                           />
                         </div>
                       </div>
@@ -1361,7 +1836,7 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Official Site / 官方网站
+                            官方网站
                           </label>
                           <input
                             type="url"
@@ -1374,7 +1849,7 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Secure Mail / 邮箱
+                            邮箱
                           </label>
                           <input
                             type="email"
@@ -1389,27 +1864,27 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Hotline / 联系电话
+                            联系电话
                           </label>
                           <input
                             type="tel"
                             value={groupForm.phone || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, phone: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="PHONE NUMBER..."
+                            placeholder="请输入联系电话..."
                           />
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Weibo / 微博账号
+                            微博账号
                           </label>
                           <input
                             type="text"
                             value={groupForm.weibo || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, weibo: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="WEIBO DOMAIN..."
+                            placeholder="请输入微博链接..."
                           />
                         </div>
                       </div>
@@ -1417,40 +1892,40 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            WeChat / 微信号
+                            微信号
                           </label>
                           <input
                             type="text"
                             value={groupForm.wechat || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, wechat: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="WECHAT ID..."
+                            placeholder="请输入微信号..."
                           />
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            QQ Group / QQ群
+                            QQ群
                           </label>
                           <input
                             type="text"
                             value={groupForm.qq_group || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, qq_group: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="QQ GROUP NUMBER..."
+                            placeholder="请输入 QQ 群号..."
                           />
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Bilibili / 哔哩哔哩
+                            哔哩哔哩
                           </label>
                           <input
                             type="text"
                             value={groupForm.bilibili || ''}
                             onChange={(e) => setGroupForm({ ...groupForm, bilibili: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="BILI SPACE..."
+                            placeholder="请输入 B 站主页链接..."
                           />
                         </div>
                       </div>
@@ -1461,7 +1936,7 @@ const ManagementPage: React.FC = () => {
                           onClick={resetGroupForm}
                           className="px-6 py-2 border-4 border-black text-black font-black uppercase italic hover:bg-black hover:text-white transition-all transform -skew-x-12"
                         >
-                          <span className="transform skew-x-12 inline-block">ABORT / 重置</span>
+                          <span className="transform skew-x-12 inline-block">重置</span>
                         </button>
                         <button
                           type="submit"
@@ -1472,12 +1947,12 @@ const ManagementPage: React.FC = () => {
                             {loading ? (
                               <>
                                 <Loader2 className="h-5 w-5 mr-3 animate-spin" />
-                                PROCESSING...
+                                处理中...
                               </>
                             ) : (
                               <>
                                 <Save className="h-5 w-5 mr-3" />
-                                {groupMode === 'create' ? 'INITIATE / 创建社团' : 'OVERWRITE / 更新社团'}
+                                {groupMode === 'create' ? '创建社团' : '更新社团'}
                               </>
                             )}
                           </span>
@@ -1487,7 +1962,7 @@ const ManagementPage: React.FC = () => {
                   </div>
                 )}
 
-                {activeTab === 'event' && (
+                {!isContributor && activeTab === 'event' && (
                   <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 border-b-8 border-p5-red pb-4">
                       <div className="flex items-center space-x-4">
@@ -1495,7 +1970,7 @@ const ManagementPage: React.FC = () => {
                           <Calendar className="w-8 h-8 text-white transform -rotate-6" />
                         </div>
                         <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
-                          {eventMode === 'create' ? 'BATTLE ENTRY / 添加新赛事' : 'ARCHIVE EDIT / 编辑赛事信息'}
+                          {eventMode === 'create' ? '添加新赛事' : '编辑赛事信息'}
                         </h2>
                       </div>
                       <div className="flex space-x-4 mt-6 md:mt-0">
@@ -1511,7 +1986,7 @@ const ManagementPage: React.FC = () => {
                         >
                           <span className="transform skew-x-12 flex items-center">
                             <Plus className="h-5 w-5 mr-2" />
-                            NEW / 新建
+                            新建
                           </span>
                         </button>
                         <button
@@ -1523,7 +1998,7 @@ const ManagementPage: React.FC = () => {
                         >
                           <span className="transform skew-x-12 flex items-center">
                             <Edit className="h-5 w-5 mr-2" />
-                            EDIT / 编辑
+                            编辑
                           </span>
                         </button>
                       </div>
@@ -1533,11 +2008,11 @@ const ManagementPage: React.FC = () => {
                       <div className="mb-10 p-6 bg-p5-red transform skew-x-2 border-r-8 border-black shadow-xl relative z-20">
                         <div className="transform -skew-x-2">
                           <label className="block text-sm font-black text-white uppercase mb-3 tracking-widest">
-                            SELECT ARCHIVE / 选择要编辑的赛事
+                            选择要编辑的赛事
                           </label>
                           <div className="border-4 border-black shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]">
                             <SearchableSelect
-                              placeholder="SEARCH BATTLE ARCHIVE..."
+                              placeholder="搜索要编辑的赛事..."
                               onChange={handleEventSelect}
                               searchFunction={() => eventService.getEvents()}
                               displayField="title"
@@ -1552,7 +2027,7 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Start Date / 开始日期 *
+                            开始日期 *
                           </label>
                           <input
                             type="date"
@@ -1565,7 +2040,7 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            End Date / 结束日期
+                            结束日期
                           </label>
                           <input
                             type="date"
@@ -1578,11 +2053,11 @@ const ManagementPage: React.FC = () => {
 
                         <div className="relative md:col-span-2">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Linked Competition / 关联比赛 *
+                            关联比赛 *
                           </label>
                           <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
                             <DropdownSelect
-                              placeholder="SELECT COMPETITION..."
+                              placeholder="选择比赛..."
                               value={eventForm.competition}
                               onChange={(value) => setEventForm({ ...eventForm, competition: value })}
                               loadOptions={() => competitionService.getCompetitions({ page_size: 100 })}
@@ -1595,7 +2070,7 @@ const ManagementPage: React.FC = () => {
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Archive Title / 赛事标题 *
+                          赛事标题 *
                         </label>
                         <input
                           type="text"
@@ -1603,40 +2078,40 @@ const ManagementPage: React.FC = () => {
                           value={eventForm.title}
                           onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
                           className="w-full p-4 border-4 border-black font-black uppercase focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="ENTER BATTLE TITLE..."
+                          placeholder="请输入赛事标题..."
                         />
                       </div>
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Battle Intel / 赛事描述
+                          赛事描述
                         </label>
                         <textarea
                           rows={4}
                           value={eventForm.description}
                           onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                           className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                          placeholder="DETAILED INTEL ON THIS EVENT..."
+                          placeholder="请输入赛事描述..."
                         />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            Contact Info / 联系方式
+                            联系方式
                           </label>
                           <input
                             type="text"
                             value={eventForm.contact}
                             onChange={(e) => setEventForm({ ...eventForm, contact: e.target.value })}
                             className="w-full p-4 border-4 border-black font-black focus:ring-0 focus:border-p5-red transition-colors placeholder-gray-300 bg-gray-50 shadow-[4px_4px_0_0_black]"
-                            placeholder="COMMUNICATIONS CHANNEL..."
+                            placeholder="请输入联系方式..."
                           />
                         </div>
 
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            HQ Website / 官网链接
+                            官网链接
                           </label>
                           <input
                             type="url"
@@ -1650,7 +2125,7 @@ const ManagementPage: React.FC = () => {
 
                       <div className="relative">
                         <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                          Promo Visual / 宣传图片链接
+                          宣传图片链接
                         </label>
                         <input
                           type="url"
@@ -1667,7 +2142,7 @@ const ManagementPage: React.FC = () => {
                           onClick={resetEventForm}
                           className="px-6 py-2 border-4 border-black text-black font-black uppercase italic hover:bg-black hover:text-white transition-all transform -skew-x-12"
                         >
-                          <span className="transform skew-x-12 inline-block">ABORT / 重置</span>
+                          <span className="transform skew-x-12 inline-block">重置</span>
                         </button>
                         <button
                           type="submit"
@@ -1678,12 +2153,12 @@ const ManagementPage: React.FC = () => {
                             {loading ? (
                               <>
                                 <Loader2 className="h-5 w-5 mr-3 animate-spin" />
-                                SYNCING...
+                                同步中...
                               </>
                             ) : (
                               <>
                                 <Save className="h-5 w-5 mr-3" />
-                                {eventMode === 'create' ? 'FILE ENTRY / 创建赛事' : 'UPDATE FILE / 更新赛事'}
+                                {eventMode === 'create' ? '创建赛事' : '更新赛事'}
                               </>
                             )}
                           </span>

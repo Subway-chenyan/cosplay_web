@@ -232,15 +232,6 @@ function Footer() {
               </button>
             </div>
 
-            {/* 右侧：版权信息 */}
-            <div className="text-center md:text-right">
-              <p className="text-gray-500 font-bold text-xs">
-                &copy; {new Date().getFullYear()} 舞台剧视频库
-              </p>
-              <p className="text-gray-600 font-bold text-xs mt-1">
-                基于前后端分离架构构建
-              </p>
-            </div>
           </div>
         </div>
       </footer>

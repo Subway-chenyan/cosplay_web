@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Group, PaginatedResponse, ProvinceStats, CityStats } from '../types'
+import { Group, GroupManager, PaginatedResponse, ProvinceStats, CityStats } from '../types'
 
 interface GroupQueryParams {
   page?: number
@@ -29,6 +29,24 @@ class GroupService {
   // 获取社团详情
   async getGroupById(id: string): Promise<Group> {
     return api.get<Group>(`/groups/${id}/`)
+  }
+
+  async getManagedGroups(): Promise<PaginatedResponse<Group>> {
+    return api.get<PaginatedResponse<Group>>('/groups/managed/?page_size=1000')
+  }
+
+  async getGroupManagers(groupId: string): Promise<PaginatedResponse<GroupManager>> {
+    return api.get<PaginatedResponse<GroupManager>>(`/groups/${groupId}/managers/`)
+  }
+
+  async addGroupManager(groupId: string, userId: string): Promise<{ detail: string; managers: GroupManager[] }> {
+    return api.post<{ detail: string; managers: GroupManager[] }>(`/groups/${groupId}/managers/`, {
+      user_id: userId,
+    })
+  }
+
+  async removeGroupManager(groupId: string, userId: string): Promise<{ detail: string }> {
+    return api.delete<{ detail: string }>(`/groups/${groupId}/managers/${userId}/`)
   }
 
   // 创建社团

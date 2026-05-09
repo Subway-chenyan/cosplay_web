@@ -14,8 +14,14 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['-created_at']
 
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('角色权限', {'fields': ('role',)}),
+        ('角色权限', {'fields': ('role', 'managed_groups')}),
+        ('权限申请', {'fields': (
+            'role_application_pending', 'role_application_reason',
+            'role_application_date', 'role_application_group',
+            'role_application_group_data',
+        )}),
     )
+    filter_horizontal = BaseUserAdmin.filter_horizontal + ('managed_groups',)
 
 
 @admin.register(Feedback)

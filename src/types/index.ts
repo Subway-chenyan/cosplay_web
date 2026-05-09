@@ -41,6 +41,24 @@ export interface Group {
   updated_at: string
 }
 
+export interface ManagedGroupSummary {
+  id: string
+  name: string
+  description: string
+}
+
+export interface GroupManager {
+  id: string
+  username: string
+  nickname?: string
+  email?: string
+  role: string
+}
+
+export interface UserSearchResult extends GroupManager {
+  managed_groups?: Array<{ id: string; name: string }>
+}
+
 export interface ProvinceStats {
   province: string
   count: number
@@ -78,6 +96,9 @@ export interface User {
   id: string
   username: string
   email: string
+  nickname?: string
+  role?: string
+  managed_groups?: ManagedGroupSummary[]
   first_name: string
   last_name: string
   is_active: boolean

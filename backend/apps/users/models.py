@@ -34,6 +34,12 @@ class User(AbstractUser):
         related_name='members',
         verbose_name='所属社团'
     )
+    managed_groups = models.ManyToManyField(
+        'groups.Group',
+        blank=True,
+        related_name='managers',
+        verbose_name='管理的社团'
+    )
     performed_videos = models.ManyToManyField(
         'videos.Video',
         blank=True,
@@ -54,6 +60,19 @@ class User(AbstractUser):
         null=True,
         blank=True,
         verbose_name='申请时间'
+    )
+    role_application_group = models.ForeignKey(
+        'groups.Group',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='role_applicants',
+        verbose_name='申请管理的社团'
+    )
+    role_application_group_data = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name='申请创建的社团资料'
     )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
@@ -83,16 +102,26 @@ class User(AbstractUser):
         return self.is_contributor()
 
     def can_import_data(self):
-        """检查是否可以导入数据（贡献者及以上）"""
-        return self.role in ['contributor', 'editor', 'admin']
+        """检查是否可以导入数据（编辑及以上）"""
+        return self.role in ['editor', 'admin'] or self.is_staff or self.is_superuser
 
     def can_manage_data(self):
         """检查是否可以管理数据（编辑及以上）"""
-        return self.role in ['editor', 'admin']
+        return self.role in ['editor', 'admin'] or self.is_staff or self.is_superuser
 
     def can_approve_roles(self):
         """检查是否可以审批角色申请（仅管理员）"""
-        return self.role == 'admin'
+        return self.role == 'admin' or self.is_staff or self.is_superuser
+
+    def can_manage_group(self, group):
+        """检查是否可以管理指定社团。"""
+        if not group:
+            return False
+        if self.can_manage_data():
+            return True
+        if self.role != 'contributor':
+            return False
+        return self.managed_groups.filter(id=group.id).exists()
 
 
 class Feedback(models.Model):

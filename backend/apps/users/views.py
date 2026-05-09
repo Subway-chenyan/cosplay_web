@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -37,6 +38,40 @@ class UserViewSet(viewsets.ModelViewSet):
         """获取当前用户信息"""
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='search')
+    def search(self, request):
+        """搜索用户，用于管理员绑定社团管理员。"""
+        if not request.user.is_authenticated or not request.user.can_approve_roles():
+            return Response({'detail': '权限不足，仅管理员可搜索用户'}, status=status.HTTP_403_FORBIDDEN)
+
+        keyword = request.query_params.get('search', '').strip()
+        queryset = User.objects.all().order_by('username')
+        if keyword:
+            queryset = queryset.filter(
+                Q(username__icontains=keyword) |
+                Q(nickname__icontains=keyword) |
+                Q(email__icontains=keyword)
+            )
+
+        users = queryset[:20]
+        return Response({
+            'count': queryset.count(),
+            'results': [
+                {
+                    'id': str(user.id),
+                    'username': user.username,
+                    'nickname': user.nickname or '',
+                    'email': user.email,
+                    'role': user.role,
+                    'managed_groups': [
+                        {'id': str(group.id), 'name': group.name}
+                        for group in user.managed_groups.all()
+                    ],
+                }
+                for user in users
+            ],
+        }, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'], url_path='change-password')
     def change_password(self, request):
@@ -78,6 +113,8 @@ class UserViewSet(viewsets.ModelViewSet):
             request.user.role_application_pending = True
             request.user.role_application_reason = serializer.validated_data['reason']
             request.user.role_application_date = timezone.now()
+            request.user.role_application_group = serializer.validated_data.get('group')
+            request.user.role_application_group_data = serializer.validated_data.get('group_data', {})
             request.user.save()
             return Response({
                 'detail': '申请已提交，请等待管理员审核'
@@ -88,7 +125,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def list_role_applications(self, request):
         """获取所有待审批的角色申请（仅管理员）"""
         # 权限检查
-        if not request.user.is_authenticated or request.user.role != 'admin':
+        if not request.user.is_authenticated or not request.user.can_approve_roles():
             return Response({'detail': '权限不足，仅管理员可访问'}, status=status.HTTP_403_FORBIDDEN)
 
         pending_users = User.objects.filter(
@@ -105,6 +142,15 @@ class UserViewSet(viewsets.ModelViewSet):
                 'role_application_reason': user.role_application_reason,
                 'role_application_date': user.role_application_date,
                 'current_role': user.role,
+                'role_application_group': (
+                    {
+                        'id': str(user.role_application_group.id),
+                        'name': user.role_application_group.name,
+                        'description': user.role_application_group.description,
+                    }
+                    if user.role_application_group else None
+                ),
+                'role_application_group_data': user.role_application_group_data,
             })
 
         return Response({
@@ -116,7 +162,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def approve_role_application(self, request):
         """审批角色申请（仅管理员）"""
         # 权限检查
-        if not request.user.is_authenticated or request.user.role != 'admin':
+        if not request.user.is_authenticated or not request.user.can_approve_roles():
             return Response({'detail': '权限不足，仅管理员可访问'}, status=status.HTTP_403_FORBIDDEN)
 
         user_id = request.data.get('user_id')
@@ -140,11 +186,28 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if action_type == 'approve':
             # 批准申请，更新用户角色
+            managed_group = user.role_application_group
+            if target_role == 'contributor':
+                if managed_group is None and user.role_application_group_data:
+                    from apps.groups.models import Group
+                    managed_group = Group.objects.create(
+                        **user.role_application_group_data,
+                        created_by=user,
+                        is_active=True
+                    )
+                if managed_group is None:
+                    return Response({'detail': '贡献者申请必须绑定一个社团'}, status=status.HTTP_400_BAD_REQUEST)
+
             user.role = target_role
             user.role_application_pending = False
             user.role_application_reason = ''
             user.role_application_date = None
+            user.role_application_group = None
+            user.role_application_group_data = {}
             user.save()
+            if target_role == 'contributor' and managed_group:
+                user.managed_groups.add(managed_group)
+                user.groups.add(managed_group)
             return Response({
                 'detail': f'已批准申请，用户角色已更新为 {target_role}'
             }, status=status.HTTP_200_OK)
@@ -153,6 +216,8 @@ class UserViewSet(viewsets.ModelViewSet):
             user.role_application_pending = False
             user.role_application_reason = ''
             user.role_application_date = None
+            user.role_application_group = None
+            user.role_application_group_data = {}
             user.save()
             return Response({
                 'detail': '已拒绝该申请'
@@ -201,7 +266,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated and user.role == 'admin':
+        if user.is_authenticated and user.can_approve_roles():
             return Feedback.objects.all()
         # 非管理员无法查看反馈列表
         return Feedback.objects.none()
@@ -228,7 +293,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """获取反馈列表（仅管理员）"""
-        if not request.user.is_authenticated or request.user.role != 'admin':
+        if not request.user.is_authenticated or not request.user.can_approve_roles():
             return Response({'detail': '权限不足'}, status=status.HTTP_403_FORBIDDEN)
 
         queryset = self.filter_queryset(self.get_queryset())
@@ -249,7 +314,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='stats')
     def stats(self, request):
         """获取反馈统计（仅管理员）"""
-        if not request.user.is_authenticated or request.user.role != 'admin':
+        if not request.user.is_authenticated or not request.user.can_approve_roles():
             return Response({'detail': '权限不足'}, status=status.HTTP_403_FORBIDDEN)
 
         total = Feedback.objects.count()
@@ -263,4 +328,3 @@ class FeedbackViewSet(viewsets.ModelViewSet):
             'processing': processing,
             'resolved': resolved
         })
-

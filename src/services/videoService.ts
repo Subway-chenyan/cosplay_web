@@ -54,6 +54,10 @@ class VideoService {
     return api.post<Video>('/videos/', data)
   }
 
+  async fetchBilibiliMetadata(url: string): Promise<Partial<Video>> {
+    return api.post<Partial<Video>>('/videos/bilibili-metadata/', { url })
+  }
+
   // 更新视频
   async updateVideo(id: string, data: Partial<Video>): Promise<Video> {
     return api.patch<Video>(`/videos/${id}/`, data)

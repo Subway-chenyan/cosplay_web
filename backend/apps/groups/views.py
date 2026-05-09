@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from django.db import transaction
@@ -15,8 +16,32 @@ from apps.awards.models import AwardRecord
 from apps.videos.serializers import VideoSerializer
 from apps.videos.pagination import LargeResultsSetPagination
 
+User = get_user_model()
 
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
+
+def is_data_manager(user):
+    return bool(
+        user and user.is_authenticated and (
+            getattr(user, 'role', None) in ['admin', 'editor'] or user.is_staff or user.is_superuser
+        )
+    )
+
+
+def can_manage_group_bindings(user):
+    return bool(user and user.is_authenticated and user.can_approve_roles())
+
+
+def serialize_group_manager(user):
+    return {
+        'id': str(user.id),
+        'username': user.username,
+        'nickname': user.nickname or '',
+        'email': user.email,
+        'role': user.role,
+    }
+
 
 class GroupViewSet(viewsets.ModelViewSet):
     """
@@ -45,19 +70,100 @@ class GroupViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
     
     def perform_create(self, serializer):
+        if not is_data_manager(self.request.user):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('社团创建需要管理员审核，请先提交社团管理员申请')
         serializer.save(created_by=self.request.user)
         # 清除相关缓存
         GroupCacheManager.clear_all_group_cache()
     
     def perform_update(self, serializer):
+        if not self.request.user.can_manage_group(self.get_object()):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('只能编辑自己管理的社团')
         super().perform_update(serializer)
         # 清除相关缓存
         GroupCacheManager.clear_all_group_cache()
     
     def perform_destroy(self, instance):
+        if not is_data_manager(self.request.user):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('只有管理员或编辑可以删除社团')
         super().perform_destroy(instance)
         # 清除相关缓存
         GroupCacheManager.clear_all_group_cache()
+
+    @action(detail=True, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticated])
+    def managers(self, request, pk=None):
+        """查看或新增指定社团的管理员绑定。"""
+        if not can_manage_group_bindings(request.user):
+            return Response({'detail': '权限不足，仅管理员可管理社团管理员绑定'}, status=status.HTTP_403_FORBIDDEN)
+
+        group = self.get_object()
+
+        if request.method == 'POST':
+            user_id = request.data.get('user_id')
+            username = request.data.get('username')
+            if not user_id and not username:
+                return Response({'detail': '请提供 user_id 或 username'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                user = User.objects.get(id=user_id) if user_id else User.objects.get(username=username)
+            except User.DoesNotExist:
+                return Response({'detail': '用户不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+            user.managed_groups.add(group)
+            user.groups.add(group)
+            if user.role == 'viewer':
+                user.role = 'contributor'
+                user.save(update_fields=['role', 'updated_at'])
+
+            return Response({
+                'detail': '已添加社团管理员绑定',
+                'managers': [serialize_group_manager(manager) for manager in group.managers.all().order_by('username')],
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'count': group.managers.count(),
+            'results': [serialize_group_manager(user) for user in group.managers.all().order_by('username')]
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'], url_path=r'managers/(?P<user_id>[^/.]+)', permission_classes=[permissions.IsAuthenticated])
+    def remove_manager(self, request, pk=None, user_id=None):
+        """移除指定社团的管理员绑定。"""
+        if not can_manage_group_bindings(request.user):
+            return Response({'detail': '权限不足，仅管理员可管理社团管理员绑定'}, status=status.HTTP_403_FORBIDDEN)
+
+        group = self.get_object()
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'detail': '用户不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        user.managed_groups.remove(group)
+        if user.groups.filter(id=group.id).exists():
+            user.groups.remove(group)
+        if user.role == 'contributor' and not user.managed_groups.exists():
+            user.role = 'viewer'
+            user.save(update_fields=['role', 'updated_at'])
+
+        return Response({'detail': '已移除社团管理员绑定'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def managed(self, request):
+        """获取当前用户可管理的社团。"""
+        if is_data_manager(request.user):
+            queryset = Group.objects.filter(is_active=True).order_by('name')
+        else:
+            queryset = request.user.managed_groups.filter(is_active=True).order_by('name')
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
     
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def update_statistics(self, request):
@@ -264,4 +370,4 @@ class GroupVideosView(generics.ListAPIView):
         group_id = self.kwargs['group_id']
         return Video.objects.filter(
             group_id=group_id
-        ).select_related('group', 'competition').prefetch_related('tags')
+        ).select_related('group', 'competition').prefetch_related('tags', 'events__competition')

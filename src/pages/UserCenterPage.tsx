@@ -5,6 +5,7 @@ import Header from '../components/Header'
 import SearchableMultiSelectModal from '../components/SearchableMultiSelectModal'
 import RoleApprovalPanel from '../components/RoleApprovalPanel'
 import FeedbackPanel from '../components/FeedbackPanel'
+import { chinaDivisions } from '../data/chinaDivisions'
 
 interface UserProfile {
   id: string
@@ -17,8 +18,11 @@ interface UserProfile {
   role_application_pending: boolean
   role_application_reason: string
   role_application_date: string
+  role_application_group_detail?: { id: string; name: string; description: string } | null
+  role_application_group_data?: Record<string, string>
   is_qq_user?: boolean
   groups: Array<{ id: string; name: string; description: string }>
+  managed_groups: Array<{ id: string; name: string; description: string }>
   performed_videos: Array<{ id: string; title: string; bv_number: string }>
 }
 
@@ -53,6 +57,23 @@ function UserCenterPage() {
 
   const [showApplicationForm, setShowApplicationForm] = useState(false)
   const [applicationReason, setApplicationReason] = useState('')
+  const [applicationMode, setApplicationMode] = useState<'existing' | 'new'>('existing')
+  const [applicationGroupSearch, setApplicationGroupSearch] = useState('')
+  const [selectedApplicationGroupId, setSelectedApplicationGroupId] = useState('')
+  const [newApplicationGroup, setNewApplicationGroup] = useState({
+    name: '',
+    description: '',
+    province: '',
+    city: '',
+    location: '',
+    website: '',
+    email: '',
+    phone: '',
+    weibo: '',
+    wechat: '',
+    qq_group: '',
+    bilibili: '',
+  })
   const [submittingApplication, setSubmittingApplication] = useState(false)
 
   const [availableGroups, setAvailableGroups] = useState<Group[]>([])
@@ -268,23 +289,50 @@ function UserCenterPage() {
       showMessage('申请理由至少需要 10 个字', 'error')
       return
     }
+    if (applicationMode === 'existing' && !selectedApplicationGroupId) {
+      showMessage('请选择要管理的社团', 'error')
+      return
+    }
+    if (applicationMode === 'new' && !newApplicationGroup.name.trim()) {
+      showMessage('请填写要创建的社团名称', 'error')
+      return
+    }
 
     setSubmittingApplication(true)
     try {
       const token = localStorage.getItem('access_token')
+      const payload = applicationMode === 'existing'
+        ? { reason: applicationReason, group_id: selectedApplicationGroupId }
+        : { reason: applicationReason, group_data: newApplicationGroup }
       const response = await fetch('/api/users/apply-role/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ reason: applicationReason }),
+        body: JSON.stringify(payload),
       })
 
       if (response.ok) {
         showMessage('申请已提交，请等待管理员审核', 'success')
         setShowApplicationForm(false)
         setApplicationReason('')
+        setSelectedApplicationGroupId('')
+        setApplicationGroupSearch('')
+        setNewApplicationGroup({
+          name: '',
+          description: '',
+          province: '',
+          city: '',
+          location: '',
+          website: '',
+          email: '',
+          phone: '',
+          weibo: '',
+          wechat: '',
+          qq_group: '',
+          bilibili: '',
+        })
         fetchProfile()
       } else {
         const errorData = await response.json()
@@ -313,6 +361,15 @@ function UserCenterPage() {
     navigate('/login')
     showMessage('已退出登录', 'success')
   }
+
+  const filteredApplicationGroups = availableGroups
+    .filter(group => !profile?.managed_groups?.some(managedGroup => managedGroup.id === group.id))
+    .filter(group => group.name.toLowerCase().includes(applicationGroupSearch.toLowerCase()))
+    .slice(0, 8)
+  const applicationProvinceOptions = Object.keys(chinaDivisions)
+  const applicationCityOptions = newApplicationGroup.province
+    ? chinaDivisions[newApplicationGroup.province] || []
+    : []
 
   if (loading) {
     return (
@@ -627,6 +684,23 @@ function UserCenterPage() {
                 </div>
 
                 {/* 申请状态 */}
+                {profile.managed_groups && profile.managed_groups.length > 0 && (
+                  <div className="bg-red-50 border-2 border-p5-red rounded-lg p-4">
+                    <p className="font-black text-p5-red mb-2">已管理社团</p>
+                    <div className="flex flex-wrap gap-2">
+                      {profile.managed_groups.map(group => (
+                        <a
+                          key={group.id}
+                          href={`/group/${group.id}`}
+                          className="inline-block bg-black px-3 py-1 text-sm font-black text-white hover:bg-p5-red"
+                        >
+                          {group.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {profile.role_application_pending && (
                   <div className="bg-yellow-50 border-2 border-yellow-500 rounded-lg p-4">
                     <p className="font-black text-yellow-800 mb-2">申请审核中</p>
@@ -636,24 +710,161 @@ function UserCenterPage() {
                     <p className="text-sm text-yellow-700 mt-2">
                       申请理由: {profile.role_application_reason || '无'}
                     </p>
+                    {profile.role_application_group_detail && (
+                      <p className="text-sm text-yellow-700 mt-2">
+                        申请管理社团: {profile.role_application_group_detail.name}
+                      </p>
+                    )}
+                    {profile.role_application_group_data?.name && (
+                      <p className="text-sm text-yellow-700 mt-2">
+                        申请创建社团: {profile.role_application_group_data.name}
+                      </p>
+                    )}
                   </div>
                 )}
 
                 {/* 申请按钮 */}
                 {!profile.role_application_pending &&
                   profile.role !== 'admin' &&
-                  profile.role !== 'editor' &&
-                  profile.role !== 'contributor' && (
+                  profile.role !== 'editor' && (
                     <div className="pt-4 border-t-2 border-black">
                       {!showApplicationForm ? (
                         <button
                           onClick={() => setShowApplicationForm(true)}
                           className="w-full border-2 border-black bg-p5-red px-6 py-3 font-black text-white hover:bg-red-700"
                         >
-                          申请成为贡献者
+                          {profile.role === 'contributor' ? '申请管理更多社团' : '申请成为社团管理员'}
                         </button>
                       ) : (
                         <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setApplicationMode('existing')}
+                              className={`min-h-[44px] border-2 border-black px-4 py-2 font-black ${applicationMode === 'existing' ? 'bg-p5-red text-white' : 'bg-white text-black'}`}
+                            >
+                              管理已有社团
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setApplicationMode('new')}
+                              className={`min-h-[44px] border-2 border-black px-4 py-2 font-black ${applicationMode === 'new' ? 'bg-p5-red text-white' : 'bg-white text-black'}`}
+                            >
+                              创建新社团
+                            </button>
+                          </div>
+
+                          {applicationMode === 'existing' ? (
+                            <div>
+                              <label className="mb-2 block text-sm font-black text-gray-700">
+                                选择要管理的社团 *
+                              </label>
+                              <input
+                                type="text"
+                                value={applicationGroupSearch}
+                                onChange={(e) => setApplicationGroupSearch(e.target.value)}
+                                className="w-full px-4 py-3 border-2 border-black focus:border-p5-red font-bold"
+                                placeholder="搜索社团名称"
+                              />
+                              <div className="mt-2 max-h-56 overflow-y-auto border-2 border-black bg-white">
+                                {filteredApplicationGroups.length > 0 ? (
+                                  filteredApplicationGroups.map(group => (
+                                    <button
+                                      key={group.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedApplicationGroupId(group.id)
+                                        setApplicationGroupSearch(group.name)
+                                      }}
+                                      className={`block w-full border-b border-gray-200 px-4 py-3 text-left font-bold hover:bg-gray-50 ${selectedApplicationGroupId === group.id ? 'bg-p5-red text-white' : 'bg-white text-black'}`}
+                                    >
+                                      {group.name}
+                                    </button>
+                                  ))
+                                ) : (
+                                  <div className="px-4 py-3 text-sm font-bold text-gray-500">
+                                    未找到可申请的社团，可以切换到“创建新社团”
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div>
+                                <label className="mb-2 block text-sm font-black text-gray-700">
+                                  新社团名称 *
+                                </label>
+                                <input
+                                  type="text"
+                                  value={newApplicationGroup.name}
+                                  onChange={(e) => setNewApplicationGroup({ ...newApplicationGroup, name: e.target.value })}
+                                  className="w-full px-4 py-3 border-2 border-black focus:border-p5-red font-bold"
+                                  placeholder="请输入社团名称"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-sm font-black text-gray-700">
+                                  社团简介
+                                </label>
+                                <textarea
+                                  rows={3}
+                                  value={newApplicationGroup.description}
+                                  onChange={(e) => setNewApplicationGroup({ ...newApplicationGroup, description: e.target.value })}
+                                  className="w-full px-4 py-3 border-2 border-black focus:border-p5-red font-bold"
+                                  placeholder="简单介绍社团，管理员审核时会看到"
+                                />
+                              </div>
+                              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div>
+                                  <label className="mb-2 block text-sm font-black text-gray-700">
+                                    省份
+                                  </label>
+                                  <select
+                                    value={newApplicationGroup.province}
+                                    onChange={(e) => setNewApplicationGroup({
+                                      ...newApplicationGroup,
+                                      province: e.target.value,
+                                      city: '',
+                                    })}
+                                    className="min-h-[44px] w-full border-2 border-black bg-white px-4 py-3 font-bold focus:border-p5-red"
+                                  >
+                                    <option value="">请选择省份</option>
+                                    {applicationProvinceOptions.map(province => (
+                                      <option key={province} value={province}>
+                                        {province}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="mb-2 block text-sm font-black text-gray-700">
+                                    城市
+                                  </label>
+                                  <select
+                                    value={newApplicationGroup.city}
+                                    onChange={(e) => setNewApplicationGroup({ ...newApplicationGroup, city: e.target.value })}
+                                    disabled={!newApplicationGroup.province}
+                                    className="min-h-[44px] w-full border-2 border-black bg-white px-4 py-3 font-bold focus:border-p5-red disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                                  >
+                                    <option value="">{newApplicationGroup.province ? '请选择城市' : '请先选择省份'}</option>
+                                    {applicationCityOptions.map(city => (
+                                      <option key={city} value={city}>
+                                        {city}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                              <input
+                                type="url"
+                                value={newApplicationGroup.bilibili}
+                                onChange={(e) => setNewApplicationGroup({ ...newApplicationGroup, bilibili: e.target.value })}
+                                className="w-full px-4 py-3 border-2 border-black font-bold"
+                                placeholder="B站主页链接（可选）"
+                              />
+                            </div>
+                          )}
+
                           <div>
                             <label className="mb-2 block text-sm font-black text-gray-700">
                               申请理由 *
@@ -663,7 +874,7 @@ function UserCenterPage() {
                               onChange={(e) => setApplicationReason(e.target.value)}
                               rows={4}
                               className="w-full px-4 py-3 border-2 border-black focus:border-p5-red font-bold"
-                              placeholder="请说明您希望成为贡献者的原因（至少 10 个字）"
+                              placeholder="请说明您希望管理该社团的原因（至少 10 个字）"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-2">
@@ -735,18 +946,34 @@ function UserCenterPage() {
                   数据管理
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* 数据导入（贡献者及以上可见） */}
-                  <a
-                    href="/data-import"
-                    className="relative group block p-6 border-4 border-black bg-white hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-3 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
-                    <div className="relative z-10">
-                      <Upload className="w-12 h-12 text-p5-red mb-4" />
-                      <h3 className="text-xl font-black mb-2">数据导入</h3>
-                      <p className="text-gray-600 font-bold text-sm">导入 Bilibili 视频数据和社团信息</p>
-                    </div>
-                  </a>
+                  {profile.role === 'contributor' && (
+                    <a
+                      href="/management"
+                      className="relative group block p-6 border-4 border-black bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-3 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
+                      <div className="relative z-10">
+                        <FileText className="w-12 h-12 text-p5-red mb-4" />
+                        <h3 className="text-xl font-black mb-2">社团管理</h3>
+                        <p className="text-gray-600 font-bold text-sm">编辑自己管理的社团，并上传该社团视频</p>
+                      </div>
+                    </a>
+                  )}
+
+                  {/* 数据导入（编辑及以上可见） */}
+                  {(profile.role === 'editor' || profile.role === 'admin') && (
+                    <a
+                      href="/data-import"
+                      className="relative group block p-6 border-4 border-black bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="absolute inset-0 bg-p5-red transform translate-x-2 translate-y-2 -skew-x-3 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
+                      <div className="relative z-10">
+                        <Upload className="w-12 h-12 text-p5-red mb-4" />
+                        <h3 className="text-xl font-black mb-2">数据导入</h3>
+                        <p className="text-gray-600 font-bold text-sm">导入 Bilibili 视频数据和社团信息</p>
+                      </div>
+                    </a>
+                  )}
 
                   {/* 数据管理（编辑及以上可见） */}
                   {(profile.role === 'editor' || profile.role === 'admin') && (

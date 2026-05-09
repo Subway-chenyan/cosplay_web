@@ -9,17 +9,21 @@ class UserSerializer(serializers.ModelSerializer):
     用户序列化器（简化版，用于 me 接口）
     """
     groups = serializers.SerializerMethodField()
+    managed_groups = serializers.SerializerMethodField()
     performed_videos = serializers.SerializerMethodField()
     is_qq_user = serializers.SerializerMethodField()
+    role_application_group_detail = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'nickname', 'bio', 'avatar',
-            'role', 'groups', 'performed_videos',
+            'role', 'groups', 'managed_groups', 'performed_videos',
             'is_qq_user',
             'role_application_pending', 'role_application_reason',
-            'role_application_date', 'is_active', 'date_joined',
+            'role_application_date', 'role_application_group',
+            'role_application_group_detail', 'role_application_group_data',
+            'is_active', 'date_joined',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'date_joined', 'created_at', 'updated_at']
@@ -27,6 +31,11 @@ class UserSerializer(serializers.ModelSerializer):
     def get_groups(self, obj):
         """获取用户所属社团"""
         groups = obj.groups.all()
+        return [{'id': str(g.id), 'name': g.name, 'description': g.description} for g in groups]
+
+    def get_managed_groups(self, obj):
+        """获取用户管理的社团"""
+        groups = obj.managed_groups.all()
         return [{'id': str(g.id), 'name': g.name, 'description': g.description} for g in groups]
 
     def get_performed_videos(self, obj):
@@ -37,6 +46,12 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_qq_user(self, obj):
         """标记是否为 QQ 第三方登录用户。"""
         return obj.social_account_links.filter(provider='qq').exists()
+
+    def get_role_application_group_detail(self, obj):
+        group = obj.role_application_group
+        if not group:
+            return None
+        return {'id': str(group.id), 'name': group.name, 'description': group.description}
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -171,13 +186,54 @@ class RoleApplicationSerializer(serializers.Serializer):
     """
     reason = serializers.CharField(required=True, min_length=10, max_length=500,
                                    help_text="申请理由，至少10个字")
+    group_id = serializers.UUIDField(required=False, allow_null=True)
+    group_data = serializers.DictField(required=False)
 
     def validate(self, attrs):
         user = self.context['request'].user
         if user.role_application_pending:
             raise serializers.ValidationError("您已有待审核的申请，请勿重复提交")
-        if user.role in ['admin', 'editor', 'contributor']:
-            raise serializers.ValidationError("您已经是贡献者或更高权限，无需申请")
+        if user.role in ['admin', 'editor']:
+            raise serializers.ValidationError("您已经拥有更高权限，无需申请社团管理员")
+
+        group_id = attrs.get('group_id')
+        group_data = attrs.get('group_data') or {}
+        if not group_id and not group_data:
+            raise serializers.ValidationError("请选择要管理的社团，或填写新社团资料")
+
+        if group_id and group_data:
+            raise serializers.ValidationError("请选择已有社团或申请创建新社团，不能同时提交")
+
+        from apps.groups.models import Group
+        if group_id:
+            try:
+                attrs['group'] = Group.objects.get(id=group_id, is_active=True)
+            except Group.DoesNotExist:
+                raise serializers.ValidationError("选择的社团不存在")
+            if user.managed_groups.filter(id=group_id).exists():
+                raise serializers.ValidationError("您已经是该社团的管理员，无需重复申请")
+
+        if group_data:
+            name = str(group_data.get('name', '')).strip()
+            if not name:
+                raise serializers.ValidationError("新社团名称不能为空")
+            if Group.objects.filter(name=name).exists():
+                raise serializers.ValidationError("该社团已存在，请选择已有社团申请管理")
+            cleaned = {
+                'name': name,
+                'description': str(group_data.get('description', '')).strip(),
+                'province': str(group_data.get('province', '')).strip(),
+                'city': str(group_data.get('city', '')).strip(),
+                'location': str(group_data.get('location', '')).strip(),
+                'website': str(group_data.get('website', '')).strip(),
+                'email': str(group_data.get('email', '')).strip(),
+                'phone': str(group_data.get('phone', '')).strip(),
+                'weibo': str(group_data.get('weibo', '')).strip(),
+                'wechat': str(group_data.get('wechat', '')).strip(),
+                'qq_group': str(group_data.get('qq_group', '')).strip(),
+                'bilibili': str(group_data.get('bilibili', '')).strip(),
+            }
+            attrs['group_data'] = cleaned
         return attrs
 
 

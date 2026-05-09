@@ -49,7 +49,7 @@ class VideoSerializer(serializers.ModelSerializer):
             'competition', 'competition_name', 'year',
             'tags', 'tag_ids', 'events', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'uploaded_by', 'uploaded_by_username']
 
 
 class VideoListSerializer(serializers.ModelSerializer):

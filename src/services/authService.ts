@@ -1,4 +1,5 @@
 import { api, getBaseURL } from './api'
+import { PaginatedResponse, UserSearchResult } from '../types'
 
 interface LoginData {
   username: string
@@ -75,6 +76,11 @@ class AuthService {
   // 获取当前用户信息
   async getCurrentUser(): Promise<UserInfo> {
     return api.get<UserInfo>('/users/me/')
+  }
+
+  async searchUsers(query: string): Promise<PaginatedResponse<UserSearchResult>> {
+    const queryString = api.buildQueryParams({ search: query, page_size: 20 })
+    return api.get<PaginatedResponse<UserSearchResult>>(`/users/search/${queryString}`)
   }
 
   // 检查是否已登录

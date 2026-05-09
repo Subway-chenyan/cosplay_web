@@ -9,6 +9,8 @@ interface RoleApplication {
   role_application_reason: string
   role_application_date: string
   current_role: string
+  role_application_group?: { id: string; name: string; description: string } | null
+  role_application_group_data?: Record<string, string>
 }
 
 interface RoleApprovalPanelProps {
@@ -206,6 +208,31 @@ function RoleApprovalPanel({ token, onRefresh }: RoleApprovalPanelProps) {
                 </label>
                 <div className="bg-gray-50 border-2 border-gray-300 p-3 font-bold">
                   {app.role_application_reason}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-black text-gray-700 mb-2 uppercase italic">
+                  目标社团 / GROUP
+                </label>
+                <div className="bg-gray-50 border-2 border-gray-300 p-3 font-bold">
+                  {app.role_application_group ? (
+                    <span>申请管理已有社团：{app.role_application_group.name}</span>
+                  ) : app.role_application_group_data?.name ? (
+                    <div>
+                      <p>申请创建新社团：{app.role_application_group_data.name}</p>
+                      {app.role_application_group_data.description && (
+                        <p className="mt-2 text-sm text-gray-600">{app.role_application_group_data.description}</p>
+                      )}
+                      {(app.role_application_group_data.province || app.role_application_group_data.city) && (
+                        <p className="mt-2 text-sm text-gray-600">
+                          {app.role_application_group_data.province}{app.role_application_group_data.city}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-p5-red">未绑定社团信息</span>
+                  )}
                 </div>
               </div>
 
