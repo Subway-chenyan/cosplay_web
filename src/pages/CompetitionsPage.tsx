@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
 import { fetchCompetitions, setCurrentPage } from '../store/slices/competitionsSlice'
 import { Trophy, Calendar } from 'lucide-react'
@@ -12,8 +12,27 @@ import ScheduleTab from '../components/schedule/ScheduleTab'
 function CompetitionsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { competitions, loading, error, pagination, currentPage } = useSelector((state: RootState) => state.competitions)
   const [activeTab, setActiveTab] = useState<'list' | 'schedule'>('list')
+
+  // 检查URL hash来设置默认标签和滚动位置
+  useEffect(() => {
+    const hash = location.hash
+    if (hash === '#schedule') {
+      setActiveTab('schedule')
+      // 滚动到赛程标签区域
+      setTimeout(() => {
+        const scheduleElement = document.querySelector('#schedule-tab')
+        if (scheduleElement) {
+          scheduleElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    } else {
+      // 如果没有hash或者hash为list，滚动到页面顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [location.hash])
 
   useEffect(() => {
     if (competitions.length === 0) {
@@ -23,6 +42,25 @@ function CompetitionsPage() {
 
   const handleCompetitionClick = (competition: Competition) => {
     navigate(`/competitions/${competition.id}`)
+  }
+
+  // 处理标签切换，更新URL hash和滚动位置
+  const handleTabChange = (tab: 'list' | 'schedule') => {
+    setActiveTab(tab)
+    if (tab === 'schedule') {
+      window.location.hash = 'schedule'
+      // 滚动到赛程标签区域
+      setTimeout(() => {
+        const scheduleElement = document.querySelector('#schedule-tab')
+        if (scheduleElement) {
+          scheduleElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    } else {
+      window.location.hash = ''
+      // 滚动到页面顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   if (loading && competitions.length === 0) {
@@ -72,7 +110,7 @@ function CompetitionsPage() {
       {/* Tab Navigation */}
       <div className="flex space-x-4 mb-8">
         <button
-          onClick={() => setActiveTab('list')}
+          onClick={() => handleTabChange('list')}
           className={`px-6 py-2 font-black transition-all ${activeTab === 'list'
             ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
             : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
@@ -81,7 +119,7 @@ function CompetitionsPage() {
           <span className="inline-block">比赛列表</span>
         </button>
         <button
-          onClick={() => setActiveTab('schedule')}
+          onClick={() => handleTabChange('schedule')}
           className={`px-6 py-2 font-black transition-all ${activeTab === 'schedule'
             ? 'bg-p5-red text-white shadow-[4px_4px_0_0_black]'
             : 'bg-gray-100 text-black border-2 border-black hover:bg-black hover:text-white'
@@ -200,7 +238,7 @@ function CompetitionsPage() {
       </>
       )}
 
-      {activeTab === 'schedule' && <ScheduleTab />}
+      {activeTab === 'schedule' && <div id="schedule-tab"><ScheduleTab /></div>}
     </div>
   )
 }

@@ -12,8 +12,9 @@ mkdir -p "$LOG_DIR"
 
 echo "正在后台启动服务..."
 
-# 启动前端（vite preview）
-npm run preview > "$LOG_DIR/frontend.log" 2>&1 &
+# 启动前端（生产构建 + 预览）
+npm run build > "$LOG_DIR/frontend_build.log" 2>&1
+npm run preview -- --port 4173 > "$LOG_DIR/frontend.log" 2>&1 &
 echo $! > "$LOG_DIR/frontend.pid"
 
 # 启动后端（Django）

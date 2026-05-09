@@ -11,7 +11,8 @@ import Pagination from '../components/Pagination'
 import { Loader, Tv, Sparkles, Play } from 'lucide-react'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
-import type { Group } from '../types'
+import { eventService } from '../services/eventService'
+import type { Group, Event } from '../types'
 
 function HomePage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -32,9 +33,12 @@ function HomePage() {
     groups: Group[]
   } | null>(null)
   const [isAgentLoading, setIsAgentLoading] = useState(false)
-  
+
   // 赛程折叠状态
   const [isScheduleExpanded, setIsScheduleExpanded] = useState(false)
+  // 最近赛事数据
+  const [recentEvents, setRecentEvents] = useState<Event[]>([])
+  const [eventsLoading, setEventsLoading] = useState(true)
 
   const fetchStats = useCallback(async () => {
     try {
@@ -45,11 +49,55 @@ function HomePage() {
     }
   }, [])
 
+  // 获取最近的赛事
+  const fetchRecentEvents = useCallback(async () => {
+    setEventsLoading(true)
+    try {
+      const events = await eventService.getActiveEvents()
+      // 按开始日期排序，取最近3个
+      const sortedEvents = events
+        .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
+        .slice(0, 3)
+      setRecentEvents(sortedEvents)
+    } catch (e) {
+      console.error('获取最近赛事失败:', e)
+      setRecentEvents([])
+    } finally {
+      setEventsLoading(false)
+    }
+  }, [])
+
+  // 格式化日期
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hour = date.getHours().toString().padStart(2, '0')
+    const minute = date.getMinutes().toString().padStart(2, '0')
+    return `${month}月${day}日 ${hour}:${minute}`
+  }
+
+  // 获取赛事状态
+  const getEventStatus = (startDate: string, endDate: string) => {
+    const now = new Date()
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+
+    if (now < start) {
+      return '即将开始'
+    } else if (now >= start && now <= end) {
+      return '进行中'
+    } else {
+      return '已结束'
+    }
+  }
+
   useEffect(() => {
     fetchStats()
+    fetchRecentEvents()
     const interval = setInterval(fetchStats, 60000)
     return () => clearInterval(interval)
-  }, [fetchStats])
+  }, [fetchStats, fetchRecentEvents])
 
   // 防抖函数
   const debounce = useCallback((func: Function, delay: number) => {
@@ -148,6 +196,25 @@ function HomePage() {
     navigate(`/video/${videoId}`)
   }
 
+  // 处理查看全部赛程
+  const handleViewAllSchedule = () => {
+    const currentPath = window.location.pathname
+    if (currentPath === '/competitions') {
+      // 如果已经在比赛页面，直接切换到赛程标签
+      const scheduleElement = document.querySelector('#schedule-tab')
+      if (scheduleElement) {
+        window.location.hash = 'schedule'
+        // 滚动到赛程区域
+        setTimeout(() => {
+          scheduleElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      }
+    } else {
+      // 如果不在比赛页面，导航到比赛页面
+      navigate('/competitions#schedule')
+    }
+  }
+
   const handleInputChange = (value: string) => {
     setInputValue(value)
   }
@@ -233,7 +300,7 @@ function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-p5-red/80 to-black -z-0"></div>
         <div className="relative z-10 text-center">
           <h1 className="text-4xl md:text-6xl font-black mb-4 text-white tracking-tight" style={{ textShadow: '6px 6px 0px #d90614' }}>
-            舞台剧视频库
+            Cos舞台剧视频库
           </h1>
           <p className="text-lg text-white font-black bg-black inline-block px-6 py-1 border-2 border-p5-red">
             各大赛事数据汇总
@@ -263,34 +330,52 @@ function HomePage() {
           {isScheduleExpanded && (
             <div className="mt-4 pt-4 border-t-2 border-white border-dashed transform skew-x-2">
               <div id="current" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div id="guangzhou" className="bg-white p-4 transform -skew-x-12 border-2 border-black">
-                  <h3 className="font-black text-black italic mb-2">2026 广州预选赛</h3>
-                  <p className="text-xs font-bold text-gray-600 italic">4月2日 15:06</p>
-                  <p className="text-xs font-bold text-p5-red italic mt-1">已结束</p>
-                </div>
-                <div id="shanghai" className="bg-white p-4 transform -skew-x-12 border-2 border-black">
-                  <h3 className="font-black text-black italic mb-2">2026 上海预选赛</h3>
-                  <p className="text-xs font-bold text-gray-600 italic">4月15日 14:00</p>
-                  <p className="text-xs font-bold text-p5-red italic mt-1">进行中</p>
-                </div>
-                <div id="beijing" className="bg-white p-4 transform -skew-x-12 border-2 border-black">
-                  <h3 className="font-black text-black italic mb-2">2026 北京预选赛</h3>
-                  <p className="text-xs font-bold text-gray-600 italic">4月22日 14:00</p>
-                  <p className="text-xs font-bold text-p5-red italic mt-1">进行中</p>
-                </div>
+                {eventsLoading ? (
+                  // 加载状态
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="bg-white p-4 transform -skew-x-12 border-2 border-black">
+                      <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded mt-1 animate-pulse"></div>
+                    </div>
+                  ))
+                ) : recentEvents.length > 0 ? (
+                  // 显示最近赛事
+                  recentEvents.map((event, index) => {
+                    const status = getEventStatus(event.start_date, event.end_date)
+                    const statusColor = status === '进行中' ? 'text-p5-red' :
+                                      status === '即将开始' ? 'text-yellow-600' : 'text-gray-600'
+
+                    return (
+                      <div
+                        key={event.id || index}
+                        className="bg-white p-4 transform -skew-x-12 border-2 border-black"
+                      >
+                        <h3 className="font-black text-black italic mb-2 truncate">{event.title}</h3>
+                        <p className="text-xs font-bold text-gray-600 italic">{formatDate(event.start_date)}</p>
+                        <p className={`text-xs font-bold ${statusColor} italic mt-1`}>{status}</p>
+                      </div>
+                    )
+                  })
+                ) : (
+                  // 无数据状态
+                  <div className="col-span-full text-center">
+                    <div className="bg-white p-4 transform -skew-x-12 border-2 border-black">
+                      <p className="text-xs font-bold text-gray-600 italic">暂无近期赛事</p>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="mt-6 text-center">
-                <a 
-                  href="https://www.cosdrama.cn/competitions#current" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <button
+                  onClick={handleViewAllSchedule}
                   className="inline-flex items-center px-6 py-3 bg-p5-red text-white font-black italic transform -skew-x-12 border-2 border-white hover:bg-white hover:text-p5-red transition-all shadow-[4px_4px_0_0_black]"
                 >
                   <span className="transform skew-x-12">查看全部赛程</span>
                   <svg className="w-4 h-4 ml-2 transform skew-x-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
-                </a>
+                </button>
               </div>
             </div>
           )}

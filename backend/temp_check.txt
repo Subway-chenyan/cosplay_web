@@ -1,0 +1,10 @@
+        state = _build_qq_state(redirect_target)$
+$
+        authorize_url = f'{QQ_AUTHORIZE_URL}?{urlencode({$
+            "response_type": "code",$
+            "client_id": settings.QQ_CONNECT_APP_ID,$
+            "redirect_uri": _get_qq_callback_url(request),$
+            "state": state,$
+            "scope": settings.QQ_CONNECT_SCOPE,$
+        })}'$
+        return redirect(authorize_url)$

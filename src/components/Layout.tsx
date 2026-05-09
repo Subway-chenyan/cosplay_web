@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
+import ScrollToTopButton from './ScrollToTopButton'
 
 function Layout() {
   const location = useLocation()
@@ -20,6 +21,9 @@ function Layout() {
         </div>
       </main>
       {!isChoreoPage && <Footer />}
+
+      {/* 回到顶部按钮 - 排除在编舞页面显示 */}
+      {!isChoreoPage && <ScrollToTopButton />}
     </div>
   )
 }

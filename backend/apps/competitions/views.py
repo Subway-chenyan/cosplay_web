@@ -224,6 +224,21 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(events, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def upcoming(self, request):
+        """获取所有未来的赛事（用于赛程页面）"""
+        import datetime as dt
+        today = dt.date.today()
+
+        events = Event.objects.filter(
+            start_date__gte=today
+        ).select_related('competition').prefetch_related('videos').order_by(
+            'competition__name', 'region', 'stage', 'start_date'
+        )
+
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def link_video(self, request, pk=None):
         """关联视频到赛事"""

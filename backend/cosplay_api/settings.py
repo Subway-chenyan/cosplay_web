@@ -256,7 +256,7 @@ SIMPLE_JWT = {
 
 # CORS Settings
 # 确保每个域名只出现一次，并添加预览端口支持
-cors_origins_default = 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:4173,http://localhost:4174,https://www.cosdrama.cn,https://cosdrama.cn'
+cors_origins_default = 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:4173,http://localhost:4174,https://www.cosdrama.cn,https://cosdrama.cn,https://data.cosdrama.cn'
 cors_origins_raw = config('CORS_ALLOWED_ORIGINS', default=cors_origins_default).split(',')
 # 去重并保持顺序，确保不会有重复的域名
 cors_origins_seen = set()
@@ -269,7 +269,27 @@ for origin in cors_origins_raw:
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOW_ALL_ORIGINS = False  # 生产环境设为False，更安全
+
+# 允许的请求方法
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# CORS middleware配置
+CORS_EXPOSE_HEADERS = [
+    'Content-Type',
+    'X-CSRFToken',
+    'Authorization',
+]
+
+# 预检请求的有效期
+CORS_PREFLIGHT_MAX_AGE = 86400
 
 # QQ 互联 OAuth 配置
 QQ_CONNECT_APP_ID = config('QQ_CONNECT_APP_ID', default='')
@@ -462,3 +482,26 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # allauth adapter (可选，自定义用户创建逻辑)
 # ACCOUNT_ADAPTER = 'apps.users.adapters.CustomAccountAdapter'
+
+# File upload settings
+# 增加文件上传大小限制到10MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+DATA_UPLOAD_MAX_FILE_SIZE = 10485760   # 10MB
+
+# 允许的文件类型
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+
+# Media settings
+MEDIA_TYPE = 'image'
+
+# 如果使用R2存储，确保media URL配置正确
+if config('R2_ACCESS_KEY_ID', default=None):
+    # 确保媒体文件的URL可以通过https访问
+    if not AWS_S3_CUSTOM_DOMAIN:
+        # 如果没有自定义域名，使用endpoint构建URL
+        MEDIA_URL = f'{AWS_S3_ENDPOINT_URL.rstrip("/")}/media/'
+else:
+    # 本地开发时的media URL
+    MEDIA_URL = '/media/'
