@@ -39,7 +39,7 @@ export default function ScheduleTab() {
       setLoading(true)
       setError('')
       try {
-        const data = await eventService.getActiveEvents()
+        const data = await eventService.getAllEvents()
         setEvents(data)
       } catch {
         setError('加载赛程失败，请稍后重试')

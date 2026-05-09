@@ -2103,7 +2103,7 @@ const ManagementPage: React.FC = () => {
                             <SearchableSelect
                               placeholder="搜索要编辑的赛事..."
                               onChange={handleEventSelect}
-                              searchFunction={() => eventService.getEvents()}
+                              searchFunction={() => eventService.getAllEvents()}
                               displayField="title"
                               valueField="id"
                             />

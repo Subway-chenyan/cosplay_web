@@ -2,9 +2,22 @@ import { api } from './api'
 import { Event } from '../types'
 
 export const eventService = {
-  // 获取所有赛事
-  getEvents: async (): Promise<Event[]> => {
-    return await api.get<Event[]>('/competitions/events/')
+  // 获取所有赛事（所有页面）
+  getAllEvents: async (): Promise<Event[]> => {
+    const allEvents: Event[] = [];
+    let page = 1;
+
+    while (true) {
+      const response = await api.get<{ count: number; results: Event[]; next?: string; previous?: string }>(`/competitions/events/?page=${page}`);
+      allEvents.push(...response.results);
+
+      if (!response.next) {
+        break;
+      }
+      page++;
+    }
+
+    return allEvents;
   },
 
   // 根据ID获取单个赛事
@@ -40,6 +53,11 @@ export const eventService = {
   // 获取当前活跃赛事
   getActiveEvents: async (): Promise<Event[]> => {
     return await api.get<Event[]>('/competitions/events/active/')
+  },
+
+  // 获取所有未来赛事（用于赛程页面）
+  getUpcomingEvents: async (): Promise<Event[]> => {
+    return await api.get<Event[]>('/competitions/events/upcoming/')
   },
 
   // 获取比赛赛程
