@@ -119,7 +119,8 @@ class GroupViewSet(viewsets.ModelViewSet):
                 user.save(update_fields=['role', 'updated_at'])
 
             return Response({
-                'detail': '已添加社团管理员绑定',
+                'detail': '已添加社团管理员绑定，可继续为该社团添加更多管理员',
+                'count': group.managers.count(),
                 'managers': [serialize_group_manager(manager) for manager in group.managers.all().order_by('username')],
             }, status=status.HTTP_200_OK)
 

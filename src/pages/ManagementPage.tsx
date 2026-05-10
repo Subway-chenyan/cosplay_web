@@ -1604,6 +1604,7 @@ const ManagementPage: React.FC = () => {
                           <div>
                             <p className="text-xs font-black text-p5-red uppercase italic tracking-widest">管理员绑定</p>
                             <h3 className="text-2xl font-black italic text-black">社团管理员</h3>
+                            <p className="mt-1 text-xs font-bold text-gray-500">一个社团可以绑定多个管理员，管理员之间权限互不覆盖</p>
                           </div>
                           <button
                             type="button"

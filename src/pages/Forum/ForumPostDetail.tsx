@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from '../../store/store'
 import { fetchPostDetail, clearCurrentPost } from '../../store/slices/forumSlice'
 import { forumService } from '../../services/forumService'
 import { ModerationPayload } from '../../types/forum'
-import { MessageSquare, User, Calendar, CornerDownRight, Send, Edit3, Lock, Pin, Star, Heart, Flag, EyeOff } from 'lucide-react'
+import { MessageSquare, User, Calendar, CornerDownRight, Send, Edit3, Lock, Pin, Star, Heart, Flag, EyeOff, X } from 'lucide-react'
 import DOMPurify from 'dompurify'
 
 const ForumPostDetail = () => {
@@ -17,6 +17,7 @@ const ForumPostDetail = () => {
   const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isModerating, setIsModerating] = useState(false)
+  const [previewImage, setPreviewImage] = useState<{ src: string; alt: string } | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -26,6 +27,29 @@ const ForumPostDetail = () => {
       dispatch(clearCurrentPost())
     }
   }, [dispatch, id])
+
+  useEffect(() => {
+    if (!previewImage) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setPreviewImage(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [previewImage])
+
+  const handleContentClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target
+    if (!(target instanceof HTMLImageElement)) return
+
+    setPreviewImage({
+      src: target.currentSrc || target.src,
+      alt: target.alt || '帖子图片',
+    })
+  }
 
   const handleSubmitComment = async () => {
     if (!id || !commentContent.trim() || isSubmitting) return
@@ -243,6 +267,7 @@ const ForumPostDetail = () => {
         <div className="bg-white border-4 border-black p-8 md:p-12 shadow-[12px_12px_0_0_rgba(0,0,0,1)] min-h-[400px]">
           <div
             className="p5-rendered-content max-w-none"
+            onClick={handleContentClick}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentPost.content) }}
           />
           <div className="mt-10 flex flex-wrap items-center gap-3 border-t-2 border-black pt-6">
@@ -327,6 +352,31 @@ const ForumPostDetail = () => {
           </div>
         </section>
       </div>
+
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="图片预览"
+          onClick={() => setPreviewImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setPreviewImage(null)}
+            className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition hover:bg-p5-red hover:text-white focus:outline-none focus:ring-4 focus:ring-p5-red/40"
+            aria-label="关闭图片预览"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <img
+            src={previewImage.src}
+            alt={previewImage.alt}
+            className="max-h-[88vh] max-w-[92vw] rounded-lg border-2 border-white object-contain shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   )
 }
