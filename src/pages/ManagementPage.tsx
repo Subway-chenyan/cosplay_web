@@ -369,8 +369,7 @@ const ManagementPage: React.FC = () => {
   const canManageGroupBindings = !isContributor && (currentUserRole === 'admin' || currentUserRole === '')
   const visibleTabs = isContributor
     ? [
-      { id: 'video', label: '视频管理', sub: '视频资料' },
-      { id: 'group', label: '社团管理', sub: '社团资料' }
+      { id: 'video', label: '社团工作台', sub: '一站式管理' }
     ]
     : [
       { id: 'video', label: '视频管理', sub: '视频资料' },
@@ -451,6 +450,13 @@ const ManagementPage: React.FC = () => {
     setManagedGroups([])
     setLoginForm({ username: '', password: '' })
     showMessage('success', '已退出登录')
+  }
+
+  const switchContributorTask = (task: 'video' | 'group') => {
+    if (task === 'group') {
+      setGroupMode('edit')
+    }
+    setActiveTab(task)
   }
 
   // 显示消息
@@ -1156,16 +1162,16 @@ const ManagementPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full text-left p-6 transition-all transform -skew-x-6 border-4 relative overflow-hidden group ${activeTab === tab.id
+                className={`w-full text-left p-6 transition-all transform -skew-x-6 border-4 relative overflow-hidden group ${(activeTab === tab.id) || (isContributor && tab.id === 'video' && activeTab === 'group')
                   ? 'bg-p5-red border-white text-white translate-x-4 shadow-[8px_8px_0_0_black]'
                   : 'bg-white border-black text-black hover:border-p5-red hover:translate-x-2'
                   }`}
               >
-                {activeTab === tab.id && (
+                {((activeTab === tab.id) || (isContributor && tab.id === 'video' && activeTab === 'group')) && (
                   <div className="absolute right-0 top-0 bottom-0 w-2 bg-white transform skew-x-12 translate-x-1"></div>
                 )}
                 <div className="relative z-10">
-                  <p className={`text-[10px] font-black uppercase italic mb-1 ${activeTab === tab.id ? 'text-black' : 'text-p5-red'}`}>{tab.sub}</p>
+                  <p className={`text-[10px] font-black uppercase italic mb-1 ${(activeTab === tab.id) || (isContributor && tab.id === 'video' && activeTab === 'group') ? 'text-black' : 'text-p5-red'}`}>{tab.sub}</p>
                   <p className="text-2xl font-black italic uppercase tracking-tighter">{tab.label}</p>
                 </div>
               </button>
@@ -1174,6 +1180,68 @@ const ManagementPage: React.FC = () => {
 
           {/* Content Area */}
           <div className="lg:col-span-3">
+            {isContributor && (
+              <div className="mb-8 border-4 border-black bg-white p-6 shadow-[6px_6px_0_0_black]">
+                <div className="mb-5 flex flex-col gap-3 border-b-4 border-p5-red pb-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-xs font-black uppercase italic tracking-widest text-p5-red">社团工作台</p>
+                    <h2 className="text-2xl font-black italic text-black">先选社团，再处理资料和视频</h2>
+                    <p className="mt-1 text-sm font-bold text-gray-600">
+                      贡献者可以管理多个社团。选中一个社团后，下方操作都会围绕这个社团展开。
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => switchContributorTask('video')}
+                      className={`border-2 border-black px-4 py-2 text-sm font-black ${activeTab === 'video' ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-black hover:text-white'}`}
+                    >
+                      视频管理/上传
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchContributorTask('group')}
+                      className={`border-2 border-black px-4 py-2 text-sm font-black ${activeTab === 'group' ? 'bg-p5-red text-white' : 'bg-white text-black hover:bg-black hover:text-white'}`}
+                    >
+                      社团资料维护
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto] md:items-end">
+                  <div>
+                    <label className="mb-2 block text-sm font-black text-gray-700">
+                      当前操作社团
+                    </label>
+                    <div className="border-4 border-black focus-within:border-p5-red">
+                      <SearchableSelect
+                        placeholder="选择要管理的社团..."
+                        onChange={handleGroupSelect}
+                        optionsList={managedGroups}
+                        displayField="name"
+                        valueField="id"
+                        value={groupForm.id || videoForm.group}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => groupForm.id && loadManagedVideos(groupForm.id)}
+                    disabled={!groupForm.id}
+                    className="min-h-[56px] border-4 border-black bg-black px-5 font-black text-white hover:bg-p5-red disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    刷新当前社团
+                  </button>
+                </div>
+
+                {!groupForm.id && (
+                  <div className="mt-4 border-2 border-dashed border-gray-400 bg-gray-50 p-4 text-sm font-bold text-gray-600">
+                    请先选择一个社团。选择后可以直接上传视频、编辑已上传视频，或维护社团资料。
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 消息提示 */}
             {message && (
               <div className={`mb-8 p-6 transform -skew-x-2 border-l-8 shadow-xl ${message.type === 'success'
@@ -1201,17 +1269,23 @@ const ManagementPage: React.FC = () => {
                         <Plus className="w-8 h-8 text-white transform -rotate-12" />
                       </div>
                       <h2 className="text-xl md:text-3xl font-black text-black uppercase italic tracking-tighter p5-text-shadow">
-                        {videoMode === 'edit' ? '编辑视频' : '添加新视频'}
+                        {isContributor ? (videoMode === 'edit' ? '编辑当前社团视频' : '上传当前社团视频') : (videoMode === 'edit' ? '编辑视频' : '添加新视频')}
                       </h2>
                     </div>
 
                     {isContributor && (
                       <div className="mb-10 border-4 border-black bg-gray-50 p-5 shadow-[4px_4px_0_0_black]">
                         <div className="mb-4 flex flex-col gap-3 border-b-4 border-p5-red pb-3 md:flex-row md:items-center md:justify-between">
-                          <h3 className="text-lg font-black italic text-black">已上传视频</h3>
+                          <div>
+                            <h3 className="text-lg font-black italic text-black">当前社团已上传视频</h3>
+                            <p className="text-xs font-bold text-gray-500">
+                              {groupForm.name ? `正在管理：${groupForm.name}` : '请先在上方选择社团'}
+                            </p>
+                          </div>
                           <button
                             type="button"
                             onClick={() => loadManagedVideos()}
+                            disabled={!videoForm.group && !groupForm.id}
                             className="border-2 border-black bg-white px-4 py-2 text-sm font-black hover:bg-black hover:text-white"
                           >
                             刷新列表
@@ -1507,8 +1581,8 @@ const ManagementPage: React.FC = () => {
                           <span className="transform skew-x-12 inline-block">{videoMode === 'edit' ? '取消编辑' : '重置'}</span>
                         </button>
                         <button
-                          type="submit"
-                          disabled={loading}
+                            type="submit"
+                          disabled={loading || (isContributor && !videoForm.group)}
                           className="px-8 py-3 bg-p5-red text-white font-black uppercase italic border-4 border-black hover:bg-black hover:shadow-[8px_8px_0_0_#d90614] transition-all transform -skew-x-12 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-[4px_4px_0_0_black]"
                         >
                           <span className="flex items-center transform skew-x-12">
@@ -1559,6 +1633,7 @@ const ManagementPage: React.FC = () => {
                           </span>
                         </button>
                         )}
+                        {!isContributor && (
                         <button
                           onClick={() => {
                             setGroupMode('edit')
@@ -1574,10 +1649,11 @@ const ManagementPage: React.FC = () => {
                             修改社团
                           </span>
                         </button>
+                        )}
                       </div>
                     </div>
 
-                    {groupMode === 'edit' && (
+                    {groupMode === 'edit' && !isContributor && (
                       <div className="mb-10 p-6 bg-black transform -skew-x-2 border-l-8 border-p5-red shadow-xl relative z-20">
                         <div className="transform skew-x-2">
                           <label className="block text-sm font-black text-p5-red uppercase mb-3 tracking-widest">
@@ -1698,6 +1774,18 @@ const ManagementPage: React.FC = () => {
                             </div>
                           )}
                         </div>
+                      </div>
+                    )}
+
+                    {isContributor && (
+                      <div className="mb-8 border-4 border-black bg-gray-50 p-5 shadow-[4px_4px_0_0_black]">
+                        <p className="text-xs font-black uppercase italic tracking-widest text-p5-red">当前维护对象</p>
+                        <h3 className="mt-1 text-xl font-black text-black">
+                          {groupForm.name || '请先在上方选择社团'}
+                        </h3>
+                        <p className="mt-2 text-sm font-bold text-gray-600">
+                          修改这里会更新社团公开资料；视频上传和编辑请切换到“视频管理/上传”。
+                        </p>
                       </div>
                     )}
 
