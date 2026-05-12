@@ -366,7 +366,7 @@ const ManagementPage: React.FC = () => {
 
   const provinceOptions = useMemo(() => Object.keys(chinaDivisions).map(name => ({ name, id: name })), [])
   const isContributor = currentUserRole === 'contributor'
-  const canManageGroupBindings = !isContributor && (currentUserRole === 'admin' || currentUserRole === '')
+  const canManageGroupBindings = currentUserRole === 'admin'
   const visibleTabs = isContributor
     ? [
       { id: 'video', label: '社团工作台', sub: '一站式管理' }
@@ -546,6 +546,11 @@ const ManagementPage: React.FC = () => {
       return
     }
 
+    if (isContributor) {
+      showMessage('error', '权限不足，仅管理员可管理社团管理员绑定')
+      return
+    }
+
     setManagerUpdating(true)
     try {
       const response = await groupService.addGroupManager(groupForm.id, userId)
@@ -561,6 +566,11 @@ const ManagementPage: React.FC = () => {
   }
 
   const handleRemoveGroupManager = async (manager: GroupManager) => {
+    if (isContributor) {
+      showMessage('error', '权限不足，仅管理员可管理社团管理员绑定')
+      return
+    }
+
     if (!groupForm.id) return
     const name = manager.nickname || manager.username
     if (!window.confirm(`确定移除「${name}」的社团管理员绑定吗？`)) return
@@ -808,10 +818,6 @@ const ManagementPage: React.FC = () => {
     e.preventDefault()
     if (!videoForm.url.trim() || !videoForm.bv_number.trim() || !videoForm.title.trim()) {
       showMessage('error', '请先粘贴 B 站链接并补全视频标题/BV号')
-      return
-    }
-    if (!videoForm.group) {
-      showMessage('error', '请选择视频所属社团')
       return
     }
     setLoading(true)
@@ -1447,7 +1453,7 @@ const ManagementPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="relative">
                           <label className="block text-xs font-black text-white bg-black px-2 py-0.5 absolute -top-3 left-4 transform -skew-x-12 uppercase z-10">
-                            社团 *
+                            社团
                           </label>
                           <div className="border-4 border-black focus-within:border-p5-red transition-colors shadow-[4px_4px_0_0_black]">
                             <SearchableSelect
