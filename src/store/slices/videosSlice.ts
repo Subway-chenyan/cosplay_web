@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { Video, VideoFilters } from '../../types'
+import { PaginatedResponse, Video, VideoFilters } from '../../types'
 import { videoService } from '../../services/videoService'
 
 interface VideosState {
@@ -122,8 +122,25 @@ export const searchVideos = createAsyncThunk(
 export const fetchGroupVideos = createAsyncThunk(
   'videos/fetchGroupVideos',
   async ({ groupId, page = 1 }: { groupId: string; page?: number }) => {
-    const response = await videoService.getGroupVideos(groupId, page, 12)
-    return response
+    const allVideos: Video[] = []
+    let currentPage = page
+    let response: PaginatedResponse<Video> = await videoService.getGroupVideos(groupId, currentPage, 1000)
+
+    while (true) {
+      allVideos.push(...response.results)
+
+      if (!response.next) {
+        break
+      }
+
+      currentPage += 1
+      response = await videoService.getGroupVideos(groupId, currentPage, 1000)
+    }
+
+    return {
+      ...response,
+      results: allVideos,
+    }
   }
 )
 

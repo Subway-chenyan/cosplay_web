@@ -37,12 +37,16 @@ export const fetchGroups = createAsyncThunk(
     console.log('groupsSlice - fetchGroups thunk called with params:', params)
     const response = await groupService.getGroups({
       page: params?.page || 1,
-      page_size: 50,
+      page_size: 12,
       search: params?.search,
       is_active: params?.is_active,
       is_verified: params?.is_verified,
     })
-    return { ...response, append: params?.append || (params?.page || 1) > 1 }
+    return {
+      ...response,
+      append: params?.append ?? false,
+      page: params?.page || 1,
+    }
   }
 )
 
@@ -108,6 +112,7 @@ const groupsSlice = createSlice({
           // 替换模式：替换所有数据
           state.groups = action.payload.results
         }
+        state.currentPage = action.payload.page
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
@@ -121,6 +126,7 @@ const groupsSlice = createSlice({
       // 处理其他异步操作
       .addCase(fetchActiveGroups.fulfilled, (state, action) => {
         state.groups = action.payload.results
+        state.currentPage = 1
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
@@ -129,6 +135,7 @@ const groupsSlice = createSlice({
       })
       .addCase(fetchVerifiedGroups.fulfilled, (state, action) => {
         state.groups = action.payload.results
+        state.currentPage = 1
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
@@ -137,6 +144,7 @@ const groupsSlice = createSlice({
       })
       .addCase(fetchPopularGroups.fulfilled, (state, action) => {
         state.groups = action.payload.results
+        state.currentPage = 1
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
@@ -150,6 +158,7 @@ const groupsSlice = createSlice({
       .addCase(searchGroups.fulfilled, (state, action) => {
         state.loading = false
         state.groups = action.payload.results
+        state.currentPage = 1
         state.pagination = {
           count: action.payload.count,
           next: action.payload.next,
