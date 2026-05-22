@@ -82,7 +82,7 @@ def _parse_qq_state(state):
     return signing.loads(
         state,
         salt='qq-oauth-state',
-        max_age=600,
+        max_age=1800,  # 30分钟有效期，足够完成登录流程
     )
 
 

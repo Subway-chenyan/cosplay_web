@@ -78,6 +78,30 @@ class AuthService {
     return api.get<UserInfo>('/users/me/')
   }
 
+  // 检查token是否即将过期（1小时内）
+  isTokenExpiringSoon(): boolean {
+    const accessToken = localStorage.getItem('access_token')
+    if (!accessToken) return true
+
+    try {
+      // JWT通常包含过期时间（exp）
+      const payload = JSON.parse(atob(accessToken.split('.')[1]))
+      const now = Math.floor(Date.now() / 1000)
+      const threshold = 3600 // 1小时
+      return (payload.exp - now) < threshold
+    } catch {
+      return true
+    }
+  }
+
+  // 确保token有效（如果即将过期则刷新）
+  async ensureValidToken(): Promise<string> {
+    if (this.isTokenExpiringSoon()) {
+      return this.refreshToken()
+    }
+    return this.getAccessToken() || ''
+  }
+
   async searchUsers(query: string): Promise<PaginatedResponse<UserSearchResult>> {
     const queryString = api.buildQueryParams({ search: query, page_size: 20 })
     return api.get<PaginatedResponse<UserSearchResult>>(`/users/search/${queryString}`)

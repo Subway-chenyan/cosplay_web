@@ -52,7 +52,8 @@ cd backend
 
 # Create/activate virtual environment (prefer uv)
 uv venv
-source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
+source .venv/bin/activate  # 或 `.venv\Scripts\activate` on Windows
+# 注意：后续所有命令都在激活的虚拟环境中执行
 
 # Install dependencies
 pip install -r requirements.txt
@@ -100,6 +101,56 @@ pip install -r requirements.txt
 
 # Run agent (for video fetching/processing)
 python main.py
+```
+
+### Database Management
+```bash
+# Use db_manager.py for database backup/restore operations
+# Note: This script is located in the project root directory
+
+# Backup database
+python db_manager.py backup
+
+# Restore database from backup
+python db_manager.py restore --backup-file database/backup_YYYYMMDD_HHMMSS.sql
+
+# List available backups
+python db_manager.py list-backups
+
+# Check database container status
+python db_manager.py status
+```
+
+### Project Startup Scripts
+```bash
+# Start all services (frontend, backend, Celery worker, Celery beat)
+./start_all.sh
+
+# Stop all services
+./stop_all.sh
+
+# Note: These scripts manage the entire development environment
+# - Frontend (Vite dev server on port 5173)
+# - Backend (Django dev server on port 8000)
+# - Celery worker for async tasks
+# - Celery beat for scheduled tasks
+```
+
+### Celery Tasks
+```bash
+cd backend
+source .venv/bin/activate  # 确保虚拟环境已激活
+
+# Start Celery worker (for async tasks)
+celery -A cosplay_api worker --loglevel=info
+
+# Start Celery beat scheduler (for periodic tasks)
+celery -A cosplay_api beat --loglevel=info
+
+# Run individual task manually
+python manage.py shell
+>>> from apps.videos.tasks import crawl_bilibili_videos_weekly
+>>> crawl_bilibili_videos_weekly.delay()
 ```
 
 ## Architecture Notes

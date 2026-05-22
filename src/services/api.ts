@@ -50,11 +50,25 @@ axiosInstance.interceptors.response.use(
   (response) => {
     return response
   },
-  (error) => {
-    if (error.response) {
-      // 处理错误响应
-      if (error.response.status === 401) {
-        // token过期或无效，清除token
+  async (error) => {
+    const originalRequest = error.config
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        // 尝试刷新token
+        const authService = await import('./authService')
+        await authService.authService.refreshToken()
+
+        // 更新原始请求的token
+        const newToken = localStorage.getItem('access_token')
+        if (newToken) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return axiosInstance(originalRequest)
+        }
+      } catch (refreshError) {
+        // 刷新失败，清除所有token
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         // 可以在这里触发重新登录
