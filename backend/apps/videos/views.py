@@ -320,53 +320,7 @@ from apps.groups.models import Group
 from apps.groups.serializers import GroupSerializer
 import logging
 
-# 导入SQL Agent相关模块
-import sys
-import os
-
-# 多种路径尝试，确保能找到SQLAgent
-base_dir = None
-possible_paths = [
-    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'apps', 'text2sql'),  # 从apps/videos向上
-    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'apps', 'text2sql'),  # 从apps/videos向上两层
-    '/home/ubuntu/cosplay_web/backend/apps/text2sql',  # 绝对路径
-    './apps/text2sql',  # 相对路径
-]
-
-for path in possible_paths:
-    if path not in sys.path:
-        sys.path.append(path)
-    if os.path.exists(os.path.join(path, 'sql_agent_cached.py')):
-        base_dir = path
-        break
-
-SQLAgent = None
-run_agent_search = None
 logger = logging.getLogger(__name__)
-
-try:
-    from apps.text2sql.agent_workflow import run_agent_search
-    logger.info("LangGraph agent workflow imported successfully")
-except Exception as e:
-    run_agent_search = None
-    logger.error(f"Failed to import LangGraph agent workflow: {e}")
-
-if run_agent_search is None:
-    try:
-        from sql_agent_cached import SQLAgent
-        logger.info(f"SQLAgent imported successfully from path: {base_dir}")
-    except ImportError as e:
-        SQLAgent = None
-        logger.error(f"Failed to import SQLAgent: {e}")
-        logger.error(f"Attempted paths: {possible_paths}")
-        logger.error(f"Current working directory: {os.getcwd()}")
-        logger.error(f"Python path: {sys.path[:3]}...")  # 只显示前3个路径
-        # 尝试提供更多调试信息
-        try:
-            import traceback
-            logger.error(f"Import error traceback: {traceback.format_exc()}")
-        except:
-            pass
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -786,59 +740,59 @@ class VideoViewSet(viewsets.ModelViewSet):
         url_path='agent-search'
     )
     def agent_search(self, request):
-        """
-        Agent智能搜索 - 使用SQL Agent进行智能查询，返回结构化结果
-        支持规则引擎（简单查询）和 LLM（复杂组合查询）两条路径
-        """
+        """Agent智能搜索 — 使用 text2sql agent 查询，返回结构化结果。"""
         search_query = request.data.get('query', '').strip()
         if not search_query:
             return Response({'error': '搜索查询不能为空'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if run_agent_search is not None:
-            logger.info("agent_search v3 start query_len=%d query=%r", len(search_query), search_query[:200])
-            try:
-                response_payload = run_agent_search(search_query)
-                return Response(response_payload)
-            except Exception as e:
-                logger.exception("agent_search v3 failed, falling back to legacy SQLAgent: %s", e)
-
-        # 检查SQL Agent是否可用
-        if SQLAgent is None:
-            logger.warning("agent_search SQLAgent is None; service unavailable")
+        try:
+            from apps.text2sql.agent import invoke_agent
+            from apps.text2sql.prompts import SYSTEM_PROMPT
+            from apps.text2sql.hydration import build_data_array
+        except ImportError as e:
+            logger.error("text2sql module not available: %s", e)
             return Response({'error': 'SQL Agent服务暂不可用'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         logger.info("agent_search start query_len=%d query=%r", len(search_query), search_query[:200])
         try:
-            # 初始化并调用SQL Agent，确保返回结构与AgentOutput一致
-            agent = SQLAgent()
-            structured = agent.invoke(search_query)
+            agent_text, sql_result = invoke_agent(search_query)
 
-            # 兼容BaseModel或dict两种返回形态
-            payload = structured.dict() if hasattr(structured, 'dict') else dict(structured)
-            logger.debug("agent_search structured_type=%s payload_keys=%s", type(structured).__name__, list(payload.keys()))
+            if not agent_text:
+                return Response({'error': 'AI 未返回有效回答'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-            # 原始ID列表
-            raw_video_ids = payload.get('video_id_list', []) or []
-            raw_group_ids = payload.get('group_id_list', []) or []
-            overview = payload.get('natural_language_overview', '') or ''
+            # Parse structured response
+            import re
+            ui_match = re.search(r'【ui_type】\s*:\s*(\w+)', agent_text, re.IGNORECASE)
+            answer_match = re.search(r'【answer】\s*:\s*(.+?)(?=【|$)', agent_text, re.IGNORECASE | re.DOTALL)
+            ui_type = ui_match.group(1).strip().lower() if ui_match else 'mixed_text'
+            answer = answer_match.group(1).strip() if answer_match else agent_text.strip()
 
-            # 规范化为字符串并去除空值
-            video_ids = [str(v) for v in raw_video_ids if v]
-            group_ids = [str(g) for g in raw_group_ids if g]
+            # Backwards-compatible response format
+            sql_rows = sql_result.rows
+            video_ids = []
+            group_ids = []
+            data = []
 
-            logger.info(
-                "agent_search payload overview_len=%d videos_count=%d groups_count=%d sample_videos=%s sample_groups=%s",
-                len(overview), len(video_ids), len(group_ids), video_ids[:3], group_ids[:3]
-            )
+            if sql_rows:
+                hydrated = build_data_array(sql_rows, ui_type, answer)
+                video_ids = hydrated['video_id_list']
+                group_ids = hydrated['group_id_list']
+                data = hydrated['data']
 
-            # 只返回与AgentOutput一致的字段
+            logger.info("agent_search ok ui_type=%s videos=%d groups=%d", ui_type, len(video_ids), len(group_ids))
+
             return Response({
-                'natural_language_overview': overview,
+                'natural_language_overview': answer,
+                'ui_type': ui_type,
+                'title': answer[:50].replace('\n', ' '),
+                'summary': answer,
+                'text': answer,
                 'video_id_list': video_ids,
                 'group_id_list': group_ids,
+                'data': data,
+                'sections': [],
             })
         except Exception as e:
             logger.exception("agent_search failed: %s", e)
-            error_msg = f"Agent搜索失败: {str(e)}"
-            return Response({'error': error_msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': f'Agent搜索失败: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
