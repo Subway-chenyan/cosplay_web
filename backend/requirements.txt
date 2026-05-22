@@ -27,3 +27,4 @@ langchain-siliconflow
 langchain-community
 langchain-core
 langgraph>=0.2.74
+deepagents>=0.6.0

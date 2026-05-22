@@ -55,6 +55,7 @@ urlpatterns = [
     path('api/users/', include('apps.users.urls')),
     path('api/forum/', include('apps.forum.urls')),
     path('api/map/', include('apps.map.urls')),
+    path('api/text2sql/', include('apps.text2sql.urls')),
 ]
 
 # Serve static and media files in development

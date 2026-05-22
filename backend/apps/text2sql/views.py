@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.throttling import UserRateThrottle
 
 from .serializers import Text2SQLQuerySerializer
-from .agent import create_agent, get_last_sql_result, get_last_sql_query
+from .agent import invoke_agent
 
 try:
     from .hydration import build_data_array
@@ -50,9 +50,8 @@ def query(request):
                 request.user.id, len(question), question[:200])
 
     try:
-        agent = create_agent()
         t0 = time.time()
-        result = agent.invoke({"messages": [{"role": "user", "content": question}]})
+        agent_text, sql_result = invoke_agent(question)
         elapsed = time.time() - t0
         logger.info("text2sql agent completed in %.1fs", elapsed)
     except Exception as e:
@@ -61,15 +60,6 @@ def query(request):
             {'error': f'AI 查询服务暂不可用，请稍后重试: {str(e)}'},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
-
-    # Extract the agent's final text response
-    if hasattr(result, 'messages'):
-        last_msg = result.messages[-1] if result.messages else {}
-        agent_text = last_msg.get('content', '') if isinstance(last_msg, dict) else str(last_msg)
-    elif isinstance(result, dict):
-        agent_text = result.get('content', result.get('text', str(result)))
-    else:
-        agent_text = str(result)
 
     if not agent_text:
         return Response({'error': 'AI 未返回有效回答'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -80,9 +70,8 @@ def query(request):
     title = answer[:50].replace('\n', ' ')
     summary = answer
 
-    # Hydrate SQL results into ORM objects for frontend cards
-    sql_rows = get_last_sql_result()
-    generated_sql = get_last_sql_query()
+    sql_rows = sql_result.rows
+    generated_sql = sql_result.sql
 
     response_data = {
         'answer': answer,

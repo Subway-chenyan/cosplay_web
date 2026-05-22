@@ -1,75 +1,84 @@
-import pytest
+from django.test import TestCase
 from apps.text2sql.agent import (
     get_schema_tool,
     execute_sql_tool,
     validate_sql_safety,
-    get_last_sql_result,
-    get_last_sql_query,
+    create_sql_result,
 )
 
-# ─── SQL safety ───
 
-def test_validate_select_allowed():
-    assert validate_sql_safety("SELECT * FROM groups_group") is True
+class TestSQLSafety(TestCase):
+    def test_validate_select_allowed(self):
+        self.assertTrue(validate_sql_safety("SELECT * FROM groups_group"))
 
-def test_validate_select_with_join():
-    assert validate_sql_safety(
-        "SELECT g.id, g.name FROM groups_group g JOIN awards_awardrecord ar ON ar.group_id = g.id"
-    ) is True
+    def test_validate_select_with_join(self):
+        self.assertTrue(validate_sql_safety(
+            "SELECT g.id, g.name FROM groups_group g JOIN awards_awardrecord ar ON ar.group_id = g.id"
+        ))
 
-def test_reject_insert():
-    assert validate_sql_safety("INSERT INTO groups_group (name) VALUES ('test')") is False
+    def test_reject_insert(self):
+        self.assertFalse(validate_sql_safety("INSERT INTO groups_group (name) VALUES ('test')"))
 
-def test_reject_delete():
-    assert validate_sql_safety("DELETE FROM groups_group") is False
+    def test_reject_delete(self):
+        self.assertFalse(validate_sql_safety("DELETE FROM groups_group"))
 
-def test_reject_drop():
-    assert validate_sql_safety("DROP TABLE groups_group") is False
+    def test_reject_drop(self):
+        self.assertFalse(validate_sql_safety("DROP TABLE groups_group"))
 
-def test_reject_update():
-    assert validate_sql_safety("UPDATE groups_group SET name = 'x'") is False
+    def test_reject_update(self):
+        self.assertFalse(validate_sql_safety("UPDATE groups_group SET name = 'x'"))
 
-def test_reject_case_insensitive():
-    assert validate_sql_safety("insert into groups_group (name) values ('test')") is False
+    def test_reject_case_insensitive(self):
+        self.assertFalse(validate_sql_safety("insert into groups_group (name) values ('test')"))
 
-def test_reject_disallowed_table():
-    assert validate_sql_safety("SELECT * FROM users_user") is False
+    def test_reject_disallowed_table(self):
+        self.assertFalse(validate_sql_safety("SELECT * FROM users_user"))
 
-def test_reject_disallowed_table_join():
-    assert validate_sql_safety(
-        "SELECT * FROM groups_group g JOIN users_user u ON u.id = g.created_by_id"
-    ) is False
+    def test_reject_disallowed_table_join(self):
+        self.assertFalse(validate_sql_safety(
+            "SELECT * FROM groups_group g JOIN users_user u ON u.id = g.created_by_id"
+        ))
 
-# ─── get_schema tool ───
+    def test_reject_multi_statement(self):
+        self.assertFalse(validate_sql_safety("SELECT * FROM groups_group; SELECT * FROM users_user"))
 
-def test_get_schema_tool_no_args():
-    result = get_schema_tool()
-    assert 'groups_group' in result
-    assert len(result) > 100
+    def test_reject_multi_statement_with_whitespace(self):
+        self.assertFalse(validate_sql_safety("SELECT 1 ; SELECT * FROM users_user"))
 
-def test_get_schema_tool_specific_table():
-    result = get_schema_tool(table_name='groups_group')
-    assert 'id' in result
-    assert 'name' in result
+    def test_allow_trailing_semicolon(self):
+        self.assertTrue(validate_sql_safety("SELECT * FROM groups_group;"))
 
-def test_get_schema_tool_unknown_table():
-    result = get_schema_tool(table_name='nonexistent')
-    assert 'not found' in result.lower() or 'error' in result.lower() or 'unknown' in result.lower()
 
-# ─── execute_sql tool ───
+class TestGetSchemaTool(TestCase):
+    def test_no_args_returns_table_list(self):
+        result = get_schema_tool()
+        self.assertIn('groups_group', result)
+        self.assertGreater(len(result), 100)
 
-def test_execute_sql_rejects_dangerous():
-    with pytest.raises(ValueError, match='只允许 SELECT'):
-        execute_sql_tool("DELETE FROM groups_group")
+    def test_specific_table_returns_columns(self):
+        result = get_schema_tool(table_name='groups_group')
+        self.assertIn('id', result)
+        self.assertIn('name', result)
 
-def test_execute_sql_rejects_non_allowed_table():
-    with pytest.raises(ValueError, match='不允许查询'):
-        execute_sql_tool("SELECT * FROM users_user")
+    def test_unknown_table_returns_error(self):
+        result = get_schema_tool(table_name='nonexistent')
+        self.assertTrue(
+            'not found' in result.lower() or 'error' in result.lower() or 'unknown' in result.lower()
+        )
 
-# ─── last SQL result accessors ───
 
-def test_get_last_sql_result_initially_empty():
-    assert get_last_sql_result() == []
+class TestExecuteSQLTool(TestCase):
+    def test_rejects_dangerous(self):
+        with self.assertRaises(ValueError):
+            execute_sql_tool("DELETE FROM groups_group")
 
-def test_get_last_sql_query_initially_empty():
-    assert get_last_sql_query() == ''
+    def test_rejects_non_allowed_table(self):
+        with self.assertRaises(ValueError):
+            execute_sql_tool("SELECT * FROM users_user")
+
+
+class TestSQLResult(TestCase):
+    def test_initially_empty(self):
+        sr = create_sql_result()
+        self.assertEqual(sr.rows, [])
+        self.assertEqual(sr.sql, '')

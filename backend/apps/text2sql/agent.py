@@ -1,6 +1,5 @@
 import os
 import re
-import threading
 import logging
 import psycopg2
 from django.conf import settings
@@ -24,14 +23,18 @@ _TABLE_NAME_RE = re.compile(
 
 
 def validate_sql_safety(sql: str) -> bool:
-    """Return True if sql is a safe read-only query on allowed tables."""
+    """Return True if sql is a safe single-statement SELECT on allowed tables."""
     if not sql.strip():
         return False
     if _DANGEROUS_RE.match(sql):
         return False
     if not re.match(r'^\s*SELECT\b', sql, re.IGNORECASE):
         return False
-    tables = _TABLE_NAME_RE.findall(sql)
+    # Reject multi-statement SQL (semicolons allow chaining dangerous queries)
+    stripped = sql.strip().rstrip(';')
+    if ';' in stripped:
+        return False
+    tables = _TABLE_NAME_RE.findall(stripped)
     bare_tables = {t.split('.')[-1].lower() for t in tables}
     if not bare_tables:
         return True
@@ -40,22 +43,19 @@ def validate_sql_safety(sql: str) -> bool:
     return True
 
 
-# ─── Thread-local cache for last SQL result ───
+# ─── Container for SQL execution results ───
+# Replaces thread-local cache to avoid cross-request data leaks.
 
-_last_sql = threading.local()
-
-
-def get_last_sql_result():
-    return getattr(_last_sql, 'rows', [])
-
-
-def get_last_sql_query():
-    return getattr(_last_sql, 'sql', '')
+class SQLResult:
+    """Holds the most recent SQL query and its result rows."""
+    __slots__ = ('rows', 'sql')
+    def __init__(self):
+        self.rows = []
+        self.sql = ''
 
 
-def _clear_last_sql():
-    _last_sql.rows = []
-    _last_sql.sql = ''
+def create_sql_result():
+    return SQLResult()
 
 
 # ─── Read-only DB connection ───
@@ -105,8 +105,8 @@ def get_schema_tool(table_name: str = "") -> str:
     )
 
 
-def execute_sql_tool(sql: str) -> str:
-    """执行只读 SQL 查询。仅允许 SELECT 语句，自动限制返回 50 行。"""
+def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
+    """执行只读 SQL 查询。仅允许单条 SELECT 语句，自动限制返回 50 行。"""
     if not validate_sql_safety(sql):
         dangerous_match = _DANGEROUS_RE.match(sql)
         if dangerous_match:
@@ -117,7 +117,9 @@ def execute_sql_tool(sql: str) -> str:
             raise ValueError(f"安全错误：不允许查询表 {', '.join(disallowed)}。只允许查询核心业务表。")
         raise ValueError("安全错误：只允许 SELECT 查询语句。")
 
-    stripped = sql.rstrip().rstrip(';')
+    stripped = sql.strip()
+    # Strip trailing semicolons (safety: prevents multi-statement)
+    stripped = stripped.rstrip(';')
     if not re.search(r'\bLIMIT\s+\d+\s*$', stripped, re.IGNORECASE):
         stripped += ' LIMIT 50'
 
@@ -131,9 +133,10 @@ def execute_sql_tool(sql: str) -> str:
             rows = cur.fetchall()
             if not rows:
                 return "查询结果为空（0行）。请尝试调整查询条件。"
-            # Cache results for hydration
-            _last_sql.rows = [dict(zip(columns, row)) for row in rows]
-            _last_sql.sql = stripped
+            # Store results in the passed container
+            if _sql_result is not None:
+                _sql_result.rows = [dict(zip(columns, row)) for row in rows]
+                _sql_result.sql = stripped
             # Format as readable text
             col_widths = []
             for i, c in enumerate(columns):
@@ -181,3 +184,35 @@ def create_agent():
     )
     logger.info("text2sql Deep Agent created with model=%s", model)
     return _agent_instance
+
+
+def invoke_agent(question: str) -> tuple[str, SQLResult]:
+    """Invoke the agent and return (answer_text, sql_result).
+
+    Creates a fresh SQLResult per call so there's no cross-request state.
+    """
+    from functools import partial
+
+    sql_result = create_sql_result()
+    bound_execute = partial(execute_sql_tool, _sql_result=sql_result)
+
+    agent = create_agent()
+    # Rebind the tool with the per-call sql_result
+    agent_with_result = create_deep_agent(
+        model="openai:deepseek-chat",
+        tools=[get_schema_tool, bound_execute],
+        system_prompt=SYSTEM_PROMPT,
+    )
+
+    result = agent_with_result.invoke({"messages": [{"role": "user", "content": question}]})
+
+    # Extract text
+    if hasattr(result, 'messages'):
+        last_msg = result.messages[-1] if result.messages else {}
+        agent_text = last_msg.get('content', '') if isinstance(last_msg, dict) else str(last_msg)
+    elif isinstance(result, dict):
+        agent_text = result.get('content', result.get('text', str(result)))
+    else:
+        agent_text = str(result)
+
+    return agent_text, sql_result
