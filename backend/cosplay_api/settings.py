@@ -71,6 +71,7 @@ LOCAL_APPS = [
     'apps.users',
     'apps.map',
     'apps.forum',
+    'apps.text2sql',
     'storages',
 ]
 
@@ -223,6 +224,9 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_RATES': {
+        'text2sql': '3/min',
+    },
 }
 
 # JWT Settings

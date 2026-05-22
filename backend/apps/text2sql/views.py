@@ -2,10 +2,11 @@ import re
 import logging
 import time
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.throttling import UserRateThrottle
 
 from .serializers import Text2SQLQuerySerializer
 from .agent import create_agent, get_last_sql_result, get_last_sql_query
@@ -31,8 +32,13 @@ def _parse_agent_response(text):
     }
 
 
+class Text2SQLThrottle(UserRateThrottle):
+    scope = 'text2sql'
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([Text2SQLThrottle])
 def query(request):
     """Text2SQL 查询端点 — 用自然语言查询 Cosplay 数据库。"""
     serializer = Text2SQLQuerySerializer(data=request.data)
