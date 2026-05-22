@@ -1,7 +1,6 @@
-"""URL configuration for text2sql app -- will be populated in a later task."""
-
 from django.urls import path
+from . import views
 
 urlpatterns = [
-    # Views and URLs will be added in Task 6.
+    path('query/', views.query, name='text2sql-query'),
 ]
