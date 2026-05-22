@@ -1,0 +1,4 @@
+interface:
+  display_name: "上传赛事视频"
+  short_description: "从 B 站链接识别赛事信息并通过后端 API 创建、绑定赛事视频。"
+  default_prompt: "使用后端 API 上传一个 B 站赛事视频，自动识别比赛、年份、剧名和赛区，缺失信息时向我确认。"
