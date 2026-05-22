@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import threading
 import psycopg2
 from django.conf import settings
 
@@ -44,7 +45,6 @@ def validate_sql_safety(sql: str) -> bool:
 
 
 # ─── Container for SQL execution results ───
-# Replaces thread-local cache to avoid cross-request data leaks.
 
 class SQLResult:
     """Holds the most recent SQL query and its result rows."""
@@ -56,6 +56,18 @@ class SQLResult:
 
 def create_sql_result():
     return SQLResult()
+
+
+# Per-thread SQLResult, set by invoke_agent before creating the agent.
+_sql_by_thread = threading.local()
+
+
+def _get_thread_sql_result():
+    return getattr(_sql_by_thread, 'result', None)
+
+
+def _set_thread_sql_result(sr):
+    _sql_by_thread.result = sr
 
 
 # ─── Read-only DB connection ───
@@ -105,7 +117,7 @@ def get_schema_tool(table_name: str = "") -> str:
     )
 
 
-def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
+def execute_sql_tool(sql: str) -> str:
     """执行只读 SQL 查询。仅允许单条 SELECT 语句，自动限制返回 50 行。"""
     if not validate_sql_safety(sql):
         dangerous_match = _DANGEROUS_RE.match(sql)
@@ -118,7 +130,6 @@ def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
         raise ValueError("安全错误：只允许 SELECT 查询语句。")
 
     stripped = sql.strip()
-    # Strip trailing semicolons (safety: prevents multi-statement)
     stripped = stripped.rstrip(';')
     if not re.search(r'\bLIMIT\s+\d+\s*$', stripped, re.IGNORECASE):
         stripped += ' LIMIT 50'
@@ -133,10 +144,11 @@ def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
             rows = cur.fetchall()
             if not rows:
                 return "查询结果为空（0行）。请尝试调整查询条件。"
-            # Store results in the passed container
-            if _sql_result is not None:
-                _sql_result.rows = [dict(zip(columns, row)) for row in rows]
-                _sql_result.sql = stripped
+            # Store in per-thread result container
+            sr = _get_thread_sql_result()
+            if sr is not None:
+                sr.rows = [dict(zip(columns, row)) for row in rows]
+                sr.sql = stripped
             # Format as readable text
             col_widths = []
             for i, c in enumerate(columns):
@@ -159,8 +171,6 @@ def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
             conn.close()
 
 
-# ─── Agent factory ───
-
 # ─── LLM import ───
 
 try:
@@ -169,12 +179,13 @@ except ImportError:
     _create_deep_agent = None
 
 _AGENT_MODEL = "openai:deepseek-chat"
+_DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
 
 
 def _ensure_api_keys():
     api_key = os.environ.get('DEEPSEEK_API_KEY', '')
     os.environ.setdefault('OPENAI_API_KEY', api_key)
-    os.environ.setdefault('OPENAI_API_BASE', 'https://api.siliconflow.cn/v1')
+    os.environ.setdefault('OPENAI_BASE_URL', _DEEPSEEK_BASE_URL)
 
 
 def create_agent():
@@ -200,27 +211,23 @@ def create_agent():
 def invoke_agent(question: str) -> tuple[str, SQLResult]:
     """Invoke the agent and return (answer_text, sql_result).
 
-    Creates a fresh SQLResult per call so there's no cross-request state.
+    Creates a fresh per-thread SQLResult so concurrent requests don't leak.
+    execute_sql_tool reads the result from the same thread.
     """
     if _create_deep_agent is None:
         raise ImportError("deepagents package is not installed. Run: pip install deepagents")
 
-    from functools import partial
-
     _ensure_api_keys()
 
-    sql_result = create_sql_result()
-    bound_execute = partial(execute_sql_tool, _sql_result=sql_result)
+    sql_result = SQLResult()
+    _set_thread_sql_result(sql_result)
 
-    agent_with_result = _create_deep_agent(
-        model=_AGENT_MODEL,
-        tools=[get_schema_tool, bound_execute],
-        system_prompt=SYSTEM_PROMPT,
-    )
+    try:
+        agent = create_agent()
+        result = agent.invoke({"messages": [{"role": "user", "content": question}]})
+    finally:
+        _set_thread_sql_result(None)
 
-    result = agent_with_result.invoke({"messages": [{"role": "user", "content": question}]})
-
-    # Extract text
     if hasattr(result, 'messages'):
         last_msg = result.messages[-1] if result.messages else {}
         agent_text = last_msg.get('content', '') if isinstance(last_msg, dict) else str(last_msg)

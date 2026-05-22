@@ -24,6 +24,7 @@ chardet==5.2.0
 setuptools==80.9.0
 
 langchain-siliconflow
+langchain-openai
 langchain-community
 langchain-core
 langgraph>=0.2.74

@@ -1,9 +1,12 @@
 from django.test import TestCase
+from unittest import mock
 from apps.text2sql.agent import (
     get_schema_tool,
     execute_sql_tool,
     validate_sql_safety,
     create_sql_result,
+    _get_thread_sql_result,
+    _set_thread_sql_result,
 )
 
 
@@ -82,3 +85,13 @@ class TestSQLResult(TestCase):
         sr = create_sql_result()
         self.assertEqual(sr.rows, [])
         self.assertEqual(sr.sql, '')
+
+    def test_thread_sql_result_isolation(self):
+        """Different threads get independent SQLResult containers."""
+        _set_thread_sql_result(None)
+        self.assertIsNone(_get_thread_sql_result())
+        sr = create_sql_result()
+        _set_thread_sql_result(sr)
+        self.assertIs(_get_thread_sql_result(), sr)
+        _set_thread_sql_result(None)
+        self.assertIsNone(_get_thread_sql_result())
