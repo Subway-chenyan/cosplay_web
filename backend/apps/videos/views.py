@@ -341,23 +341,32 @@ for path in possible_paths:
         break
 
 SQLAgent = None
+run_agent_search = None
 logger = logging.getLogger(__name__)
 
 try:
-    from sql_agent_cached import SQLAgent
-    logger.info(f"SQLAgent imported successfully from path: {base_dir}")
-except ImportError as e:
-    SQLAgent = None
-    logger.error(f"Failed to import SQLAgent: {e}")
-    logger.error(f"Attempted paths: {possible_paths}")
-    logger.error(f"Current working directory: {os.getcwd()}")
-    logger.error(f"Python path: {sys.path[:3]}...")  # 只显示前3个路径
-    # 尝试提供更多调试信息
+    from apps.text2sql.agent_workflow import run_agent_search
+    logger.info("LangGraph agent workflow imported successfully")
+except Exception as e:
+    run_agent_search = None
+    logger.error(f"Failed to import LangGraph agent workflow: {e}")
+
+if run_agent_search is None:
     try:
-        import traceback
-        logger.error(f"Import error traceback: {traceback.format_exc()}")
-    except:
-        pass
+        from sql_agent_cached import SQLAgent
+        logger.info(f"SQLAgent imported successfully from path: {base_dir}")
+    except ImportError as e:
+        SQLAgent = None
+        logger.error(f"Failed to import SQLAgent: {e}")
+        logger.error(f"Attempted paths: {possible_paths}")
+        logger.error(f"Current working directory: {os.getcwd()}")
+        logger.error(f"Python path: {sys.path[:3]}...")  # 只显示前3个路径
+        # 尝试提供更多调试信息
+        try:
+            import traceback
+            logger.error(f"Import error traceback: {traceback.format_exc()}")
+        except:
+            pass
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -779,10 +788,19 @@ class VideoViewSet(viewsets.ModelViewSet):
     def agent_search(self, request):
         """
         Agent智能搜索 - 使用SQL Agent进行智能查询，返回结构化结果
+        支持规则引擎（简单查询）和 LLM（复杂组合查询）两条路径
         """
         search_query = request.data.get('query', '').strip()
         if not search_query:
             return Response({'error': '搜索查询不能为空'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if run_agent_search is not None:
+            logger.info("agent_search v3 start query_len=%d query=%r", len(search_query), search_query[:200])
+            try:
+                response_payload = run_agent_search(search_query)
+                return Response(response_payload)
+            except Exception as e:
+                logger.exception("agent_search v3 failed, falling back to legacy SQLAgent: %s", e)
 
         # 检查SQL Agent是否可用
         if SQLAgent is None:

@@ -1,21 +1,74 @@
 import { api } from './api'
 import { videoService } from './videoService'
 import { groupService } from './groupService'
-import type { Video, Group } from '../types'
+import type { Video, Group, AwardRecord } from '../types'
 
-// 后端原始返回结构
 interface RawAgentResponse {
-  natural_language_overview: string
-  video_id_list: Array<string | number>
-  group_id_list: Array<string | number>
+  natural_language_overview?: string
+  video_id_list?: Array<string | number>
+  group_id_list?: Array<string | number>
+  query?: string
+  answer_type?: string
+  ui_type?: AgentUiType
+  title?: string
+  summary?: string
+  data?: unknown[]
+  sections?: AgentSection[]
+  debug?: {
+    selected_schemas?: string[]
+    generated_sql?: string
+  }
+}
+
+export type AgentUiType = 'video_grid' | 'group_list' | 'award_leaderboard' | 'mixed_text' | 'group_detail'
+
+export interface AgentVideoGridItem {
+  award_record?: AwardRecord | null
+  group?: Group | null
+  video?: Video | null
+  competition?: {
+    id?: string
+    name?: string
+    year?: number
+  }
+}
+
+export interface AgentLeaderboardItem {
+  group: Group
+  metrics: {
+    gold_award_count?: number
+    award_count?: number
+  }
+  award_records: AwardRecord[]
+  videos: Video[]
+}
+
+export interface AgentSection {
+  type: AgentUiType | 'leaderboard'
+  title: string
+  items: Array<AgentVideoGridItem | AgentLeaderboardItem | GroupDetailItem>
+}
+
+export interface GroupDetailItem {
+  group: Group
+  award_records: AwardRecord[]
+  videos: Video[]
 }
 
 export interface AgentSearchResponse {
-  text: string // LLM生成的自然语言总结（映射自 natural_language_overview）
-  video_id_list: string[] // 视频ID列表
-  group_id_list: string[] // 社团ID列表
+  query: string
+  answer_type: string
+  ui_type: AgentUiType
+  title: string
+  summary: string
+  text: string
+  video_id_list: string[]
+  group_id_list: string[]
   videos: Video[]
   groups: Group[]
+  data: Array<AgentVideoGridItem | AgentLeaderboardItem | GroupDetailItem>
+  sections: AgentSection[]
+  debug?: RawAgentResponse['debug']
 }
 
 class AgentService {
@@ -31,12 +84,59 @@ class AgentService {
         query: query.trim()
       }, { timeout: 30000 })
 
-      console.debug('[AgentService] raw agent response:', raw)
+      console.debug('[AgentService] raw agent response keys:', Object.keys(raw), 'ui_type:', raw.ui_type, 'data_type:', typeof raw.data, 'isArray:', Array.isArray(raw.data), 'data_len:', Array.isArray(raw.data) ? raw.data.length : 'N/A')
 
       const videoIds = (raw.video_id_list || []).map((id) => String(id))
       const groupIds = (raw.group_id_list || []).map((id) => String(id))
 
-      // 并发获取详情，容错处理
+      if (raw.ui_type && Array.isArray(raw.data)) {
+        let hydratedVideos = new Map<string, Video>()
+        let hydratedGroups = new Map<string, Group>()
+
+        try {
+          const collectFromItem = (item: any) => {
+            if (item?.video?.id) hydratedVideos.set(String(item.video.id), item.video)
+            if (item?.group?.id) hydratedGroups.set(String(item.group.id), item.group)
+            if (Array.isArray(item?.videos)) {
+              item.videos.forEach((video: Video) => {
+                if (video?.id) hydratedVideos.set(String(video.id), video)
+              })
+            }
+            if (Array.isArray(item?.award_records)) {
+              item.award_records.forEach((record: AwardRecord) => {
+                if (record?.video && item?.videos) {
+                  const video = item.videos.find((v: Video) => v.id === record.video)
+                  if (video?.id) hydratedVideos.set(String(video.id), video)
+                }
+              })
+            }
+          }
+
+          raw.data.forEach(collectFromItem)
+        } catch (transformError) {
+          console.error('[AgentService] data transform error, falling back to raw structure:', transformError)
+          hydratedVideos = new Map()
+          hydratedGroups = new Map()
+        }
+
+        return {
+          query: raw.query || query.trim(),
+          answer_type: raw.answer_type || 'mixed',
+          ui_type: raw.ui_type,
+          title: raw.title || '智能检索结果',
+          summary: raw.summary || raw.natural_language_overview || '',
+          text: raw.natural_language_overview || raw.summary || '',
+          video_id_list: videoIds,
+          group_id_list: groupIds,
+          videos: Array.from(hydratedVideos.values()),
+          groups: Array.from(hydratedGroups.values()),
+          data: raw.data as Array<AgentVideoGridItem | AgentLeaderboardItem | GroupDetailItem>,
+          sections: raw.sections || [],
+          debug: raw.debug,
+        }
+      }
+
+      // 兼容旧版后端：只返回 ID 时再并发获取详情
       const videoSettled = await Promise.allSettled(
         videoIds.map((id) => videoService.getVideoById(id))
       )
@@ -85,11 +185,21 @@ class AgentService {
       })
 
       return {
+        query: query.trim(),
+        answer_type: 'legacy',
+        ui_type: videos.length ? 'video_grid' : groups.length ? 'group_list' : 'mixed_text',
+        title: '智能检索结果',
+        summary: raw.natural_language_overview || '',
         text: raw.natural_language_overview || '',
         video_id_list: videoIds,
         group_id_list: groupIds,
         videos,
         groups,
+        data: [
+          ...videos.map((video) => ({ video, group: null, award_record: null })),
+          ...groups.map((group) => ({ group, video: null, award_record: null })),
+        ],
+        sections: [],
       }
     } catch (error: any) {
       console.error('[AgentService] search error', error)

@@ -9,10 +9,12 @@ import VideoCard from '../components/VideoCard'
 import SearchBar from '../components/SearchBar'
 import Pagination from '../components/Pagination'
 import { Loader, Tv, Sparkles, Play } from 'lucide-react'
+import AgentSearchResultPanel from '../components/AgentSearchResultPanel'
 import { videoService } from '../services/videoService'
 import { agentService } from '../services/agentService'
 import { eventService } from '../services/eventService'
-import type { Group, Event } from '../types'
+import type { AgentSearchResponse } from '../services/agentService'
+import type { Event } from '../types'
 
 function HomePage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -25,14 +27,15 @@ function HomePage() {
   const searchQueryRef = useRef(searchQuery)
 
   const [stats, setStats] = useState<{ total_videos: number; weekly_new_videos: number } | null>(null)
-  const [, setAgentResults] = useState<{
-    text: string
-    video_id_list: string[]
-    group_id_list: string[]
-    videos: unknown[]
-    groups: Group[]
-  } | null>(null)
+  const [agentResults, setAgentResults] = useState<AgentSearchResponse | null>(() => {
+    try {
+      const cached = sessionStorage.getItem('agent_search_results')
+      return cached ? JSON.parse(cached) : null
+    } catch { return null }
+  })
   const [isAgentLoading, setIsAgentLoading] = useState(false)
+  const [agentError, setAgentError] = useState<string | null>(null)
+  const [searchMode, setSearchMode] = useState<'regular' | 'smart'>('smart')
 
   // 赛程折叠状态
   const [isScheduleExpanded, setIsScheduleExpanded] = useState(false)
@@ -192,6 +195,15 @@ function HomePage() {
     }
   }, []) // 只在组件挂载时执行一次
 
+  // 同步智能检索结果到 sessionStorage（跨页面导航缓存）
+  useEffect(() => {
+    if (agentResults) {
+      sessionStorage.setItem('agent_search_results', JSON.stringify(agentResults))
+    } else {
+      sessionStorage.removeItem('agent_search_results')
+    }
+  }, [agentResults])
+
   const handleVideoClick = (videoId: string) => {
     navigate(`/video/${videoId}`)
   }
@@ -223,34 +235,44 @@ function HomePage() {
     setInputValue('')
     dispatch(clearSearch() as any)
     setAgentResults(null)
+    setAgentError(null)
+    sessionStorage.removeItem('agent_search_results')
   }
 
   const handleSearch = async () => {
-    if (false) {
-      // Agent搜索模式
-      setIsAgentLoading(true)
-      try {
-        const results = await agentService.search(inputValue)
-        setAgentResults({
-          text: results.text || '',
-          video_id_list: results.video_id_list || [],
-          group_id_list: results.group_id_list || [],
-          videos: results.videos || [],
-          groups: results.groups || []
-        })
-      } catch (error) {
-        console.error('Agent搜索失败:', error)
-        // 如果Agent搜索失败，回退到普通搜索
+    const trimmed = inputValue.trim()
+
+    if (trimmed.length > 0) {
+      if (searchMode === 'regular') {
+        // 普通搜索：使用传统关键字搜索
         dispatch(setSearchQuery(inputValue) as any)
         dispatch(setCurrentPage(1) as any)
+        setAgentResults(null)
+        sessionStorage.removeItem('agent_search_results')
+        return
+      }
+
+      // 智能搜索
+      if (isAgentLoading) return
+      setIsAgentLoading(true)
+      setAgentError(null)
+      try {
+        const results = await agentService.search(inputValue)
+        setAgentResults(results)
+      } catch (error) {
+        console.error('Agent搜索失败:', error)
+        setAgentError(error instanceof Error ? error.message : String(error))
+        dispatch(setSearchQuery(inputValue) as any)
+        dispatch(setCurrentPage(1) as any)
+        setAgentResults(null)
       } finally {
         setIsAgentLoading(false)
       }
     } else {
-      // 普通搜索模式
       dispatch(setSearchQuery(inputValue) as any)
       dispatch(setCurrentPage(1) as any)
       setAgentResults(null)
+      sessionStorage.removeItem('agent_search_results')
     }
   }
 
@@ -266,18 +288,7 @@ function HomePage() {
     )
   }
 
-  // Agent搜索加载状态（已隐藏）
-  if (isAgentLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <Sparkles className="w-8 h-8 animate-pulse mx-auto mb-4 text-purple-600" />
-          <p className="text-gray-600">正在智能搜索中...</p>
-        </div>
-      </div>
-    )
-  }
-
+  // 错误状态
   if (error) {
     return (
       <div className="text-center py-12">
@@ -386,18 +397,43 @@ function HomePage() {
       <div className="relative group">
         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
         <div className="relative z-10 bg-white border-4 border-black p-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-black text-black border-b-4 border-p5-red">
-              搜索视频
+              搜索
             </h2>
+          </div>
+          <div className="flex gap-0 mb-4">
+            <button
+              type="button"
+              onClick={() => setSearchMode('regular')}
+              className={`px-4 py-1.5 font-black text-xs border-2 transition-all ${
+                searchMode === 'regular'
+                  ? 'bg-p5-red text-white border-p5-red z-10'
+                  : 'bg-white text-black border-black hover:border-p5-red'
+              }`}
+            >
+              普通搜索
+            </button>
+            <button
+              type="button"
+              onClick={() => setSearchMode('smart')}
+              className={`px-4 py-1.5 font-black text-xs border-2 -ml-[2px] transition-all inline-flex items-center gap-1.5 ${
+                searchMode === 'smart'
+                  ? 'bg-black text-white border-p5-red z-10'
+                  : 'bg-white text-black border-black hover:border-p5-red'
+              }`}
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${searchMode === 'smart' ? 'text-p5-red' : ''}`} />
+              智能检索
+            </button>
           </div>
           <SearchBar
             value={inputValue}
             onChange={handleInputChange}
             onClear={handleClearSearch}
             onSearch={handleSearch}
-            placeholder="请输入标题、社团、比赛或标签"
-            className="max-w-2xl"
+            placeholder="可搜索：社团名称、奖项名称、组合条件（如 同时获得国漫金奖和CJ金奖的团队）"
+            className="max-w-full"
           />
         </div>
       </div>
@@ -443,10 +479,34 @@ function HomePage() {
         </div>
       )} */}
 
-      {/* Agent Search Results 已停用 */}
+      {searchMode === 'smart' && isAgentLoading && (
+        <div className="relative group">
+          <div className="absolute inset-0 bg-purple-600 translate-x-2 translate-y-2 z-0"></div>
+          <div className="relative z-10 bg-black border-4 border-purple-600 p-6">
+            <div className="flex items-center justify-center space-x-3">
+              <Sparkles className="w-6 h-6 animate-pulse text-purple-600" />
+              <p className="text-white font-black text-lg">智能检索分析中...</p>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Regular Video Grid - 只在非Agent模式下显示 */}
-      {(
+      {searchMode === 'smart' && agentError && !isAgentLoading && (
+        <div className="relative group">
+          <div className="absolute inset-0 bg-red-600 translate-x-2 translate-y-2 z-0"></div>
+          <div className="relative z-10 bg-black border-4 border-red-600 p-6">
+            <div className="flex items-center justify-center space-x-3">
+              <p className="text-red-400 font-black text-lg">智能检索失败: {agentError}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {searchMode === 'smart' && agentResults && !isAgentLoading && (
+        <AgentSearchResultPanel result={agentResults} />
+      )}
+
+      {(searchMode === 'regular' || (!agentResults && searchMode === 'smart')) && !isAgentLoading && (
         <div className="mt-12">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div className="relative group">
@@ -501,7 +561,7 @@ function HomePage() {
       )}
 
       {/* Pagination */}
-      {(
+      {(searchMode === 'regular' || (!agentResults && searchMode === 'smart')) && !isAgentLoading && (
         <Pagination
           currentPage={currentPage}
           totalCount={pagination.count}
