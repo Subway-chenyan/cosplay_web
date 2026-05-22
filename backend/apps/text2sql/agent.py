@@ -161,7 +161,20 @@ def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
 
 # ─── Agent factory ───
 
-_agent_instance = None
+# ─── LLM import ───
+
+try:
+    from deepagents import create_deep_agent as _create_deep_agent
+except ImportError:
+    _create_deep_agent = None
+
+_AGENT_MODEL = "openai:deepseek-chat"
+
+
+def _ensure_api_keys():
+    api_key = os.environ.get('DEEPSEEK_API_KEY', '')
+    os.environ.setdefault('OPENAI_API_KEY', api_key)
+    os.environ.setdefault('OPENAI_API_BASE', 'https://api.siliconflow.cn/v1')
 
 
 def create_agent():
@@ -170,19 +183,17 @@ def create_agent():
     if _agent_instance is not None:
         return _agent_instance
 
-    from deepagents import create_deep_agent
+    if _create_deep_agent is None:
+        raise ImportError("deepagents package is not installed. Run: pip install deepagents")
 
-    api_key = os.environ.get('DEEPSEEK_API_KEY', '')
-    model = "openai:deepseek-chat"
-    os.environ.setdefault('OPENAI_API_KEY', api_key)
-    os.environ.setdefault('OPENAI_API_BASE', 'https://api.siliconflow.cn/v1')
+    _ensure_api_keys()
 
-    _agent_instance = create_deep_agent(
-        model=model,
+    _agent_instance = _create_deep_agent(
+        model=_AGENT_MODEL,
         tools=[get_schema_tool, execute_sql_tool],
         system_prompt=SYSTEM_PROMPT,
     )
-    logger.info("text2sql Deep Agent created with model=%s", model)
+    logger.info("text2sql Deep Agent created with model=%s", _AGENT_MODEL)
     return _agent_instance
 
 
@@ -191,15 +202,18 @@ def invoke_agent(question: str) -> tuple[str, SQLResult]:
 
     Creates a fresh SQLResult per call so there's no cross-request state.
     """
+    if _create_deep_agent is None:
+        raise ImportError("deepagents package is not installed. Run: pip install deepagents")
+
     from functools import partial
+
+    _ensure_api_keys()
 
     sql_result = create_sql_result()
     bound_execute = partial(execute_sql_tool, _sql_result=sql_result)
 
-    agent = create_agent()
-    # Rebind the tool with the per-call sql_result
-    agent_with_result = create_deep_agent(
-        model="openai:deepseek-chat",
+    agent_with_result = _create_deep_agent(
+        model=_AGENT_MODEL,
         tools=[get_schema_tool, bound_execute],
         system_prompt=SYSTEM_PROMPT,
     )
