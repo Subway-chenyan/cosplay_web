@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Award, Medal, Play, Sparkles, Trophy, Users } from 'lucide-react'
+import DOMPurify from 'dompurify'
 import VideoCard from './VideoCard'
 import ClubCard from './ClubCard'
 import type {
@@ -27,6 +28,79 @@ function uniqueById<T extends { id?: string }>(items: Array<T | null | undefined
 
 function isLeaderboardItem(item: AgentVideoGridItem | AgentLeaderboardItem): item is AgentLeaderboardItem {
   return Boolean((item as AgentLeaderboardItem).metrics && (item as AgentLeaderboardItem).group)
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function renderInlineMarkdown(value: string) {
+  return escapeHtml(value)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+}
+
+function markdownToHtml(markdown: string) {
+  const lines = markdown.replace(/\r\n/g, '\n').split('\n')
+  const html: string[] = []
+  let listType: 'ul' | 'ol' | null = null
+
+  const closeList = () => {
+    if (listType) {
+      html.push(`</${listType}>`)
+      listType = null
+    }
+  }
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim()
+    if (!line) {
+      closeList()
+      continue
+    }
+    if (/^-{3,}$/.test(line)) {
+      closeList()
+      html.push('<hr />')
+      continue
+    }
+    const heading = /^(#{1,3})\s+(.+)$/.exec(line)
+    if (heading) {
+      closeList()
+      const level = heading[1].length
+      html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`)
+      continue
+    }
+    const bullet = /^[-*]\s+(.+)$/.exec(line)
+    if (bullet) {
+      if (listType !== 'ul') {
+        closeList()
+        html.push('<ul>')
+        listType = 'ul'
+      }
+      html.push(`<li>${renderInlineMarkdown(bullet[1])}</li>`)
+      continue
+    }
+    const ordered = /^\d+[.)]\s+(.+)$/.exec(line)
+    if (ordered) {
+      if (listType !== 'ol') {
+        closeList()
+        html.push('<ol>')
+        listType = 'ol'
+      }
+      html.push(`<li>${renderInlineMarkdown(ordered[1])}</li>`)
+      continue
+    }
+    closeList()
+    html.push(`<p>${renderInlineMarkdown(line)}</p>`)
+  }
+
+  closeList()
+  return DOMPurify.sanitize(html.join(''))
 }
 
 function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
@@ -82,6 +156,11 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
     awardCount: groupDetailItems.reduce((sum, item) => sum + item.award_records.length, 0),
   }), [groupDetailItems])
 
+  const summaryHtml = useMemo(
+    () => markdownToHtml(result.summary || result.text || ''),
+    [result.summary, result.text]
+  )
+
   return (
     <section className="relative mt-10">
       <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
@@ -95,9 +174,12 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
             <h2 className="text-2xl md:text-4xl font-black text-black leading-tight border-b-8 border-p5-red inline-block">
               {result.title}
             </h2>
-            <p className="mt-4 text-sm md:text-base font-bold text-gray-700 leading-relaxed">
-              {result.summary || result.text}
-            </p>
+            {summaryHtml && (
+              <div
+                className="agent-markdown mt-4 max-w-4xl text-sm md:text-base font-bold text-gray-700"
+                dangerouslySetInnerHTML={{ __html: summaryHtml }}
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center min-w-60">

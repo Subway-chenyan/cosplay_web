@@ -306,4 +306,80 @@
     text-decoration-thickness: 0.14em;
     text-underline-offset: 0.18em;
   }
+
+  .agent-markdown {
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  .agent-markdown p {
+    margin: 0.55rem 0;
+  }
+
+  .agent-markdown h1,
+  .agent-markdown h2,
+  .agent-markdown h3 {
+    margin: 0.9rem 0 0.45rem;
+    color: #111111;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+
+  .agent-markdown h1 {
+    font-size: 1.55rem;
+  }
+
+  .agent-markdown h2 {
+    font-size: 1.3rem;
+  }
+
+  .agent-markdown h3 {
+    font-size: 1.1rem;
+  }
+
+  .agent-markdown strong {
+    color: #111111;
+    font-weight: 900;
+  }
+
+  .agent-markdown ul,
+  .agent-markdown ol {
+    margin: 0.6rem 0;
+    padding-left: 1.35rem;
+    text-align: left;
+  }
+
+  .agent-markdown ul {
+    list-style: disc;
+  }
+
+  .agent-markdown ol {
+    list-style: decimal;
+  }
+
+  .agent-markdown li {
+    margin: 0.25rem 0;
+  }
+
+  .agent-markdown code {
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.08rem 0.3rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  .agent-markdown hr {
+    margin: 0.9rem 0;
+    border: 0;
+    border-top: 3px solid #d90614;
+  }
+
+  .agent-markdown-inverted,
+  .agent-markdown-inverted h1,
+  .agent-markdown-inverted h2,
+  .agent-markdown-inverted h3,
+  .agent-markdown-inverted strong {
+    color: #ffffff;
+  }
 }

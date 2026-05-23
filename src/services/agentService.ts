@@ -7,6 +7,9 @@ interface RawAgentResponse {
   natural_language_overview?: string
   video_id_list?: Array<string | number>
   group_id_list?: Array<string | number>
+  award_record_id_list?: Array<string | number>
+  llm_output?: unknown
+  generated_sql?: string
   query?: string
   answer_type?: string
   ui_type?: AgentUiType
@@ -64,11 +67,14 @@ export interface AgentSearchResponse {
   text: string
   video_id_list: string[]
   group_id_list: string[]
+  award_record_id_list: string[]
   videos: Video[]
   groups: Group[]
   data: Array<AgentVideoGridItem | AgentLeaderboardItem | GroupDetailItem>
   sections: AgentSection[]
   debug?: RawAgentResponse['debug']
+  llm_output?: unknown
+  generated_sql?: string
 }
 
 class AgentService {
@@ -82,12 +88,13 @@ class AgentService {
       // 增加该接口的超时时间，避免默认10秒在AI搜索上过短
       const raw = await api.post<RawAgentResponse>('/videos/agent-search/', {
         query: query.trim()
-      }, { timeout: 30000 })
+      }, { timeout: 120000 })
 
       console.debug('[AgentService] raw agent response keys:', Object.keys(raw), 'ui_type:', raw.ui_type, 'data_type:', typeof raw.data, 'isArray:', Array.isArray(raw.data), 'data_len:', Array.isArray(raw.data) ? raw.data.length : 'N/A')
 
       const videoIds = (raw.video_id_list || []).map((id) => String(id))
       const groupIds = (raw.group_id_list || []).map((id) => String(id))
+      const awardRecordIds = (raw.award_record_id_list || []).map((id) => String(id))
 
       if (raw.ui_type && Array.isArray(raw.data)) {
         let hydratedVideos = new Map<string, Video>()
@@ -128,11 +135,14 @@ class AgentService {
           text: raw.natural_language_overview || raw.summary || '',
           video_id_list: videoIds,
           group_id_list: groupIds,
+          award_record_id_list: awardRecordIds,
           videos: Array.from(hydratedVideos.values()),
           groups: Array.from(hydratedGroups.values()),
           data: raw.data as Array<AgentVideoGridItem | AgentLeaderboardItem | GroupDetailItem>,
           sections: raw.sections || [],
           debug: raw.debug,
+          llm_output: raw.llm_output,
+          generated_sql: raw.generated_sql,
         }
       }
 
@@ -193,6 +203,7 @@ class AgentService {
         text: raw.natural_language_overview || '',
         video_id_list: videoIds,
         group_id_list: groupIds,
+        award_record_id_list: awardRecordIds,
         videos,
         groups,
         data: [
@@ -200,6 +211,8 @@ class AgentService {
           ...groups.map((group) => ({ group, video: null, award_record: null })),
         ],
         sections: [],
+        llm_output: raw.llm_output,
+        generated_sql: raw.generated_sql,
       }
     } catch (error: any) {
       console.error('[AgentService] search error', error)

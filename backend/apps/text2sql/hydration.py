@@ -66,7 +66,19 @@ def hydrate_award_records(award_record_ids):
     return AwardRecordSerializer(records, many=True).data
 
 
-def build_data_array(rows, ui_type, answer_text):
+def _merge_unique(*lists):
+    merged = []
+    seen = set()
+    for values in lists:
+        for value in values or []:
+            string_value = str(value)
+            if string_value and string_value not in seen:
+                seen.add(string_value)
+                merged.append(string_value)
+    return merged
+
+
+def build_data_array(rows, ui_type, answer_text, explicit_ids=None):
     """Build the data/response structure for the frontend.
 
     Returns dict with: video_id_list, group_id_list, data (hydrated objects).
@@ -74,9 +86,26 @@ def build_data_array(rows, ui_type, answer_text):
     ids_map = extract_ids_from_rows(rows)
 
     # Identify entity IDs from various possible column names
-    group_ids = ids_map.get('group_id', []) or ids_map.get('group', [])
-    video_ids = ids_map.get('video_id', []) or ids_map.get('video', [])
-    ar_ids = ids_map.get('award_record_id', []) or ids_map.get('award_record', [])
+    explicit_ids = explicit_ids or {}
+    group_ids = _merge_unique(
+        ids_map.get('group_id', []),
+        ids_map.get('group', []),
+        ids_map.get('g_id', []),
+        explicit_ids.get('group_id_list', []),
+    )
+    video_ids = _merge_unique(
+        ids_map.get('video_id', []),
+        ids_map.get('video', []),
+        ids_map.get('v_id', []),
+        explicit_ids.get('video_id_list', []),
+    )
+    ar_ids = _merge_unique(
+        ids_map.get('award_record_id', []),
+        ids_map.get('award_record', []),
+        ids_map.get('ar_id', []),
+        ids_map.get('record_id', []),
+        explicit_ids.get('award_record_id_list', []),
+    )
 
     # Heuristic for bare 'id' column when only one entity type is involved
     if not group_ids and not video_ids and not ar_ids:
@@ -105,7 +134,17 @@ def build_data_array(rows, ui_type, answer_text):
             arid = str(row.get('award_record_id', row.get('award_record', '')))
             if arid and arid in ars_by_id and ars_by_id[arid] not in grouped[gid]['award_records']:
                 grouped[gid]['award_records'].append(ars_by_id[arid])
-        data = list(grouped.values())
+        for gid, group in groups_by_id.items():
+            grouped[gid]['group'] = group
+        for video in videos_by_id.values():
+            gid = str(video.get('group') or '')
+            if gid in groups_by_id and video not in grouped[gid]['videos']:
+                grouped[gid]['videos'].append(video)
+        for record in ars_by_id.values():
+            gid = str(record.get('group') or '')
+            if gid in groups_by_id and record not in grouped[gid]['award_records']:
+                grouped[gid]['award_records'].append(record)
+        data = [item for item in grouped.values() if item['group']]
 
     elif ui_type == 'video_grid':
         seen_videos = set()
@@ -121,6 +160,13 @@ def build_data_array(rows, ui_type, answer_text):
                     'award_record': ars_by_id.get(arid),
                 }
                 data.append(item)
+        for vid, video in videos_by_id.items():
+            if vid not in seen_videos:
+                data.append({
+                    'video': video,
+                    'group': groups_by_id.get(str(video.get('group') or '')),
+                    'award_record': None,
+                })
 
     elif ui_type == 'award_leaderboard':
         grouped = defaultdict(lambda: {'group': None, 'metrics': {'award_count': 0}, 'award_records': [], 'videos': []})
@@ -138,6 +184,14 @@ def build_data_array(rows, ui_type, answer_text):
             if vid and vid in videos_by_id:
                 grouped[gid]['videos'].append(videos_by_id[vid])
         data = list(grouped.values())
+
+    elif ui_type == 'group_list':
+        for gid, group in groups_by_id.items():
+            item = {'group': group, 'videos': [], 'award_records': []}
+            for video in videos_by_id.values():
+                if str(video.get('group') or '') == gid:
+                    item['videos'].append(video)
+            data.append(item)
 
     # mixed_text or unknown → empty data
     return {
