@@ -437,6 +437,11 @@ def llm_post_processor(state: AgentState) -> Dict[str, Any]:
     if not raw_data:
         return {}
 
+    # If the SQL already returned the standard row shape, keep it exact.
+    # Re-querying by group_id alone can pull unrelated videos from the same team.
+    if any(row.get("video_id") or row.get("award_record_id") for row in raw_data):
+        return {}
+
     group_ids = sorted({str(r["group_id"]) for r in raw_data if r.get("group_id")})
     if not group_ids:
         return {}
