@@ -23,9 +23,10 @@ xlrd==2.0.1
 chardet==5.2.0 
 setuptools==80.9.0
 
-langchain-siliconflow
-langchain-openai
-langchain-community
-langchain-core
-langgraph>=0.2.74
-deepagents>=0.6.0
+llama-index-core
+llama-index-llms-openai
+llama-index-llms-openai-like
+arize-otel
+llama-index-callbacks-arize-phoenix
+openinference-instrumentation-llama-index
+SQLAlchemy

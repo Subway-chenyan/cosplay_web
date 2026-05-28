@@ -5,8 +5,7 @@ from apps.text2sql.agent import (
     execute_sql_tool,
     validate_sql_safety,
     create_sql_result,
-    _get_thread_sql_result,
-    _set_thread_sql_result,
+    invoke_agent,
 )
 
 
@@ -86,12 +85,27 @@ class TestSQLResult(TestCase):
         self.assertEqual(sr.rows, [])
         self.assertEqual(sr.sql, '')
 
-    def test_thread_sql_result_isolation(self):
-        """Different threads get independent SQLResult containers."""
-        _set_thread_sql_result(None)
-        self.assertIsNone(_get_thread_sql_result())
-        sr = create_sql_result()
-        _set_thread_sql_result(sr)
-        self.assertIs(_get_thread_sql_result(), sr)
-        _set_thread_sql_result(None)
-        self.assertIsNone(_get_thread_sql_result())
+    @mock.patch('apps.text2sql.agent._synthesize_answer')
+    @mock.patch('apps.text2sql.agent.execute_sql_tool')
+    @mock.patch('apps.text2sql.agent._generate_sql_with_llamaindex')
+    def test_invoke_agent_uses_llamaindex_sql_adapter(self, mock_generate, mock_execute, mock_synthesize):
+        mock_generate.return_value = (
+            "SELECT g.id AS group_id, g.name FROM groups_group g ORDER BY g.name LIMIT 50"
+        )
+        mock_synthesize.return_value = "查询到 1 条相关结果。"
+
+        def fill_result(sql, _sql_result=None):
+            _sql_result.sql = sql
+            _sql_result.rows = [{'group_id': 'group-1', 'name': '测试社团'}]
+            return "查询到 1 行结果"
+
+        mock_execute.side_effect = fill_result
+
+        answer, sql_result, structured = invoke_agent("测试社团详情")
+
+        self.assertEqual(answer, "查询到 1 条相关结果。")
+        self.assertEqual(sql_result.sql, mock_generate.return_value)
+        self.assertEqual(sql_result.rows[0]['group_id'], 'group-1')
+        self.assertEqual(structured['ui_type'], 'group_detail')
+        self.assertEqual(structured['group_id_list'], ['group-1'])
+        mock_execute.assert_called_once()

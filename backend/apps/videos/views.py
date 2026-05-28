@@ -855,7 +855,6 @@ class VideoViewSet(viewsets.ModelViewSet):
 
         try:
             from apps.text2sql.agent import invoke_agent
-            from apps.text2sql.prompts import SYSTEM_PROMPT
             from apps.text2sql.hydration import build_data_array
         except ImportError as e:
             logger.error("text2sql module not available: %s", e)

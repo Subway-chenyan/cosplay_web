@@ -208,6 +208,22 @@ python manage.py shell
 
 ---
 
+## Agent skills
+
+### Issue tracker
+
+Issues 托管在 GitHub Issues。使用 `gh` CLI 进行创建和管理。详见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用中文标签：需要评估、需要信息、agent自动化、需要人工、不会修复。详见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+单一上下文布局：`CONTEXT.md` + `docs/adr/` 在仓库根目录。详见 `docs/agents/domain.md`。
+
+---
+
 ## 开发进度记录
 ### 2026-01-16: 论坛功能 (Forum)
 - **后端**: 实现 Django forum App，包含分类、帖子、评论模型。支持原子浏览量统计及 N+1 查询优化。已修复发帖内容丢失及头像缺失导致的 500 错误。

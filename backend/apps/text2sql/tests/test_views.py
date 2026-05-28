@@ -35,6 +35,14 @@ class TestText2SQLQueryEndpoint(TestCase):
         mock_invoke.return_value = (
             '【ui_type】: mixed_text\n【answer】: 目前共有5个社团。',
             sr,
+            {
+                'ui_type': 'mixed_text',
+                'title': '社团数量',
+                'natural_language_overview': '目前共有5个社团。',
+                'video_id_list': [],
+                'group_id_list': [],
+                'award_record_id_list': [],
+            },
         )
 
         client = APIClient()
@@ -55,3 +63,34 @@ class TestText2SQLQueryEndpoint(TestCase):
         self.assertIn('group_id_list', data)
         self.assertIn('data', data)
         user.delete()
+
+    @mock.patch('apps.text2sql.agent.invoke_agent')
+    def test_video_agent_search_returns_expected_fields(self, mock_invoke):
+        """Public smart-search endpoint returns the frontend-compatible response."""
+        from apps.text2sql.agent import SQLResult
+
+        sr = SQLResult()
+        sr.rows = []
+        sr.sql = 'SELECT COUNT(*) FROM groups_group LIMIT 50'
+        mock_invoke.return_value = (
+            '目前共有5个社团。',
+            sr,
+            {
+                'ui_type': 'mixed_text',
+                'title': '社团数量',
+                'natural_language_overview': '目前共有5个社团。',
+                'video_id_list': [],
+                'group_id_list': [],
+                'award_record_id_list': [],
+            },
+        )
+
+        client = APIClient()
+        response = client.post('/api/videos/agent-search/', {'query': '有多少个社团？'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        data = response.data
+        self.assertEqual(data['ui_type'], 'mixed_text')
+        self.assertEqual(data['natural_language_overview'], '目前共有5个社团。')
+        self.assertIn('data', data)
+        self.assertEqual(data['generated_sql'], sr.sql)
