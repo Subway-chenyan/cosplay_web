@@ -257,12 +257,7 @@ def execute_sql_tool(sql: str, _sql_result: SQLResult | None = None) -> str:
 
 
 def _ensure_api_keys():
-    try:
-        from dotenv import load_dotenv
-
-        load_dotenv(os.path.join(settings.BASE_DIR, '.env'), override=True)
-    except Exception:
-        logger.exception("failed to load backend .env for text2sql")
+    pass
 
 
 def _provider_config() -> tuple[str, str, str]:
