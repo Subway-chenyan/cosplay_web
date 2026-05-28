@@ -290,12 +290,15 @@ def _configure_tracing():
         from arize.otel import register
         from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 
-        tp = register(
+        register(
             space_id=space_id,
             api_key=api_key,
             project_name="cosdrama-text2sql",
         )
-        LlamaIndexInstrumentor().instrument(tracer_provider=tp)
+
+        instr = LlamaIndexInstrumentor()
+        if not instr.is_instrumented_by_opentelemetry:
+            instr.instrument()
         _TRACING_CONFIGURED = True
         logger.info("arize tracing enabled with LlamaIndex instrumentation")
     except Exception:
