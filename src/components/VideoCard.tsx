@@ -90,7 +90,6 @@ function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
         )}
       </div>
 
-<<<<<<< Updated upstream
       <div className="relative z-10 min-h-[116px] border-t border-white/16 bg-black p-4 text-white">
         <h3 className="line-clamp-2 min-h-[44px] text-[16px] font-black leading-snug text-white">
           {dramaName || video.title}
