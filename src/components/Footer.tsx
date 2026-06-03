@@ -184,10 +184,7 @@ function Footer() {
 
   return (
     <>
-      <footer className="relative bg-black border-t-4 border-p5-red">
-        {/* P5 风格装饰 */}
-        <div className="absolute top-0 right-0 w-[200px] h-full bg-p5-red opacity-20 transform skew-x-[-20deg] translate-x-16 pointer-events-none" />
-
+      <footer className="relative bg-black/78 backdrop-blur-sm border-t-4 border-p5-red">
         <div className="container mx-auto px-4 py-8 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             {/* 左侧：开发者信息 */}
@@ -210,10 +207,10 @@ function Footer() {
                 href="https://github.com/Subway-chenyan/cosplay_web"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative"
+                className="group relative block"
               >
-                <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
-                <div className="relative flex items-center px-4 py-2 bg-white border-2 border-black font-black italic text-sm hover:bg-gray-100 transition-colors">
+                <div className="absolute inset-0 bg-p5-red transform translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform" />
+                <div className="relative flex items-center px-5 py-2.5 bg-black text-white border-2 border-white/80 font-black text-sm tracking-wide shadow-[inset_0_0_0_1px_rgba(217,6,20,0.75)] hover:bg-p5-red hover:border-white transition-colors">
                   <Github className="w-4 h-4 mr-2" />
                   项目仓库
                 </div>
@@ -222,10 +219,10 @@ function Footer() {
               {/* 问题反馈按钮 */}
               <button
                 onClick={() => setShowFeedback(true)}
-                className="group relative"
+                className="group relative block"
               >
-                <div className="absolute inset-0 bg-white transform translate-x-1 translate-y-1 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
-                <div className="relative flex items-center px-4 py-2 bg-p5-red text-white border-2 border-black font-black italic text-sm hover:bg-red-700 transition-colors">
+                <div className="absolute inset-0 bg-white/85 transform translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform" />
+                <div className="relative flex items-center px-5 py-2.5 bg-p5-red text-white border-2 border-white/85 font-black text-sm tracking-wide hover:bg-red-700 transition-colors">
                   <MessageSquare className="w-4 h-4 mr-2" />
                   问题反馈
                 </div>

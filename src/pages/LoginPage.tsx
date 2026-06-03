@@ -72,7 +72,7 @@ function LoginPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-transparent py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* P5 风格标题 */}
         <div className="relative group mb-8">

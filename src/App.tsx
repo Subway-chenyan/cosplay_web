@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import GroupsPage from './pages/GroupsPage'
@@ -19,66 +19,30 @@ import QQLoginCallbackPage from './pages/QQLoginCallbackPage'
 import RegisterPage from './pages/RegisterPage'
 import UserCenterPage from './pages/UserCenterPage'
 
+function P5MinimalBackground() {
+  return (
+    <div className="absolute inset-0 z-0 bg-black pointer-events-none">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "url('/assets/new_ui/back.png')",
+          backgroundPosition: 'top center',
+          backgroundRepeat: 'repeat-y',
+          backgroundSize: '100% auto',
+        }}
+      />
+      <div className="absolute inset-0 bg-black/18" />
+    </div>
+  )
+}
+
 function App() {
+  const location = useLocation()
+  const usesHomeVisual = location.pathname === '/' || location.pathname === '/choreo'
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          background:
-            'linear-gradient(135deg, #000000 0%, #120001 14%, #3a0006 32%, #8f000f 54%, #250003 76%, #000000 100%)',
-        }}
-      />
-      <div
-        className="fixed -left-[18%] top-0 h-full w-[52%] z-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,18,36,0.55) 0%, rgba(145,0,12,0.22) 100%)',
-          transform: 'skewX(-22deg)',
-          boxShadow: '0 0 120px rgba(217,6,20,0.28)',
-        }}
-      />
-      <div
-        className="fixed left-[20%] top-0 h-full w-[22%] z-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.015) 100%)',
-          transform: 'skewX(-22deg)',
-        }}
-      />
-      <div
-        className="fixed left-[38%] top-0 h-full w-[28%] z-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,0,30,0.42) 0%, rgba(115,0,10,0.18) 100%)',
-          transform: 'skewX(-22deg)',
-        }}
-      />
-      <div
-        className="fixed left-[58%] top-0 h-full w-[18%] z-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.01) 100%)',
-          transform: 'skewX(-22deg)',
-        }}
-      />
-      <div
-        className="fixed right-[-14%] top-0 h-full w-[42%] z-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%)',
-          transform: 'skewX(-22deg)',
-        }}
-      />
-      <div
-        className="fixed inset-0 z-0 pointer-events-none opacity-70"
-        style={{
-          background:
-            'linear-gradient(135deg, transparent 0%, transparent 18%, rgba(255,255,255,0.06) 18%, rgba(255,255,255,0.06) 25%, transparent 25%, transparent 45%, rgba(255,255,255,0.04) 45%, rgba(255,255,255,0.04) 52%, transparent 52%, transparent 72%, rgba(255,255,255,0.03) 72%, rgba(255,255,255,0.03) 77%, transparent 77%, transparent 100%)',
-        }}
-      />
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle at 14% 18%, rgba(255,80,80,0.22) 0%, rgba(255,80,80,0) 24%), radial-gradient(circle at 52% 12%, rgba(255,20,40,0.18) 0%, rgba(255,20,40,0) 20%), radial-gradient(circle at 82% 16%, rgba(217,6,20,0.18) 0%, rgba(217,6,20,0) 22%), radial-gradient(circle at 70% 78%, rgba(120,0,0,0.28) 0%, rgba(120,0,0,0) 28%)',
-        }}
-      />
+      {!usesHomeVisual && <P5MinimalBackground />}
 
       <div className="relative z-10">
         <Routes>

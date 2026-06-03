@@ -55,6 +55,11 @@ export const eventService = {
     return await api.get<Event[]>('/competitions/events/active/')
   },
 
+  // 获取按后端当前日期计算的最近一场赛事
+  getNearestEvent: async (): Promise<Event | null> => {
+    return await api.get<Event | null>('/competitions/events/nearest/')
+  },
+
   // 获取所有未来赛事（用于赛程页面）
   getUpcomingEvents: async (): Promise<Event[]> => {
     return await api.get<Event[]>('/competitions/events/upcoming/')

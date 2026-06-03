@@ -10,6 +10,7 @@ from apps.videos.serializers import VideoSerializer
 from apps.videos.models import Video
 from rest_framework.pagination import PageNumberPagination
 from apps.videos.pagination import LargeResultsSetPagination
+from django.utils import timezone
 
 
 class CompetitionViewSet(viewsets.ModelViewSet):
@@ -222,6 +223,41 @@ class EventViewSet(viewsets.ModelViewSet):
         )
 
         serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def nearest(self, request):
+        """获取按后端当前日期计算的最近一场赛事。"""
+        today = timezone.localdate()
+        base_queryset = Event.objects.select_related('competition').prefetch_related('videos')
+
+        event = (
+            base_queryset
+            .filter(start_date__lte=today, end_date__gte=today)
+            .order_by('end_date', 'start_date')
+            .first()
+        )
+
+        if event is None:
+            event = (
+                base_queryset
+                .filter(start_date__gte=today)
+                .order_by('start_date', 'end_date')
+                .first()
+            )
+
+        if event is None:
+            event = (
+                base_queryset
+                .filter(end_date__lt=today)
+                .order_by('-end_date', '-start_date')
+                .first()
+            )
+
+        if event is None:
+            return Response(None)
+
+        serializer = self.get_serializer(event)
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'])

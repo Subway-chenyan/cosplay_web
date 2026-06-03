@@ -6,26 +6,18 @@ import ScrollToTopButton from './ScrollToTopButton'
 function Layout() {
   const location = useLocation()
   const isChoreoPage = location.pathname === '/choreo'
+  const isHomePage = location.pathname === '/'
 
   return (
-    <div className="min-h-screen bg-transparent flex flex-col">
+    <div className={`min-h-screen text-white flex flex-col ${isHomePage || isChoreoPage ? 'bg-black' : 'bg-transparent'}`}>
       <Header />
-      <main className="container mx-auto px-4 py-12 relative flex-grow">
-        {/* Dynamic page decoration - More aggressive P5 shards */}
-        <div className="fixed top-0 right-0 w-[500px] h-full bg-p5-red opacity-10 transform skew-x-[-20deg] translate-x-32 pointer-events-none z-0"></div>
-        <div className="fixed bottom-0 left-0 w-[300px] h-full bg-black opacity-20 transform skew-x-[-15deg] -translate-x-16 pointer-events-none z-0"></div>
-        <div className="fixed top-1/4 left-0 w-64 h-64 p5-halftone opacity-20 transform -rotate-45 -translate-x-32 pointer-events-none z-0"></div>
-
-        <div className="relative z-10">
-          <Outlet />
-        </div>
+      <main className={`relative flex-grow ${isHomePage ? 'pb-12' : 'mx-auto w-full max-w-[1500px] px-4 py-10'}`}>
+        <Outlet />
       </main>
       {!isChoreoPage && <Footer />}
-
-      {/* 回到顶部按钮 - 排除在编舞页面显示 */}
       {!isChoreoPage && <ScrollToTopButton />}
     </div>
   )
 }
 
-export default Layout 
+export default Layout

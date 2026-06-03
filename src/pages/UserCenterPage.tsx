@@ -404,7 +404,7 @@ function UserCenterPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 px-3 py-6 sm:px-4 sm:py-8">
+      <div className="min-h-screen bg-transparent px-3 py-6 sm:px-4 sm:py-8">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* 页面标题 */}
           <div className="relative group">
