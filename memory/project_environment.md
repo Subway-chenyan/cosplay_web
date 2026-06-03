@@ -175,7 +175,7 @@ npm run build:choreomaster
 
 ### 环境变量配置
 
-**后端环境变量** (在 backend/.env)
+**环境变量** (在项目根目录 .env，由 Django settings.py 加载)
 ```env
 DEBUG=True
 SECRET_KEY=your-secret-key
