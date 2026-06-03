@@ -306,4 +306,25 @@
     text-decoration-thickness: 0.14em;
     text-underline-offset: 0.18em;
   }
+
+  .management-page input,
+  .management-page textarea,
+  .management-page select {
+    color: #111111;
+    background-color: #f9fafb;
+    color-scheme: light;
+  }
+
+  .management-page input::placeholder,
+  .management-page textarea::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+  }
+
+  .management-page input:disabled,
+  .management-page textarea:disabled,
+  .management-page select:disabled {
+    color: #4b5563;
+    background-color: #e5e7eb;
+  }
 }

@@ -1008,7 +1008,7 @@ const ManagementPage: React.FC = () => {
   // 如果未认证，显示权限验证界面
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-transparent py-16">
+      <div className="management-page min-h-screen bg-transparent py-16 text-black">
         <div className="max-w-md mx-auto px-4 relative group">
           <div className="absolute inset-0 bg-black transform -rotate-2 translate-x-3 translate-y-3 z-0"></div>
           <div className="relative z-10 bg-white border-4 border-black p-8 transform rotate-1">
@@ -1082,7 +1082,7 @@ const ManagementPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent py-12">
+    <div className="management-page min-h-screen bg-transparent py-12 text-black">
       {resultDialog && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4"
