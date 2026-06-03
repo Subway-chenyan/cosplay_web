@@ -78,6 +78,9 @@ function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
               </div>
             )}
 
+            <div className="absolute right-0 top-0 bg-p5-red px-3 py-1.5 text-sm font-black text-white">
+              {video.year || new Date(video.created_at).getFullYear()}
+            </div>
             <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
               <div className="flex h-14 w-14 items-center justify-center border border-white/50 bg-p5-red">
                 <Play className="h-7 w-7 fill-current text-white" />
@@ -85,12 +88,9 @@ function VideoCard({ video, onClick, dramaName }: VideoCardProps) {
             </div>
           </>
         )}
-
-        <div className="absolute right-0 top-0 bg-p5-red px-3 py-1.5 text-sm font-black text-white">
-          {video.year || new Date(video.created_at).getFullYear()}
-        </div>
       </div>
 
+<<<<<<< Updated upstream
       <div className="relative z-10 min-h-[116px] border-t border-white/16 bg-black p-4 text-white">
         <h3 className="line-clamp-2 min-h-[44px] text-[16px] font-black leading-snug text-white">
           {dramaName || video.title}

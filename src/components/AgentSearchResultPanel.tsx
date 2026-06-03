@@ -85,17 +85,17 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
   return (
     <section className="relative mt-10">
       <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
-      <div className="relative z-10 bg-white border-4 border-black p-5 md:p-8">
+      <div className="relative z-10 bg-[#070707] border-4 border-white p-5 md:p-8 p5-comic-box">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
           <div className="min-w-0">
             <div className="inline-flex items-center gap-2 bg-black text-white px-3 py-1 border-2 border-p5-red font-black text-xs mb-3">
               <Sparkles className="w-4 h-4 text-p5-red" />
               <span>智能检索</span>
             </div>
-            <h2 className="text-2xl md:text-4xl font-black text-black leading-tight border-b-8 border-p5-red inline-block">
+            <h2 className="text-2xl md:text-4xl font-black text-white leading-tight border-b-8 border-p5-red inline-block">
               {result.title}
             </h2>
-            <p className="mt-4 text-sm md:text-base font-bold text-gray-700 leading-relaxed">
+            <p className="mt-4 text-sm md:text-base font-bold text-white/75 leading-relaxed">
               {result.summary || result.text}
             </p>
           </div>
@@ -103,13 +103,13 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
           <div className="grid grid-cols-3 gap-2 text-center min-w-60">
             <div className="bg-black text-white border-2 border-p5-red px-3 py-2">
               <div className="text-2xl font-black">{isGroupDetail ? groupStats.groupCount : groups.length}</div>
-              <div className="text-xs font-black text-gray-300">团队</div>
+              <div className="text-xs font-black text-white/75">团队</div>
             </div>
             <div className="bg-p5-red text-white border-2 border-black px-3 py-2">
               <div className="text-2xl font-black">{isGroupDetail ? groupStats.videoCount : videos.length}</div>
-              <div className="text-xs font-black">视频</div>
+              <div className="text-xs font-black text-white">视频</div>
             </div>
-            <div className="bg-white text-black border-2 border-black px-3 py-2">
+            <div className="bg-p5-red text-white border-2 border-black px-3 py-2">
               <div className="text-2xl font-black">{isGroupDetail ? groupStats.awardCount : awardRows.length}</div>
               <div className="text-xs font-black">获奖</div>
             </div>
@@ -120,7 +120,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Trophy className="w-7 h-7 text-p5-red" />
-              <h3 className="text-xl md:text-2xl font-black text-black">荣誉榜单</h3>
+              <h3 className="text-xl md:text-2xl font-black text-white">荣誉榜单</h3>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {leaderboardItems.map((item, index) => {
@@ -132,8 +132,8 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                     onClick={() => setActiveGroupId(item.group.id)}
                     className={`text-left border-4 p-4 transition-all ${
                       isActive
-                        ? 'bg-black text-white border-p5-red shadow-[6px_6px_0_0_#d90614]'
-                        : 'bg-white text-black border-black hover:border-p5-red'
+                        ? 'bg-[#070707] text-white border-p5-red shadow-[6px_6px_0_0_#d90614]'
+                        : 'bg-[#070707] text-white border-white/50 hover:border-p5-red'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -143,7 +143,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                         </div>
                         <div className="min-w-0">
                           <div className="font-black text-lg truncate">{item.group.name}</div>
-                          <div className={`text-xs font-bold ${isActive ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <div className={`text-xs font-bold ${isActive ? 'text-white/75' : 'text-white/50'}`}>
                             {item.group.location || item.group.province || '未知地区'}
                           </div>
                         </div>
@@ -179,8 +179,8 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                   <div className="mb-6">
                     <div className="flex items-center gap-3 mb-4">
                       <Play className="w-6 h-6 text-p5-red" />
-                      <h3 className="text-xl font-black text-black">获奖视频</h3>
-                      <span className="text-sm font-bold text-gray-500">（{item.videos.length} 个）</span>
+                      <h3 className="text-xl font-black text-white">获奖视频</h3>
+                      <span className="text-sm font-bold text-white/50">（{item.videos.length} 个）</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                       {item.videos.map((video) => (
@@ -199,12 +199,12 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                   <div>
                     <div className="flex items-center gap-3 mb-4">
                       <Medal className="w-6 h-6 text-p5-red" />
-                      <h3 className="text-xl font-black text-black">获奖记录</h3>
+                      <h3 className="text-xl font-black text-white">获奖记录</h3>
                       <span className="text-sm font-bold text-gray-500">（{item.award_records.length} 条）</span>
                     </div>
                     <div className="overflow-x-auto border-2 border-black">
-                      <table className="min-w-full bg-white text-sm">
-                        <thead className="bg-black text-white">
+                      <table className="min-w-full bg-[#070707] text-sm">
+                        <thead className="bg-p5-red text-white">
                           <tr>
                             <th className="px-4 py-3 text-left font-black">奖项</th>
                             <th className="px-4 py-3 text-left font-black">赛事</th>
@@ -221,9 +221,9 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                                   {record.award_name || '未知奖项'}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 font-bold">{record.competition_name || '未知赛事'}</td>
-                              <td className="px-4 py-3 font-bold">{record.competition_year || '-'}</td>
-                              <td className="px-4 py-3 font-bold">{record.drama_name || record.video_title || '-'}</td>
+                              <td className="px-4 py-3 font-bold text-white/90">{record.competition_name || '未知赛事'}</td>
+                              <td className="px-4 py-3 font-bold text-white/90">{record.competition_year || '-'}</td>
+                              <td className="px-4 py-3 font-bold text-white/90">{record.drama_name || record.video_title || '-'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -240,7 +240,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Users className="w-7 h-7 text-p5-red" />
-              <h3 className="text-xl md:text-2xl font-black text-black">相关团队</h3>
+              <h3 className="text-xl md:text-2xl font-black text-white">相关团队</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {groups.map((group) => (
@@ -258,7 +258,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Play className="w-7 h-7 text-p5-red" />
-              <h3 className="text-xl md:text-2xl font-black text-black">相关视频</h3>
+              <h3 className="text-xl md:text-2xl font-black text-white">相关视频</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {videos.map((video) => (
@@ -276,11 +276,11 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <Medal className="w-7 h-7 text-p5-red" />
-              <h3 className="text-xl md:text-2xl font-black text-black">获奖记录</h3>
+              <h3 className="text-xl md:text-2xl font-black text-white">获奖记录</h3>
             </div>
             <div className="overflow-x-auto border-2 border-black">
-              <table className="min-w-full bg-white text-sm">
-                <thead className="bg-black text-white">
+              <table className="min-w-full bg-[#070707] text-sm">
+                <thead className="bg-p5-red text-white">
                   <tr>
                     <th className="px-4 py-3 text-left font-black">奖项</th>
                     <th className="px-4 py-3 text-left font-black">团队</th>
@@ -298,10 +298,10 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                           {record?.award_name || '未知奖项'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-bold">{record?.group_name || '未知团队'}</td>
-                      <td className="px-4 py-3 font-bold">{record?.competition_name || '未知赛事'}</td>
-                      <td className="px-4 py-3 font-bold">{record?.competition_year || '-'}</td>
-                      <td className="px-4 py-3 font-bold">{record?.drama_name || record?.video_title || '-'}</td>
+                      <td className="px-4 py-3 font-bold text-white/90">{record?.group_name || '未知团队'}</td>
+                      <td className="px-4 py-3 font-bold text-white/90">{record?.competition_name || '未知赛事'}</td>
+                      <td className="px-4 py-3 font-bold text-white/90">{record?.competition_year || '-'}</td>
+                      <td className="px-4 py-3 font-bold text-white/90">{record?.drama_name || record?.video_title || '-'}</td>
                     </tr>
                   ))}
                 </tbody>

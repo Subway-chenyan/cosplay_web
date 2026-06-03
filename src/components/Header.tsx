@@ -24,7 +24,7 @@ function Header() {
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <header className="bg-black/78 backdrop-blur-sm border-b-4 border-p5-red sticky top-0 z-50 shadow-[0_4px_0_0_rgba(0,0,0,0.78)]">
+    <header className="bg-black/95 backdrop-blur-sm border-b-4 border-p5-red sticky top-0 z-50 shadow-[0_4px_0_0_rgba(0,0,0,0.95)]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -124,7 +124,7 @@ function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-6 bg-black border-t-2 border-p5-red">
+          <div className="md:hidden py-6 bg-black/95 border-t-2 border-p5-red">
             <nav className="flex flex-col space-y-3">
               {navigation.map((item) => {
                 const active = isActive(item.href)
