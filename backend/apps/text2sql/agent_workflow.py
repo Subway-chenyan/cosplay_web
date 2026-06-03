@@ -156,8 +156,22 @@ def intent_schema_selector(state: AgentState) -> Dict[str, Any]:
 
 
 def route_by_complexity(state: AgentState) -> str:
-    """Always route to LLM — rule-based path removed per user request."""
-    return "llm_sql_generator"
+    """优先使用确定性模板，失败时回退到LLM"""
+    query = state.get("query", "")
+    logger.info(f"Routing query: {query}")
+
+    # 导入并使用确定性模板
+    try:
+        from apps.text2sql.llm_sql_generator import _heuristic_sql
+        sql = _heuristic_sql(query)
+        if sql:
+            logger.info(f"Using deterministic template for: {query[:50]}...")
+            return "sql_generator"  # 使用确定性模板
+    except Exception as e:
+        logger.error(f"Error with heuristic SQL: {e}")
+
+    logger.info(f"Falling back to LLM for: {query[:50]}...")
+    return "llm_sql_generator"  # 回退到LLM
 
 
 def _award_rows_sql(where_clause: str, limit: int = 80) -> str:

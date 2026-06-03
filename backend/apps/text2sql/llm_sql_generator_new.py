@@ -6,8 +6,6 @@
 
 import os
 import json
-import re
-import requests
 import logging
 from typing import Dict, List, Any, Optional, Union
 from dotenv import load_dotenv
@@ -178,7 +176,6 @@ LIMIT 80
 
     # 模式4: 同时获得金龙和CJ金奖的查询
     if ("同时获得" in query or "都获得" in query) and ("金龙" in query and "CJ" in query):
-        logger.info(f"Matched pattern 4 for query: {query}")
         return """
 WITH teams_both_awards AS (
     SELECT DISTINCT g.id as group_id

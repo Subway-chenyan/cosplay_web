@@ -11,7 +11,7 @@ function Layout() {
   return (
     <div className={`min-h-screen text-white flex flex-col ${isHomePage || isChoreoPage ? 'bg-black' : 'bg-transparent'}`}>
       <Header />
-      <main className={`relative flex-grow ${isHomePage ? 'pb-12' : 'mx-auto w-full max-w-[1500px] px-4 py-10'}`}>
+      <main className={`relative flex-grow ${!isHomePage ? 'mx-auto w-full max-w-[1500px] px-4 py-10' : ''}`}>
         <Outlet />
       </main>
       {!isChoreoPage && <Footer />}
@@ -20,4 +20,4 @@ function Layout() {
   )
 }
 
-export default Layout
+export default Layout 
