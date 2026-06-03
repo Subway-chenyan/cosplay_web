@@ -261,17 +261,15 @@ function HomePage() {
 
   return (
     <div className="relative overflow-hidden bg-black">
-      <section className="relative min-h-[540px] overflow-hidden lg:min-h-[590px]">
-        <picture>
-          <source media="(max-width: 767px)" srcSet="/assets/new_ui/mb-banner.png" />
-          <img
-            src="/assets/new_ui/pc-banner.png"
-            alt="Cos 舞台剧视频库"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        </picture>
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent" />
-        <div className="relative z-10 mx-auto flex min-h-[540px] max-w-[1500px] flex-col items-center justify-center px-6 pb-14 pt-8 md:items-start md:px-12 lg:min-h-[590px]">
+      <div className="absolute inset-0">
+        <img
+          src="/assets/new_ui/back.png"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <section className="relative min-h-[400px] overflow-hidden lg:min-h-[450px]">
+        <div className="relative z-10 mx-auto flex min-h-[400px] max-w-[1500px] flex-col items-center justify-center px-6 pb-14 pt-8 md:items-start md:px-12 lg:min-h-[450px]">
           <img
             src="/assets/new_ui/banner-cutout.png"
             alt="Cos 舞台剧视频库"
@@ -281,6 +279,7 @@ function HomePage() {
       </section>
 
       <div className="mx-auto -mt-5 max-w-[1500px] px-5 md:px-12">
+        <div className="p5-halftone absolute inset-0 opacity-10 pointer-events-none"></div>
         <section className="relative z-20 border border-white/18 bg-[#070707]/95 px-5 py-5 shadow-[inset_7px_0_0_#d90614] md:px-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-5">
@@ -317,7 +316,7 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="mt-4 border border-white/16 bg-[#070707]/95 p-5 md:p-7">
+        <section className="mt-4 border border-white/16 bg-[#070707]/95 p-5 md:p-7 p5-comic-box">
           <div className="grid gap-5 lg:grid-cols-[170px_1fr] lg:items-center">
             <div className="flex items-center gap-4">
               <Search className="h-12 w-12 text-white" />
@@ -356,7 +355,7 @@ function HomePage() {
         </section>
 
         <section className="mt-4 grid gap-4 md:grid-cols-2">
-          <div className="border border-white/16 bg-[#070707] p-5">
+          <div className="border border-white/16 bg-[#070707] p-5 p5-comic-box">
             <div className="flex items-center gap-6">
               <div className="flex h-20 w-20 items-center justify-center bg-p5-red">
                 <Play className="h-11 w-11 fill-current text-white" />
@@ -370,7 +369,7 @@ function HomePage() {
               </div>
             </div>
           </div>
-          <div className="relative overflow-hidden border border-white/16 bg-[#070707] p-5">
+          <div className="relative overflow-hidden border border-white/16 bg-[#070707] p-5 p5-comic-box">
             <div className="absolute bottom-4 right-5 h-20 w-44 opacity-90">
               <svg viewBox="0 0 180 80" className="h-full w-full" aria-hidden="true">
                 <polyline fill="none" stroke="#d90614" strokeWidth="3" points="4,60 32,52 54,34 78,49 101,36 127,46 151,25 176,12" />

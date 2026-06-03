@@ -165,7 +165,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
         {isGroupDetail && groupDetailItems.length > 0 && (
           <div className="space-y-10">
             {groupDetailItems.map((item) => (
-              <div key={item.group.id} className="border-4 border-black p-4 md:p-6 bg-gray-50">
+              <div key={item.group.id} className="border-4 border-black p-4 md:p-6 bg-[#070707]">
                 {/* Group card */}
                 <div className="mb-6 max-w-sm">
                   <ClubCard
@@ -214,7 +214,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                         </thead>
                         <tbody>
                           {item.award_records.map((record, index) => (
-                            <tr key={record.id || index} className="border-t-2 border-black odd:bg-gray-50">
+                            <tr key={record.id || index} className="border-t-2 border-black odd:bg-[#070707]">
                               <td className="px-4 py-3 font-black text-p5-red">
                                 <span className="inline-flex items-center gap-2">
                                   <Award className="w-4 h-4" />
@@ -291,7 +291,7 @@ function AgentSearchResultPanel({ result }: AgentSearchResultPanelProps) {
                 </thead>
                 <tbody>
                   {awardRows.map((record, index) => (
-                    <tr key={record?.id || index} className="border-t-2 border-black odd:bg-gray-50">
+                    <tr key={record?.id || index} className="border-t-2 border-black odd:bg-[#070707]">
                       <td className="px-4 py-3 font-black text-p5-red">
                         <span className="inline-flex items-center gap-2">
                           <Award className="w-4 h-4" />
