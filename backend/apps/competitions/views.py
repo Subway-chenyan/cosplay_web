@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from datetime import datetime
@@ -11,6 +12,13 @@ from apps.videos.models import Video
 from rest_framework.pagination import PageNumberPagination
 from apps.videos.pagination import LargeResultsSetPagination
 from django.utils import timezone
+from apps.awards.models import Award
+from .entries import (
+    CompetitionEntriesPagination,
+    build_competition_entries,
+    get_competition_filter_options,
+    hydrate_competition_entries,
+)
 
 
 class CompetitionViewSet(viewsets.ModelViewSet):
@@ -19,6 +27,8 @@ class CompetitionViewSet(viewsets.ModelViewSet):
     """
     queryset = Competition.objects.filter()
     serializer_class = CompetitionSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['name', 'description']
     
     def get_permissions(self):
         """
@@ -38,6 +48,62 @@ class CompetitionViewSet(viewsets.ModelViewSet):
         years = CompetitionYear.objects.filter(competition=competition)
         serializer = CompetitionYearSerializer(years, many=True)
         return Response(serializer.data)
+
+    @staticmethod
+    def _parse_year(raw_year):
+        if raw_year in (None, ''):
+            return None, None
+        try:
+            year = int(raw_year)
+        except (TypeError, ValueError):
+            return None, Response(
+                {'year': ['年份必须是整数。']},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if year < 1800 or year > 2200:
+            return None, Response(
+                {'year': ['年份必须在 1800 到 2200 之间。']},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return year, None
+
+    @action(detail=True, methods=['get'], url_path='entries')
+    def entries(self, request, pk=None):
+        competition = self.get_object()
+        year, error_response = self._parse_year(request.query_params.get('year'))
+        if error_response:
+            return error_response
+
+        award = None
+        award_id = request.query_params.get('award')
+        if award_id:
+            try:
+                award = Award.objects.filter(
+                    id=award_id,
+                    competition=competition,
+                ).first()
+            except (TypeError, ValueError):
+                award = None
+            if award is None:
+                return Response(
+                    {'award': ['奖项不存在或不属于当前比赛。']},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        queryset = build_competition_entries(
+            competition,
+            year=year,
+            award=award,
+        )
+        paginator = CompetitionEntriesPagination()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        return paginator.get_paginated_response(
+            hydrate_competition_entries(page)
+        )
+
+    @action(detail=True, methods=['get'], url_path='filter-options')
+    def filter_options(self, request, pk=None):
+        return Response(get_competition_filter_options(self.get_object()))
     
     @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
     def update_config(self, request, pk=None):
