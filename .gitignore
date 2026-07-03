@@ -136,3 +136,4 @@ backend/.env
 AGENTS.md
 .agents/
 .superpowers/
+.worktrees/
