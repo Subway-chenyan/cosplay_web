@@ -18,7 +18,10 @@ interface CompetitionQueryParams {
 
 class CompetitionService {
   // 获取比赛列表
-  async getCompetitions(params?: CompetitionQueryParams): Promise<PaginatedResponse<Competition>> {
+  async getCompetitions(
+    params?: CompetitionQueryParams,
+    signal?: AbortSignal,
+  ): Promise<PaginatedResponse<Competition>> {
     const queryParams = {
       page: params?.page || 1,
       page_size: params?.page_size || 12,
@@ -26,7 +29,10 @@ class CompetitionService {
     }
     
     const queryString = api.buildQueryParams(queryParams)
-    return api.get<PaginatedResponse<Competition>>(`/competitions/competitions/${queryString}`)
+    return api.get<PaginatedResponse<Competition>>(
+      `/competitions/competitions/${queryString}`,
+      { signal },
+    )
   }
 
   // 获取比赛详情
@@ -93,8 +99,11 @@ class CompetitionService {
   }
 
   // 搜索比赛
-  async searchCompetitions(query: string): Promise<PaginatedResponse<Competition>> {
-    return this.getCompetitions({ search: query })
+  async searchCompetitions(
+    query: string,
+    signal?: AbortSignal,
+  ): Promise<PaginatedResponse<Competition>> {
+    return this.getCompetitions({ search: query, page_size: 20 }, signal)
   }
 
   // 获取某年的比赛

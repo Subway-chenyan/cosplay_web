@@ -14,7 +14,10 @@ interface GroupQueryParams {
 
 class GroupService {
   // 获取社团列表
-  async getGroups(params?: GroupQueryParams): Promise<PaginatedResponse<Group>> {
+  async getGroups(
+    params?: GroupQueryParams,
+    signal?: AbortSignal,
+  ): Promise<PaginatedResponse<Group>> {
     const queryParams = {
       page: params?.page || 1,
       page_size: params?.page_size || 12,
@@ -23,7 +26,7 @@ class GroupService {
     
     const queryString = api.buildQueryParams(queryParams)
     console.log('GroupService - API URL:', `/groups/${queryString}`)
-    return api.get<PaginatedResponse<Group>>(`/groups/${queryString}`)
+    return api.get<PaginatedResponse<Group>>(`/groups/${queryString}`, { signal })
   }
 
   // 获取社团详情
@@ -74,9 +77,9 @@ class GroupService {
   }
 
   // 搜索社团
-  async searchGroups(query: string): Promise<PaginatedResponse<Group>> {
+  async searchGroups(query: string, signal?: AbortSignal): Promise<PaginatedResponse<Group>> {
     console.log('GroupService - searchGroups called with query:', query)
-    return this.getGroups({ search: query })
+    return this.getGroups({ search: query, page_size: 20 }, signal)
   }
 
   // 获取活跃社团

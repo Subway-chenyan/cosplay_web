@@ -1,11 +1,13 @@
-import { useEffect, useCallback, useState, useRef } from 'react'
+import { useEffect, useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchVideos, setSearchQuery, clearSearch, setCurrentPage } from '../store/slices/videosSlice'
+import { fetchHomeVideos } from '../store/slices/homeVideosSlice'
 import VideoCard from '../components/VideoCard'
 import SearchBar from '../components/SearchBar'
 import Pagination from '../components/Pagination'
+import HomeServerFilters from '../components/HomeServerFilters'
+import type { AsyncSelectOption } from '../components/AsyncMultiSelect'
 import {
   CalendarDays,
   ChevronRight,
@@ -19,20 +21,33 @@ import {
 } from 'lucide-react'
 import AgentSearchResultPanel from '../components/AgentSearchResultPanel'
 import { videoService } from '../services/videoService'
+import { competitionService } from '../services/competitionService'
+import { groupService } from '../services/groupService'
 import { agentService } from '../services/agentService'
 import { eventService } from '../services/eventService'
+import {
+  parseHomeFilterParams,
+  serializeHomeFilterParams,
+} from '../features/serverFilters/query'
 import type { AgentSearchResponse } from '../services/agentService'
-import type { Event } from '../types'
+import type { CountFilterOption, Event, HomeFilterState } from '../types'
 
 function HomePage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { videos, loading, error, pagination, searchQuery, filters, currentPage } = useSelector((state: RootState) => state.videos)
-  const [inputValue, setInputValue] = useState(searchQuery)
-  const [isFilterLoading, setIsFilterLoading] = useState(false)
-  const scrollPositionRef = useRef<number>(0)
-  const filtersRef = useRef(filters)
-  const searchQueryRef = useRef(searchQuery)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchParamsKey = searchParams.toString()
+  const appliedFilters = useMemo(
+    () => parseHomeFilterParams(new URLSearchParams(searchParamsKey)),
+    [searchParamsKey],
+  )
+  const { videos, loading, error, count } = useSelector(
+    (state: RootState) => state.homeVideos,
+  )
+  const [inputValue, setInputValue] = useState(appliedFilters.query)
+  const [yearOptions, setYearOptions] = useState<CountFilterOption[]>([])
+  const [selectedCompetitions, setSelectedCompetitions] = useState<AsyncSelectOption[]>([])
+  const [selectedGroups, setSelectedGroups] = useState<AsyncSelectOption[]>([])
 
   const [stats, setStats] = useState<{ total_videos: number; weekly_new_videos: number } | null>(null)
   const [agentResults, setAgentResults] = useState<AgentSearchResponse | null>(() => {
@@ -48,6 +63,68 @@ function HomePage() {
   const [searchMode, setSearchMode] = useState<'regular' | 'smart'>('regular')
   const [recentEvents, setRecentEvents] = useState<Event[]>([])
   const [eventsLoading, setEventsLoading] = useState(true)
+
+  useEffect(() => {
+    setInputValue(appliedFilters.query)
+  }, [appliedFilters.query])
+
+  useEffect(() => {
+    const request = dispatch(fetchHomeVideos(appliedFilters))
+    return () => request.abort()
+  }, [appliedFilters, dispatch])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    videoService.getFilterOptions(controller.signal)
+      .then((options) => setYearOptions(options.years))
+      .catch((optionsError) => {
+        if (!controller.signal.aborted) console.error('获取年份筛选项失败', optionsError)
+      })
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    Promise.all(appliedFilters.competitionIds.map(async (id) => {
+      const competition = await competitionService.getCompetitionById(id)
+      return { id: competition.id, name: competition.name }
+    })).then((options) => {
+      if (active) setSelectedCompetitions(options)
+    }).catch((selectionError) => {
+      if (active) console.error('恢复已选比赛失败', selectionError)
+    })
+    return () => { active = false }
+  }, [appliedFilters.competitionIds])
+
+  useEffect(() => {
+    let active = true
+    Promise.all(appliedFilters.groupIds.map(async (id) => {
+      const group = await groupService.getGroupById(id)
+      return { id: group.id, name: group.name }
+    })).then((options) => {
+      if (active) setSelectedGroups(options)
+    }).catch((selectionError) => {
+      if (active) console.error('恢复已选社团失败', selectionError)
+    })
+    return () => { active = false }
+  }, [appliedFilters.groupIds])
+
+  const loadCompetitions = useCallback(async (query: string, signal: AbortSignal) => {
+    const response = await competitionService.searchCompetitions(query, signal)
+    return response.results.map((competition) => ({
+      id: competition.id,
+      name: competition.name,
+    }))
+  }, [])
+
+  const loadGroups = useCallback(async (query: string, signal: AbortSignal) => {
+    const response = await groupService.searchGroups(query, signal)
+    return response.results.map((group) => ({ id: group.id, name: group.name }))
+  }, [])
+
+  const applyFilters = useCallback((filters: HomeFilterState) => {
+    setSearchParams(serializeHomeFilterParams(filters))
+  }, [setSearchParams])
 
   const fetchStats = useCallback(async () => {
     try {
@@ -108,90 +185,6 @@ function HomePage() {
     }
   }, [fetchStats, fetchRecentEvents])
 
-  const debounce = useCallback((func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout
-    return (...args: any[]) => {
-      clearTimeout(timeoutId)
-      timeoutId = setTimeout(() => func(...args), delay)
-    }
-  }, [])
-
-  const saveScrollPosition = useCallback(() => {
-    scrollPositionRef.current = window.scrollY
-  }, [])
-
-  const restoreScrollPosition = useCallback(() => {
-    if (scrollPositionRef.current > 0) {
-      window.scrollTo(0, scrollPositionRef.current)
-    }
-  }, [])
-
-  const fetchVideosData = useCallback(async (params?: {
-    page?: number
-    filters?: any
-    searchQuery?: string
-  }) => {
-    const isFilterChange = JSON.stringify(params?.filters) !== JSON.stringify(filtersRef.current) ||
-      params?.searchQuery !== searchQueryRef.current
-
-    if (isFilterChange) {
-      setIsFilterLoading(true)
-      saveScrollPosition()
-    }
-
-    try {
-      await dispatch(fetchVideos(params) as any)
-    } finally {
-      if (isFilterChange) {
-        setIsFilterLoading(false)
-        setTimeout(restoreScrollPosition, 100)
-      }
-    }
-  }, [dispatch, saveScrollPosition, restoreScrollPosition])
-
-  const debouncedFetchVideos = useCallback(
-    debounce(fetchVideosData, 300),
-    [fetchVideosData, debounce]
-  )
-
-  useEffect(() => {
-    const hasFiltersChanged = JSON.stringify(filters) !== JSON.stringify(filtersRef.current)
-    const hasSearchChanged = searchQuery !== searchQueryRef.current
-
-    if (hasFiltersChanged || hasSearchChanged) {
-      filtersRef.current = filters
-      searchQueryRef.current = searchQuery
-      debouncedFetchVideos({
-        page: 1,
-        searchQuery,
-        filters
-      })
-    }
-  }, [filters, searchQuery, debouncedFetchVideos])
-
-  useEffect(() => {
-    const hasFiltersChanged = JSON.stringify(filters) !== JSON.stringify(filtersRef.current)
-    const hasSearchChanged = searchQuery !== searchQueryRef.current
-
-    if (!hasFiltersChanged && !hasSearchChanged) {
-      fetchVideosData({
-        page: currentPage,
-        searchQuery,
-        filters
-      })
-    }
-  }, [currentPage, fetchVideosData, filters, searchQuery])
-
-  useEffect(() => {
-    if (videos.length === 0) {
-      fetchVideosData({
-        page: currentPage,
-        searchQuery,
-        filters
-      })
-    }
-  }, [])
-
   useEffect(() => {
     if (agentResults) {
       sessionStorage.setItem('agent_search_results', JSON.stringify(agentResults))
@@ -210,7 +203,7 @@ function HomePage() {
 
   const handleClearSearch = () => {
     setInputValue('')
-    dispatch(clearSearch() as any)
+    applyFilters({ ...appliedFilters, query: '', page: 1 })
     setAgentResults(null)
     setAgentError(null)
     sessionStorage.removeItem('agent_search_results')
@@ -221,8 +214,7 @@ function HomePage() {
 
     if (trimmed.length > 0) {
       if (searchMode === 'regular') {
-        dispatch(setSearchQuery(inputValue) as any)
-        dispatch(setCurrentPage(1) as any)
+        applyFilters({ ...appliedFilters, query: trimmed, page: 1 })
         setAgentResults(null)
         sessionStorage.removeItem('agent_search_results')
         return
@@ -237,15 +229,13 @@ function HomePage() {
       } catch (searchError) {
         console.error('智能搜索失败:', searchError)
         setAgentError(searchError instanceof Error ? searchError.message : String(searchError))
-        dispatch(setSearchQuery(inputValue) as any)
-        dispatch(setCurrentPage(1) as any)
+        applyFilters({ ...appliedFilters, query: trimmed, page: 1 })
         setAgentResults(null)
       } finally {
         setIsAgentLoading(false)
       }
     } else {
-      dispatch(setSearchQuery(inputValue) as any)
-      dispatch(setCurrentPage(1) as any)
+      applyFilters({ ...appliedFilters, query: '', page: 1 })
       setAgentResults(null)
       sessionStorage.removeItem('agent_search_results')
     }
@@ -256,7 +246,7 @@ function HomePage() {
   const eventStatus = getEventStatus(currentEvent?.start_date, currentEvent?.end_date)
   const eventTitle = currentEvent?.title || '2025 华南地区 Cosplay 舞台剧大赛 · 总决赛'
   const eventRegion = currentEvent?.region || '广州 · 保利世贸博览馆'
-  const totalVideos = stats?.total_videos ?? pagination.count
+  const totalVideos = stats?.total_videos ?? count
   const weeklyVideos = stats?.weekly_new_videos ?? 0
 
   return (
@@ -354,6 +344,24 @@ function HomePage() {
           </div>
         </section>
 
+        {searchMode === 'regular' && (
+          <HomeServerFilters
+            value={appliedFilters}
+            years={yearOptions}
+            competitionOptions={selectedCompetitions}
+            groupOptions={selectedGroups}
+            loadCompetitions={loadCompetitions}
+            loadGroups={loadGroups}
+            onApply={applyFilters}
+            onClear={() => applyFilters({
+              query: appliedFilters.query,
+              competitionIds: [],
+              groupIds: [],
+              page: 1,
+            })}
+          />
+        )}
+
         <section className="mt-4 grid gap-4 md:grid-cols-2">
           <div className="border border-white/16 bg-[#070707] p-5 p5-comic-box">
             <div className="flex items-center gap-6">
@@ -420,10 +428,10 @@ function HomePage() {
               <div className="flex items-center gap-3">
                 <Star className="h-9 w-9 text-white" />
                 <h2 className="text-[28px] font-black leading-none md:text-[34px]">视频记录</h2>
-                <span className="pt-2 text-base font-bold text-p5-red">（共 {pagination.count} 条）</span>
+                <span className="pt-2 text-base font-bold text-p5-red">（共 {count} 条）</span>
               </div>
               <div className="flex items-center gap-3">
-                {loading && !isFilterLoading && (
+                {loading && (
                   <div className="hidden items-center gap-2 text-sm text-white/65 sm:flex">
                     <Loader className="h-4 w-4 animate-spin text-p5-red" />
                     同步中...
@@ -432,32 +440,34 @@ function HomePage() {
               </div>
             </div>
 
-            {error ? (
+            {error && (
               <div className="border border-p5-red bg-[#070707] px-6 py-16 text-center">
                 <Tv className="mx-auto mb-5 h-16 w-16 text-white/35" />
                 <h3 className="text-2xl font-black text-p5-red">视频加载失败</h3>
                 <p className="mt-2 text-white/55">{error}</p>
                 <button
                   type="button"
-                  onClick={() => dispatch(fetchVideos() as any)}
+                  onClick={() => dispatch(fetchHomeVideos(appliedFilters))}
                   className="mt-6 bg-p5-red px-6 py-3 font-bold text-white"
                 >
                   重新加载
                 </button>
               </div>
-            ) : loading && videos.length === 0 ? (
+            )}
+
+            {loading && videos.length === 0 ? (
               <div className="border border-white/16 bg-[#070707] px-6 py-16 text-center">
                 <Loader className="mx-auto mb-5 h-12 w-12 animate-spin text-p5-red" />
                 <h3 className="text-2xl font-black">正在加载视频...</h3>
               </div>
-            ) : videos.length === 0 ? (
+            ) : videos.length === 0 && !error ? (
               <div className="border border-white/16 bg-[#070707] px-6 py-16 text-center">
                 <Tv className="mx-auto mb-5 h-16 w-16 text-white/35" />
                 <h3 className="text-2xl font-black">未找到匹配内容</h3>
                 <p className="mt-2 text-white/55">当前搜索条件下没有结果</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className={`grid grid-cols-1 gap-5 transition-opacity sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${loading ? 'opacity-50' : 'opacity-100'}`}>
                 {videos.map((video) => (
                   <VideoCard
                     key={video.id}
@@ -472,11 +482,11 @@ function HomePage() {
 
         {(searchMode === 'regular' || (!agentResults && searchMode === 'smart')) && !isAgentLoading && (
           <Pagination
-            currentPage={currentPage}
-            totalCount={pagination.count}
+            currentPage={appliedFilters.page}
+            totalCount={count}
             pageSize={12}
             onPageChange={(page) => {
-              dispatch(setCurrentPage(page))
+              applyFilters({ ...appliedFilters, page })
               window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
           />
