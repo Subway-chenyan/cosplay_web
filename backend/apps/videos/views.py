@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django.db.models import Q
+from django.db.models import Count, Q
 import pandas as pd
 import io
 
@@ -377,9 +377,17 @@ class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = VideoFilter
-    search_fields = ['title', 'description', 'bv_number']
-    ordering_fields = ['created_at', 'year', 'play_count', 'like_count']
-    ordering = ['-created_at']
+    search_fields = [
+        'title',
+        'description',
+        'bv_number',
+        'group__name',
+        'competition__name',
+        'award_records__award__name',
+        'award_records__drama_name',
+    ]
+    ordering_fields = ['id', 'created_at', 'year', 'play_count', 'like_count']
+    ordering = ['-created_at', '-id']
     pagination_class = OptimizedVideoPagination
     
     def get_serializer_class(self):
@@ -396,6 +404,27 @@ class VideoViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]
+
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.AllowAny],
+        url_path='filter-options',
+    )
+    def filter_options(self, request):
+        years = (
+            self.queryset
+            .exclude(year__isnull=True)
+            .values('year')
+            .annotate(count=Count('id'))
+            .order_by('-year')
+        )
+        return Response({
+            'years': [
+                {'value': row['year'], 'count': row['count']}
+                for row in years
+            ]
+        })
 
     def ensure_can_manage_video(self, video):
         """确认当前用户可以管理该视频。"""

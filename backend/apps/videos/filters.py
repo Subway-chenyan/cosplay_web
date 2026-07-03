@@ -1,6 +1,9 @@
 import django_filters
-from django.db import models
 from .models import Video
+
+
+class UUIDInFilter(django_filters.BaseInFilter, django_filters.UUIDFilter):
+    """Validate a comma-separated list of UUIDs before filtering."""
 
 
 class VideoFilter(django_filters.FilterSet):
@@ -12,27 +15,13 @@ class VideoFilter(django_filters.FilterSet):
     description_contains = django_filters.CharFilter(field_name='description', lookup_expr='icontains')
     
     # 关联筛选
-    groups = django_filters.CharFilter(field_name='group__id', method='filter_by_groups')
-    competitions = django_filters.CharFilter(field_name='competition__id', method='filter_by_competitions')
+    groups = UUIDInFilter(field_name='group_id', lookup_expr='in')
+    competitions = UUIDInFilter(field_name='competition_id', lookup_expr='in')
 
     tags = django_filters.CharFilter(field_name='tags__id', method='filter_by_tags')
     styleTag = django_filters.CharFilter(method='filter_by_style_tag')
     ipTag = django_filters.CharFilter(method='filter_by_ip_tag')
 
-    def filter_by_groups(self, queryset, name, value):
-        """按社团ID筛选"""
-        if value:
-            group_ids = value.split(',')
-            return queryset.filter(group__id__in=group_ids).distinct()
-        return queryset
-    
-    def filter_by_competitions(self, queryset, name, value):
-        """按比赛ID筛选"""
-        if value:
-            competition_ids = value.split(',')
-            return queryset.filter(competition__id__in=competition_ids).distinct()
-        return queryset
-    
     def filter_by_tags(self, queryset, name, value):
         """按标签ID筛选（AND逻辑）"""
         if value:
