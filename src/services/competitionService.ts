@@ -1,5 +1,12 @@
 import { api } from './api'
-import { Competition, PaginatedResponse } from '../types'
+import {
+  Competition,
+  CompetitionEntry,
+  CompetitionFilterOptions,
+  CompetitionFilterState,
+  PaginatedResponse,
+  ServerPaginatedResponse,
+} from '../types'
 
 interface CompetitionQueryParams {
   page?: number
@@ -25,6 +32,49 @@ class CompetitionService {
   // 获取比赛详情
   async getCompetitionById(id: string): Promise<Competition> {
     return api.get<Competition>(`/competitions/competitions/${id}/`)
+  }
+
+  async getFilterOptions(
+    competitionId: string,
+    signal?: AbortSignal,
+  ): Promise<CompetitionFilterOptions> {
+    return api.get<CompetitionFilterOptions>(
+      `/competitions/competitions/${competitionId}/filter-options/`,
+      { signal },
+    )
+  }
+
+  async getEntries(
+    competitionId: string,
+    filters: CompetitionFilterState,
+    page: number = 1,
+    signal?: AbortSignal,
+  ): Promise<ServerPaginatedResponse<CompetitionEntry>> {
+    const queryString = api.buildQueryParams({
+      year: filters.year,
+      award: filters.awardId,
+      page,
+      page_size: 24,
+    })
+    return api.get<ServerPaginatedResponse<CompetitionEntry>>(
+      `/competitions/competitions/${competitionId}/entries/${queryString}`,
+      { signal },
+    )
+  }
+
+  async getEntriesByUrl(
+    nextUrl: string,
+    signal?: AbortSignal,
+  ): Promise<ServerPaginatedResponse<CompetitionEntry>> {
+    let requestUrl = nextUrl
+    if (/^https?:\/\//i.test(nextUrl)) {
+      const parsed = new URL(nextUrl)
+      const apiPrefix = '/api'
+      requestUrl = parsed.pathname.startsWith(apiPrefix)
+        ? parsed.pathname.slice(apiPrefix.length) + parsed.search
+        : parsed.pathname + parsed.search
+    }
+    return api.get<ServerPaginatedResponse<CompetitionEntry>>(requestUrl, { signal })
   }
 
   // 创建比赛

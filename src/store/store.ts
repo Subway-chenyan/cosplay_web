@@ -6,6 +6,8 @@ import tagsReducer from './slices/tagsSlice'
 import awardsReducer from './slices/awardsSlice'
 import dataImportReducer from './slices/dataImportSlice'
 import forumReducer from './slices/forumSlice'
+import homeVideosReducer from './slices/homeVideosSlice'
+import competitionEntriesReducer from './slices/competitionEntriesSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +18,8 @@ export const store = configureStore({
     awards: awardsReducer,
     dataImport: dataImportReducer,
     forum: forumReducer,
+    homeVideos: homeVideosReducer,
+    competitionEntries: competitionEntriesReducer,
   },
 })
 

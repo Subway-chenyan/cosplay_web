@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Video, PaginatedResponse, VideoFilters } from '../types'
+import { HomeFilterOptions, Video, PaginatedResponse, VideoFilters } from '../types'
 
 interface VideoQueryParams {
   page?: number
@@ -16,32 +16,26 @@ interface VideoQueryParams {
 
 class VideoService {
   // 获取视频列表
-  async getVideos(params?: VideoQueryParams): Promise<PaginatedResponse<Video>> {
+  async getVideos(params?: VideoQueryParams, signal?: AbortSignal): Promise<PaginatedResponse<Video>> {
     const queryParams = {
       page: params?.page || 1,
       page_size: params?.page_size || 12,
-      ...params,
+      search: params?.search,
+      year: params?.year,
+      ordering: params?.ordering,
+      groups: params?.groups?.length ? params.groups.join(',') : undefined,
+      competitions: params?.competitions?.length ? params.competitions.join(',') : undefined,
+      tags: params?.tags?.length ? params.tags.join(',') : undefined,
+      styleTag: params?.styleTag,
+      ipTag: params?.ipTag,
     }
-    
-    // 处理数组参数
-    if (params?.groups && params.groups.length > 0) {
-      queryParams.groups = params.groups
-    }
-    if (params?.competitions && params.competitions.length > 0) {
-      queryParams.competitions = params.competitions
-    }
-    if (params?.tags && params.tags.length > 0) {
-      queryParams.tags = params.tags
-    }
-    if (params?.styleTag) {
-      queryParams.styleTag = params.styleTag
-    }
-    if (params?.ipTag) {
-      queryParams.ipTag = params.ipTag
-    }
-    
+
     const queryString = api.buildQueryParams(queryParams)
-    return api.get<PaginatedResponse<Video>>(`/videos/${queryString}`)
+    return api.get<PaginatedResponse<Video>>(`/videos/${queryString}`, { signal })
+  }
+
+  async getFilterOptions(signal?: AbortSignal): Promise<HomeFilterOptions> {
+    return api.get<HomeFilterOptions>('/videos/filter-options/', { signal })
   }
 
   // 获取视频详情
