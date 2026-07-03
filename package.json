@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "vitest run",
     "build": "node scripts/build-choreomaster.js && tsc && vite build",
     "build:choreomaster": "node scripts/build-choreomaster.js",
     "build:main": "tsc && vite build",
@@ -51,6 +52,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
-    "vite": "^7.0.6"
+    "vite": "^7.0.6",
+    "vitest": "^4.1.9"
   }
 }

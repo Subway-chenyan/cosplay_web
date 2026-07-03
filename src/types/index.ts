@@ -115,6 +115,61 @@ export interface VideoFilters {
   search?: string
 }
 
+export interface HomeFilterState {
+  query: string
+  year?: number
+  competitionIds: string[]
+  groupIds: string[]
+  page: number
+}
+
+export interface CompetitionFilterState {
+  year?: number
+  awardId?: string
+}
+
+export interface CountFilterOption {
+  value: number
+  count: number
+}
+
+export interface NamedFilterOption {
+  id: string
+  name: string
+  count: number
+}
+
+export interface HomeFilterOptions {
+  years: CountFilterOption[]
+}
+
+export interface CompetitionFilterOptions {
+  years: CountFilterOption[]
+  awards: NamedFilterOption[]
+  total_count: number
+}
+
+export type CompetitionEntryKind =
+  | 'awarded_video'
+  | 'award_without_video'
+  | 'unawarded_video'
+
+export interface CompetitionEntry {
+  entry_id: string
+  kind: CompetitionEntryKind
+  year?: number
+  award: Pick<Award, 'id' | 'name'> | null
+  award_record: AwardRecord | null
+  video: Video | null
+}
+
+export interface ServerPaginatedResponse<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
+}
+
 export interface Award {
   id: string
   name: string
