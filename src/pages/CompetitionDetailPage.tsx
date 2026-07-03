@@ -60,17 +60,19 @@ function CompetitionDetailPage() {
     }
   }, [dispatch, competitions.length, groups.length])
 
-  // 获取比赛数据
+  // 获取比赛数据 - 只在组件挂载时获取一次所有数据
   useEffect(() => {
     if (id) {
       setPage(1)
       setHasMore(true)
-      // 使用更大的pageSize确保获取更多数据，避免筛选时数据不全
-      dispatch(fetchCompetitionVideos({ competitionId: id, year: selectedYear || undefined, page: 1, pageSize: 500 }) as any)
+      // 获取所有视频（不按年份过滤），数据在前端筛选
+      // 使用大page_size确保获取所有数据
+      dispatch(fetchCompetitionVideos({ competitionId: id, page: 1, pageSize: 1000 }) as any)
       dispatch(fetchCompetitionAwards(id) as any)
-      dispatch(fetchCompetitionAwardRecords({ competitionId: id }) as any)
+      // 获取所有奖项记录（不按年份过滤），数据在前端筛选
+      dispatch(fetchCompetitionAwardRecords({ competitionId: id, year: undefined }) as any)
     }
-  }, [dispatch, id, selectedYear])
+  }, [dispatch, id])
 
   // 获取比赛赛程
   useEffect(() => {

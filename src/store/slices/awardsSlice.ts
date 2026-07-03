@@ -50,11 +50,7 @@ export const fetchAwardRecords = createAsyncThunk(
 export const fetchCompetitionAwardRecords = createAsyncThunk<AwardRecord[], { competitionId: string; year?: number }>(
   'awards/fetchCompetitionAwardRecords',
   async ({ competitionId, year }: { competitionId: string; year?: number }) => {
-    if (year) {
-      return await awardService.getAwardYearVideos(competitionId, year)
-    } else {
-      return await awardService.getCompetitionAwardRecords(competitionId)
-    }
+    return await awardService.getCompetitionAwardRecords(competitionId, year)
   }
 )
 

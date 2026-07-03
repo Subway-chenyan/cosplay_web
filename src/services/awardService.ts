@@ -57,11 +57,13 @@ class AwardService {
 
   // 获取比赛的所有获奖记录
   async getCompetitionAwardRecords(competitionId: string, year?: number): Promise<AwardRecord[]> {
-    const queryParams: any = {}
+    const queryParams: any = {
+      page_size: 1000 // 设置大页面大小以获取所有记录
+    }
     if (year) {
       queryParams.year = year
     }
-    
+
     const queryString = api.buildQueryParams({ ...queryParams, competition: competitionId })
     return api.get<AwardRecord[]>(`/awards/records/by_competition/${queryString}`)
   }

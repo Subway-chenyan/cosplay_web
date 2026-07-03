@@ -113,7 +113,7 @@ class VideoService {
 
   // 获取比赛年份视频
   async getCompetitionYearVideos(competitionId: string, year: number, page: number = 1, pageSize: number = 50): Promise<PaginatedResponse<Video>> {
-    return api.get<PaginatedResponse<Video>>(`/competitions/${competitionId}/years/${year}/videos/?page=${page}&page_size=${pageSize}`)
+    return api.get<PaginatedResponse<Video>>(`/competitions/competitions/${competitionId}/years/${year}/videos/?page=${page}&page_size=${pageSize}`)
   }
 
   // 获取社团视频

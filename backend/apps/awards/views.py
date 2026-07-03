@@ -67,19 +67,33 @@ class AwardRecordViewSet(viewsets.ModelViewSet):
     def by_competition(self, request):
         """
         获取指定比赛的所有获奖记录
+        支持year参数过滤特定年份的获奖记录
         """
         competition_id = request.query_params.get('competition')
         if not competition_id:
             return Response(
-                {'error': 'competition parameter is required'}, 
+                {'error': 'competition parameter is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # 获取该比赛的所有奖项ID
         award_ids = Award.objects.filter(competition_id=competition_id).values_list('id', flat=True)
-        
+
         # 获取这些奖项的所有获奖记录
         records = AwardRecord.objects.filter(award_id__in=award_ids)
+
+        # 支持按年份过滤
+        year = request.query_params.get('year')
+        if year:
+            try:
+                year_int = int(year)
+                records = records.filter(competition_year__year=year_int)
+            except ValueError:
+                return Response(
+                    {'error': 'year parameter must be a valid integer'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
         serializer = AwardRecordDetailSerializer(records, many=True)
         return Response(serializer.data)
     
