@@ -41,7 +41,7 @@ export const fetchCompetitionEntries = createAsyncThunk<
   ServerPaginatedResponse<CompetitionEntry>,
   FetchCompetitionEntriesArgs
 >('competitionEntries/fetch', async ({ competitionId, filters }, thunkApi) => (
-  competitionService.getEntries(competitionId, filters, 1, thunkApi.signal)
+  competitionService.getEntries(competitionId, filters, 1, 200, thunkApi.signal)
 ))
 
 export const loadMoreCompetitionEntries = createAsyncThunk<

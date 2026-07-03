@@ -14,6 +14,7 @@ ENTRY_VALUE_FIELDS = (
     'kind',
     'entry_year',
     'sort_year',
+    'sort_kind',
     'sort_created',
     'record_key',
     'video_key',
@@ -24,7 +25,7 @@ ENTRY_VALUE_FIELDS = (
 class CompetitionEntriesPagination(PageNumberPagination):
     page_size = 24
     page_size_query_param = 'page_size'
-    max_page_size = 100
+    max_page_size = 200
 
 
 def build_competition_entries(competition, *, year=None, award=None):
@@ -48,6 +49,11 @@ def build_competition_entries(competition, *, year=None, award=None):
         entry_year=F('competition_year__year'),
         sort_year=F('competition_year__year'),
         sort_created=F('created_at'),
+        sort_kind=Case(
+            When(video_id__isnull=True, then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField(),
+        ),
         record_key=Cast('id', output_field=CharField()),
         video_key=Cast('video_id', output_field=CharField()),
         award_key=Cast('award_id', output_field=CharField()),
@@ -73,6 +79,7 @@ def build_competition_entries(competition, *, year=None, award=None):
         entry_year=F('year'),
         sort_year=Coalesce('year', Value(0), output_field=IntegerField()),
         sort_created=F('created_at'),
+        sort_kind=Value(2, output_field=IntegerField()),
         record_key=Value(None, output_field=CharField()),
         video_key=Cast('id', output_field=CharField()),
         award_key=Value(None, output_field=CharField()),
@@ -80,6 +87,7 @@ def build_competition_entries(competition, *, year=None, award=None):
 
     return award_rows.union(video_rows, all=True).order_by(
         '-sort_year',
+        'sort_kind',
         '-sort_created',
         '-entry_id',
     )

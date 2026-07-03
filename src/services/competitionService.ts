@@ -54,13 +54,14 @@ class CompetitionService {
     competitionId: string,
     filters: CompetitionFilterState,
     page: number = 1,
+    pageSize: number = 24,
     signal?: AbortSignal,
   ): Promise<ServerPaginatedResponse<CompetitionEntry>> {
     const queryString = api.buildQueryParams({
       year: filters.year,
       award: filters.awardId,
       page,
-      page_size: 24,
+      page_size: pageSize,
     })
     return api.get<ServerPaginatedResponse<CompetitionEntry>>(
       `/competitions/competitions/${competitionId}/entries/${queryString}`,
