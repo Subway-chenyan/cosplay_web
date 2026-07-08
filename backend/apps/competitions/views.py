@@ -355,6 +355,12 @@ class EventViewSet(viewsets.ModelViewSet):
         except Video.DoesNotExist:
             return Response({'error': '视频不存在'}, status=status.HTTP_404_NOT_FOUND)
 
+        if event.start_date and video.year and video.year != event.start_date.year:
+            return Response(
+                {'error': f'视频年份{video.year}与赛事年份{event.start_date.year}不一致'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         event.videos.add(video)
         serializer = self.get_serializer(event)
         return Response(serializer.data)

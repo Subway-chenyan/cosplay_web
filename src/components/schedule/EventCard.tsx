@@ -31,6 +31,11 @@ function isEventPast(endDate: string): boolean {
   return end < today
 }
 
+function getYearMatchedVideos(event: Event): EventVideo[] {
+  const eventYear = event.start_date ? new Date(`${event.start_date}T00:00:00`).getFullYear() : null
+  return (event.videos || []).filter((video) => !eventYear || !video.year || video.year === eventYear)
+}
+
 /** Group videos by team name */
 function groupVideosByTeam(videos: EventVideo[]): { team: string; videos: EventVideo[] }[] {
   const groups: Record<string, EventVideo[]> = {}
@@ -58,7 +63,8 @@ function groupVideosByTeam(videos: EventVideo[]): { team: string; videos: EventV
 
 export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, isFinal = false }: EventCardProps) {
   const past = isEventPast(event.end_date)
-  const hasVideos = event.videos && event.videos.length > 0
+  const displayVideos = getYearMatchedVideos(event)
+  const hasVideos = displayVideos.length > 0
 
   const borderColor = isFinal ? 'border-amber-600' : 'border-black'
   const accentBorder = isFinal ? 'border-amber-500' : 'border-p5-red'
@@ -68,7 +74,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
 
   // Completed event with videos: show as full-width card with prominent video section
   if (past && hasVideos) {
-    const teamGroups = groupVideosByTeam(event.videos)
+    const teamGroups = groupVideosByTeam(displayVideos)
 
     return (
       <div className={`relative group transition-all duration-300 ${isFinal ? 'ring-2 ring-amber-400/50' : ''}`}>
@@ -121,7 +127,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
                 参赛作品
               </span>
               <span className="text-[10px] font-black text-gray-400 italic">
-                ({event.videos.length} 个视频)
+                ({displayVideos.length} 个视频)
               </span>
               <div className="flex-1 border-b border-gray-200"></div>
             </div>
@@ -271,7 +277,7 @@ export default function EventCard({ event, isAdmin, onLinkVideo, onUnlinkVideo, 
               </span>
             </div>
             <div className="flex flex-wrap gap-1">
-              {event.videos.map((v: EventVideo) => (
+              {displayVideos.map((v: EventVideo) => (
                 <span key={v.id} className="inline-flex items-center group/vid">
                   <a
                     href={v.url}

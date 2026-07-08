@@ -217,6 +217,7 @@ export interface EventVideo {
   title: string
   url: string
   thumbnail: string
+  year?: number
   group_name?: string
 }
 

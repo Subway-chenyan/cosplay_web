@@ -5,6 +5,7 @@ import GroupsPage from './pages/GroupsPage'
 import GroupDetailPage from './pages/GroupDetailPage'
 import CompetitionsPage from './pages/CompetitionsPage'
 import CompetitionDetailPage from './pages/CompetitionDetailPage'
+import ChinaJoy2026FinalistsPage from './pages/ChinaJoy2026FinalistsPage'
 import VideoDetailPage from './pages/VideoDetailPage'
 import DataImportPage from './pages/DataImportPage'
 import ManagementPage from './pages/ManagementPage'
@@ -52,6 +53,7 @@ function App() {
             <Route path="/groups" element={<GroupsPage />} />
             <Route path="/group/:id" element={<GroupDetailPage />} />
             <Route path="/competitions" element={<CompetitionsPage />} />
+            <Route path="/competitions/chinajoy-2026-finalists" element={<ChinaJoy2026FinalistsPage />} />
             <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
             <Route path="/data-import" element={<DataImportPage />} />
             <Route path="/management" element={<ManagementPage />} />

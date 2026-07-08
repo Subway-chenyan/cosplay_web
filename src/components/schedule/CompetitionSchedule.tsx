@@ -53,6 +53,11 @@ function isEventPast(endDate: string): boolean {
   return end < today
 }
 
+function getYearMatchedVideos(event: Event): EventVideo[] {
+  const eventYear = event.start_date ? new Date(`${event.start_date}T00:00:00`).getFullYear() : null
+  return (event.videos || []).filter((video) => !eventYear || !video.year || video.year === eventYear)
+}
+
 /** Format date range */
 function formatDateRange(start: string, end: string): string {
   const s = new Date(start + 'T00:00:00')
@@ -187,7 +192,7 @@ export default function CompetitionSchedule({
   }, [upcomingEvents])
 
   // Total video count across completed events
-  const totalCompletedVideos = completedEvents.reduce((sum, e) => sum + (e.videos?.length || 0), 0)
+  const totalCompletedVideos = completedEvents.reduce((sum, e) => sum + getYearMatchedVideos(e).length, 0)
 
   if (!events || events.length === 0) {
     return (
@@ -268,9 +273,9 @@ export default function CompetitionSchedule({
                   </div>
 
                   {/* Video cards grid */}
-                  {event.videos && event.videos.length > 0 ? (
+                  {getYearMatchedVideos(event).length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                      {event.videos.map((v: EventVideo) => (
+                      {getYearMatchedVideos(event).map((v: EventVideo) => (
                         <ScheduleVideoCard key={v.id} video={v} />
                       ))}
                     </div>

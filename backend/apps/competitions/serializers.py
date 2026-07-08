@@ -21,7 +21,7 @@ class EventVideoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Video
-        fields = ['id', 'bv_number', 'title', 'url', 'thumbnail', 'group_name']
+        fields = ['id', 'bv_number', 'title', 'url', 'thumbnail', 'year', 'group_name']
 
 
 class EventSerializer(serializers.ModelSerializer):

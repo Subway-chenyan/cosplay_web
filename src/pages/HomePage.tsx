@@ -12,6 +12,7 @@ import {
   CalendarDays,
   ChevronRight,
   Clock3,
+  ListChecks,
   Loader,
   Play,
   Search,
@@ -201,6 +202,10 @@ function HomePage() {
     navigate('/competitions#schedule')
   }
 
+  const handleViewChinaJoyFinalists = () => {
+    navigate('/competitions/chinajoy-2026-finalists')
+  }
+
   const handleClearSearch = () => {
     setInputValue('')
     applyFilters({ ...appliedFilters, query: '', page: 1 })
@@ -246,6 +251,9 @@ function HomePage() {
   const eventStatus = getEventStatus(currentEvent?.start_date, currentEvent?.end_date)
   const eventTitle = currentEvent?.title || '2025 华南地区 Cosplay 舞台剧大赛 · 总决赛'
   const eventRegion = currentEvent?.region || '广州 · 保利世贸博览馆'
+  const shouldShowChinaJoyFinalists =
+    (currentEvent?.start_date?.startsWith('2026') ?? false) &&
+    /CJ|ChinaJoy|总决赛|總決賽/i.test(`${eventTitle} ${eventRegion} ${currentEvent?.competition_name || ''}`)
   const totalVideos = stats?.total_videos ?? count
   const weeklyVideos = stats?.weekly_new_videos ?? 0
 
@@ -295,14 +303,26 @@ function HomePage() {
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={handleViewAllSchedule}
-              className="inline-flex h-12 items-center justify-center gap-3 border border-white/40 px-8 text-sm font-bold text-white transition hover:border-p5-red hover:bg-p5-red"
-            >
-              查看全部赛程
-              <ChevronRight className="h-5 w-5" />
-            </button>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {shouldShowChinaJoyFinalists && (
+                <button
+                  type="button"
+                  onClick={handleViewChinaJoyFinalists}
+                  className="inline-flex h-12 items-center justify-center gap-3 border border-p5-red bg-p5-red px-7 text-sm font-bold text-white transition hover:bg-white hover:text-black"
+                >
+                  <ListChecks className="h-5 w-5" />
+                  晋级名单
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleViewAllSchedule}
+                className="inline-flex h-12 items-center justify-center gap-3 border border-white/40 px-8 text-sm font-bold text-white transition hover:border-p5-red hover:bg-p5-red"
+              >
+                查看全部赛程
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </section>
 
