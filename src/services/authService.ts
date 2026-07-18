@@ -44,15 +44,20 @@ class AuthService {
       throw new Error('No refresh token available')
     }
 
-    const response = await api.post<{ access: string }>('/token/refresh/', {
+    // 后端开启了 ROTATE_REFRESH_TOKENS，响应中会同时下发新的 refresh token
+    const response = await api.post<{ access: string; refresh?: string }>('/token/refresh/', {
       refresh: refreshToken
     })
-    
+
     // 更新access token
     if (response.access) {
       localStorage.setItem('access_token', response.access)
     }
-    
+    // 必须保存轮换后的 refresh token，否则旧 token 被加入黑名单后用户会被强制登出
+    if (response.refresh) {
+      localStorage.setItem('refresh_token', response.refresh)
+    }
+
     return response.access
   }
 

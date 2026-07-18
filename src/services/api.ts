@@ -45,6 +45,21 @@ axiosInstance.interceptors.request.use(
   }
 )
 
+// 刷新 token 的单例 Promise：并发请求收到 401 时共享同一次刷新，
+// 避免后端 refresh token 轮换（ROTATE_REFRESH_TOKENS）下出现竞态
+let refreshPromise: Promise<string> | null = null
+
+const refreshTokenSingleFlight = (): Promise<string> => {
+  if (!refreshPromise) {
+    refreshPromise = import('./authService')
+      .then((m) => m.authService.refreshToken())
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+  return refreshPromise
+}
+
 // 响应拦截器
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -57,9 +72,8 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        // 尝试刷新token
-        const authService = await import('./authService')
-        await authService.authService.refreshToken()
+        // 尝试刷新token（并发请求共享同一次刷新）
+        await refreshTokenSingleFlight()
 
         // 更新原始请求的token
         const newToken = localStorage.getItem('access_token')
