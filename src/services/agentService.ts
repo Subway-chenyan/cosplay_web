@@ -82,7 +82,7 @@ class AgentService {
       // 增加该接口的超时时间，避免默认10秒在AI搜索上过短
       const raw = await api.post<RawAgentResponse>('/videos/agent-search/', {
         query: query.trim()
-      }, { timeout: 30000 })
+      }, { timeout: 60000 })
 
       console.debug('[AgentService] raw agent response keys:', Object.keys(raw), 'ui_type:', raw.ui_type, 'data_type:', typeof raw.data, 'isArray:', Array.isArray(raw.data), 'data_len:', Array.isArray(raw.data) ? raw.data.length : 'N/A')
 
