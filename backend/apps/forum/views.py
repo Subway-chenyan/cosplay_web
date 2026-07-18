@@ -66,6 +66,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ForumTag.objects.all()
     serializer_class = ForumTagSerializer
     pagination_class = None
+    # 只读视图集，匿名用户也可读取
+    permission_classes = [permissions.AllowAny]
 
 
 class PostViewSet(viewsets.ModelViewSet):

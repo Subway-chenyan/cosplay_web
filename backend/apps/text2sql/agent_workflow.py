@@ -5,7 +5,19 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Literal, Optional, TypedDict
 
-from django.db import connection
+from django.conf import settings as django_settings
+from django.db import connections
+
+
+def _get_search_connection():
+    """text2sql 查询优先使用只读数据库账号（settings.DATABASES['text2sql']）。
+
+    未配置时回退到默认连接（仅推荐开发环境）。生产环境请务必配置只读账号，
+    这是防御 SQL 注入最可靠的一道防线。
+    """
+    if 'text2sql' in getattr(django_settings, 'DATABASES', {}):
+        return connections['text2sql']
+    return connections['default']
 from pydantic import BaseModel, Field
 
 from apps.text2sql.llm_sql_generator import generate_sql_via_llm
@@ -403,7 +415,7 @@ def sql_executor(state: AgentState) -> Dict[str, Any]:
         }
 
     try:
-        with connection.cursor() as cursor:
+        with _get_search_connection().cursor() as cursor:
             cursor.execute("SET statement_timeout TO 3000")
             try:
                 cursor.execute(sql)
@@ -412,11 +424,12 @@ def sql_executor(state: AgentState) -> Dict[str, Any]:
             finally:
                 cursor.execute("RESET statement_timeout")
         return {"raw_data": raw_data, "sql_error": ""}
-    except Exception as exc:
+    except Exception:
+        # 错误细节（表结构、SQL 片段等）只记录日志，绝不返回给客户端
         logger.exception("agent SQL execution failed")
         return {
             "raw_data": [],
-            "sql_error": str(exc),
+            "sql_error": "查询执行失败，请换个问法再试。",
             "retry_count": state.get("retry_count", 0) + 1,
         }
 
@@ -465,7 +478,7 @@ def llm_post_processor(state: AgentState) -> Dict[str, Any]:
     follow_up_sql = _award_rows_sql(where, limit=200)
 
     try:
-        with connection.cursor() as cursor:
+        with _get_search_connection().cursor() as cursor:
             cursor.execute("SET statement_timeout TO 5000")
             try:
                 cursor.execute(follow_up_sql)
@@ -565,7 +578,6 @@ def response_formatter(state: AgentState) -> Dict[str, Any]:
             "sections": [],
             "debug": {
                 "selected_schemas": state.get("selected_schemas", []),
-                "generated_sql": state.get("generated_sql", ""),
             },
             "natural_language_overview": f"检索执行失败：{sql_error}",
             "video_id_list": [],
@@ -587,7 +599,6 @@ def response_formatter(state: AgentState) -> Dict[str, Any]:
             "sections": [],
             "debug": {
                 "selected_schemas": state.get("selected_schemas", []),
-                "generated_sql": state.get("generated_sql", ""),
             },
             "natural_language_overview": "当前数据库中没有查到符合条件的结果。",
             "video_id_list": [],
@@ -631,7 +642,6 @@ def response_formatter(state: AgentState) -> Dict[str, Any]:
             "sections": [{"type": "leaderboard", "title": "金奖最多团队", "items": items}],
             "debug": {
                 "selected_schemas": state.get("selected_schemas", []),
-                "generated_sql": state.get("generated_sql", ""),
             },
             "natural_language_overview": summary,
             "video_id_list": video_ids,
@@ -688,7 +698,6 @@ def response_formatter(state: AgentState) -> Dict[str, Any]:
         "sections": [{"type": ui_type, "title": title, "items": items if intent_type == "award_keyword" else rows}],
         "debug": {
             "selected_schemas": state.get("selected_schemas", []),
-            "generated_sql": state.get("generated_sql", ""),
         },
         "natural_language_overview": summary,
         "video_id_list": video_ids,
@@ -759,6 +768,17 @@ def build_agent_graph():
     return graph.compile()
 
 
+_COMPILED_GRAPH = None
+
+
+def _get_compiled_graph():
+    """LangGraph 图编译有开销，模块级编译一次并复用。"""
+    global _COMPILED_GRAPH
+    if _COMPILED_GRAPH is None:
+        _COMPILED_GRAPH = build_agent_graph()
+    return _COMPILED_GRAPH
+
+
 def run_agent_search(query: str) -> Dict[str, Any]:
     initial_state: AgentState = {
         "query": query,
@@ -767,7 +787,7 @@ def run_agent_search(query: str) -> Dict[str, Any]:
         "selected_schemas": [],
     }
 
-    graph = build_agent_graph()
+    graph = _get_compiled_graph()
     if graph is None:
         final_state = _run_without_langgraph(initial_state)
     else:
