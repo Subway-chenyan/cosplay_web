@@ -19,7 +19,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
-load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
+# .env 位于 backend/ 目录（与 manage.py 同级），不要提交到 git
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -121,8 +122,24 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD', default='cosplay_password_2024'),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default='5433'),
+        # 复用数据库连接，避免每个请求都新建 PostgreSQL 连接
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
     }
 }
+
+# text2sql 智能检索专用只读数据库账号（强烈建议配置）。
+# 在数据库侧执行：CREATE ROLE ... LOGIN PASSWORD ...; GRANT SELECT ON ALL TABLES ...
+# 未配置时回退到默认连接（仅推荐开发环境这样做）
+if config('TEXT2SQL_DB_USER', default=''):
+    DATABASES['text2sql'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='cosplay_db'),
+        'USER': config('TEXT2SQL_DB_USER'),
+        'PASSWORD': config('TEXT2SQL_DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5433'),
+        'CONN_MAX_AGE': 60,
+    }
 
 # Password validation
 # https://docs.djangoproject.com/web/4.2/topics/auth/passwords/#password-validation
@@ -211,12 +228,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        # 默认要求登录；公开读取接口请在视图中显式声明 permission_classes = [AllowAny]
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'PAGE_SIZE_QUERY_PARAM': 'page_size',
-    'MAX_PAGE_SIZE': 1000,
+    'MAX_PAGE_SIZE': 100,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -415,6 +433,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SCHEMA_PATH_PREFIX': '/api/',
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
     'COMPONENT_SPLIT_REQUEST': True,
     'SORT_OPERATIONS': False,
 }
@@ -490,7 +509,6 @@ SOCIALACCOUNT_PROVIDERS = {
 # 增加文件上传大小限制到10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
-DATA_UPLOAD_MAX_FILE_SIZE = 10485760   # 10MB
 
 # 允许的文件类型
 FILE_UPLOAD_PERMISSIONS = 0o644
