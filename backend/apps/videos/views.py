@@ -262,7 +262,6 @@ def start_import(request):
         )
         thread.daemon = True
         thread.start()
-        
         return Response({
             'task_id': task_id,
             'message': '导入任务已启动'
@@ -320,26 +319,7 @@ from apps.groups.models import Group
 from apps.groups.serializers import GroupSerializer
 import logging
 
-# 导入SQL Agent相关模块
-import sys
-import os
-
-# 多种路径尝试，确保能找到SQLAgent
-base_dir = None
-possible_paths = [
-    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'apps', 'text2sql'),  # 从apps/videos向上
-    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'apps', 'text2sql'),  # 从apps/videos向上两层
-    '/home/ubuntu/cosplay_web/backend/apps/text2sql',  # 绝对路径
-    './apps/text2sql',  # 相对路径
-]
-
-for path in possible_paths:
-    if path not in sys.path:
-        sys.path.append(path)
-    if os.path.exists(os.path.join(path, 'sql_agent_cached.py')):
-        base_dir = path
-        break
-
+# 导入SQL Agent相关模块（标准包导入，text2sql 是 apps 下的正规 Python 包）
 SQLAgent = None
 run_agent_search = None
 logger = logging.getLogger(__name__)
@@ -353,20 +333,11 @@ except Exception as e:
 
 if run_agent_search is None:
     try:
-        from sql_agent_cached import SQLAgent
-        logger.info(f"SQLAgent imported successfully from path: {base_dir}")
-    except ImportError as e:
+        from apps.text2sql.sql_agent_cached import SQLAgent
+        logger.info("SQLAgent imported successfully as fallback")
+    except ImportError:
         SQLAgent = None
-        logger.error(f"Failed to import SQLAgent: {e}")
-        logger.error(f"Attempted paths: {possible_paths}")
-        logger.error(f"Current working directory: {os.getcwd()}")
-        logger.error(f"Python path: {sys.path[:3]}...")  # 只显示前3个路径
-        # 尝试提供更多调试信息
-        try:
-            import traceback
-            logger.error(f"Import error traceback: {traceback.format_exc()}")
-        except:
-            pass
+        logger.exception("Failed to import SQLAgent")
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -866,8 +837,8 @@ class VideoViewSet(viewsets.ModelViewSet):
                 'video_id_list': video_ids,
                 'group_id_list': group_ids,
             })
-        except Exception as e:
-            logger.exception("agent_search failed: %s", e)
-            error_msg = f"Agent搜索失败: {str(e)}"
-            return Response({'error': error_msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            # 异常细节只记录日志，避免向客户端泄露 SQL / 表结构信息
+            logger.exception("agent_search failed")
+            return Response({'error': '智能搜索暂时不可用，请稍后再试'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
