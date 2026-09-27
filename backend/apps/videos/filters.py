@@ -20,7 +20,13 @@ class VideoFilter(django_filters.FilterSet):
 
     tags = django_filters.CharFilter(field_name='tags__id', method='filter_by_tags')
     styleTag = django_filters.CharFilter(method='filter_by_style_tag')
-    ipTag = django_filters.CharFilter(method='filter_by_ip_tag')
+    ipTags = UUIDInFilter(method='filter_by_ip_tags')
+    ipTag = django_filters.UUIDFilter(method='filter_by_ip_tag')
+
+    def filter_by_ip_tags(self, queryset, name, value):
+        if value:
+            return queryset.filter(tags__id__in=value, tags__category='IP', tags__is_active=True).distinct()
+        return queryset
 
     def filter_by_tags(self, queryset, name, value):
         """按标签ID筛选（AND逻辑）"""

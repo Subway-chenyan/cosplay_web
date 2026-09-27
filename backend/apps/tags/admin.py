@@ -7,8 +7,8 @@ class TagAdmin(admin.ModelAdmin):
     """
     标签管理后台
     """
-    list_display = ['name', 'category', 'usage_count', 'is_active', 'created_at']
-    list_filter = ['category', 'is_active', 'is_featured', 'created_at']
+    list_display = ['name', 'category', 'ip_category', 'usage_count', 'is_active', 'created_at']
+    list_filter = ['category', 'ip_category', 'is_active', 'is_featured', 'created_at']
     search_fields = ['name', 'description']
     ordering = ['-usage_count', 'name']
     readonly_fields = ['usage_count']
@@ -22,4 +22,4 @@ class VideoTagAdmin(admin.ModelAdmin):
     list_display = ['video', 'tag', 'created_at']
     list_filter = ['tag__category', 'created_at']
     search_fields = ['video__title', 'tag__name']
-    ordering = ['-created_at'] 
+    ordering = ['-created_at']

@@ -240,7 +240,7 @@ function VideoDetailPage() {
       {/* 返回按钮 */}
       <div className="flex items-center">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => window.history.state?.idx > 0 ? navigate(-1) : navigate('/', { replace: true })}
           className="group flex items-center bg-black text-white px-4 py-2 hover:bg-p5-red transition-all shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]"
         >
           <span className="flex items-center">

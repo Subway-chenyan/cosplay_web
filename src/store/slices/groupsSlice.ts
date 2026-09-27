@@ -11,6 +11,7 @@ interface GroupsState {
     next?: string
     previous?: string
   }
+  currentRequestId?: string
   currentPage: number
 }
 
@@ -27,21 +28,24 @@ const initialState: GroupsState = {
 // 异步thunk - 获取社团列表
 export const fetchGroups = createAsyncThunk(
   'groups/fetchGroups',
-  async (params?: { 
+  async (params: {
     page?: number
+    page_size?: number
+    province?: string
     search?: string
     is_active?: boolean
     is_verified?: boolean
     append?: boolean
-  }) => {
+  } | undefined = undefined, thunkApi) => {
     console.log('groupsSlice - fetchGroups thunk called with params:', params)
     const response = await groupService.getGroups({
       page: params?.page || 1,
-      page_size: 12,
+      page_size: params?.page_size || 12,
+      province: params?.province,
       search: params?.search,
       is_active: params?.is_active,
       is_verified: params?.is_verified,
-    })
+    }, thunkApi.signal)
     return {
       ...response,
       append: params?.append ?? false,
@@ -99,11 +103,14 @@ const groupsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // 处理 fetchGroups
-      .addCase(fetchGroups.pending, (state) => {
+      .addCase(fetchGroups.pending, (state, action) => {
+        state.currentRequestId = action.meta.requestId
         state.loading = true
         state.error = null
       })
       .addCase(fetchGroups.fulfilled, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return
+        state.currentRequestId = undefined
         state.loading = false
         if (action.payload.append) {
           // 追加模式：将新数据添加到现有数据中
@@ -120,8 +127,10 @@ const groupsSlice = createSlice({
         }
       })
       .addCase(fetchGroups.rejected, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return
+        state.currentRequestId = undefined
         state.loading = false
-        state.error = action.error.message || '获取社团失败'
+        state.error = action.meta.aborted ? null : action.error.message || '获取社团失败'
       })
       // 处理其他异步操作
       .addCase(fetchActiveGroups.fulfilled, (state, action) => {

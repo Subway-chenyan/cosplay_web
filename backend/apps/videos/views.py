@@ -390,7 +390,15 @@ class VideoViewSet(viewsets.ModelViewSet):
             .annotate(count=Count('id'))
             .order_by('-year')
         )
+        from apps.tags.models import Tag
+        ips = (
+            Tag.objects.filter(category='IP', is_active=True)
+            .annotate(count=Count('videos', distinct=True))
+            .filter(count__gt=0)
+            .order_by('-count', 'name')
+        )
         return Response({
+            'ips': list(ips.values('id', 'name', 'ip_category', 'count')),
             'years': [
                 {'value': row['year'], 'count': row['count']}
                 for row in years

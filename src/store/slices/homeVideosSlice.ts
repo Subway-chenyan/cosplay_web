@@ -34,6 +34,7 @@ export const fetchHomeVideos = createAsyncThunk<
     year: filters.year,
     competitions: filters.competitionIds,
     groups: filters.groupIds,
+    ipTags: filters.ipTagIds,
   }, thunkApi.signal)
   return {
     ...response,

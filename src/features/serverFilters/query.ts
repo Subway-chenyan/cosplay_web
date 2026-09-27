@@ -7,10 +7,10 @@ const parseYear = (value: string | null): number | undefined => {
   return year >= 1800 && year <= 2200 ? year : undefined
 }
 
-const parsePage = (value: string | null): number => {
+export const parsePage = (value: string | null): number => {
   if (!value || !/^\d+$/.test(value)) return 1
   const page = Number(value)
-  return page > 0 ? page : 1
+  return Number.isSafeInteger(page) && page > 0 ? page : 1
 }
 
 const normalizeIds = (value: string | null): string[] => {
@@ -28,6 +28,7 @@ export const parseHomeFilterParams = (params: URLSearchParams): HomeFilterState 
   year: parseYear(params.get('year')),
   competitionIds: normalizeIds(params.get('competitions')),
   groupIds: normalizeIds(params.get('groups')),
+  ipTagIds: normalizeIds(params.get('ips')),
   page: parsePage(params.get('page')),
 })
 
@@ -37,6 +38,8 @@ export const serializeHomeFilterParams = (state: HomeFilterState): URLSearchPara
   const competitionIds = normalizeIds(state.competitionIds.join(','))
   const groupIds = normalizeIds(state.groupIds.join(','))
 
+  const ips = normalizeIds((state.ipTagIds || []).join(','))
+  if (ips.length) params.set('ips', ips.join(','))
   if (query) params.set('q', query)
   if (state.year) params.set('year', String(state.year))
   if (competitionIds.length) params.set('competitions', competitionIds.join(','))

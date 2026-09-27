@@ -118,6 +118,7 @@ export interface VideoFilters {
 export interface HomeFilterState {
   query: string
   year?: number
+  ipTagIds?: string[]
   competitionIds: string[]
   groupIds: string[]
   page: number
@@ -137,9 +138,11 @@ export interface NamedFilterOption {
   id: string
   name: string
   count: number
+  ip_category?: string
 }
 
 export interface HomeFilterOptions {
+  ips: NamedFilterOption[]
   years: CountFilterOption[]
 }
 

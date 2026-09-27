@@ -3,12 +3,10 @@ import * as echarts from 'echarts';
 import { Search, MapPin } from 'lucide-react';
 import { fetchChinaGeoJSON, provinceNameMap } from '../data/chinaGeoJSON';
 import { groupService } from '../services/groupService';
-import { Group } from '../types';
 
 interface ClubData {
   [province: string]: {
     count: number;
-    clubs: Group[];
   };
 }
 
@@ -18,14 +16,14 @@ interface ClubData {
 
 interface ChinaMapModuleProps {
   className?: string;
-  onProvinceSelect?: (province: string, groups: Group[]) => void;
+  onProvinceSelect?: (province: string) => void;
 }
 
 const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvinceSelect }) => {
+  const onProvinceSelectRef = useRef(onProvinceSelect);
+  onProvinceSelectRef.current = onProvinceSelect;
   const mapRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
-  const [, setSelectedProvince] = useState<string>('');
-  const [, setSelectedClubs] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [clubData, setClubData] = useState<ClubData>({});
   const [error, setError] = useState<string | null>(null);
@@ -42,13 +40,8 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
 
         for (const stat of response.province_stats) {
           if (stat.province) {
-            // 获取该省份的社团详情，设置较大的page_size以获取所有社团
-            const groupsResponse = await groupService.getGroupsByProvince(stat.province, {
-              page_size: 100 // 设置较大的页面大小以获取更多社团
-            });
             transformedData[stat.province] = {
               count: stat.count,
-              clubs: groupsResponse.results
             };
           }
         }
@@ -83,7 +76,6 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
         const provinceData = Object.entries(clubData).map(([province, data]) => ({
           name: province, // API返回的已经是完整省份名称，直接使用
           value: data.count,
-          clubs: data.clubs
         }));
         const maxValue = Math.max(...provinceData.map(item => item.value), 1);
 
@@ -189,15 +181,11 @@ const ChinaMapModule: React.FC<ChinaMapModuleProps> = ({ className = '', onProvi
             provinceNameMap[key] === provinceName || key === provinceName
           );
           if (data) {
-            setSelectedProvince(data[0]);
-            setSelectedClubs(data[1].clubs);
             // 通知父组件省份被选中
-            onProvinceSelect?.(data[0], data[1].clubs);
+            onProvinceSelectRef.current?.(data[0]);
           } else {
-            setSelectedProvince(provinceName);
-            setSelectedClubs([]);
             // 通知父组件省份被选中（无数据）
-            onProvinceSelect?.(provinceName, []);
+            onProvinceSelectRef.current?.(provinceName);
           }
         });
 

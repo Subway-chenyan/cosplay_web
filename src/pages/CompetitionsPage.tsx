@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { parsePage } from '../features/serverFilters/query'
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchCompetitions, setCurrentPage } from '../store/slices/competitionsSlice'
+import { fetchCompetitions } from '../store/slices/competitionsSlice'
 import { Trophy, Calendar } from 'lucide-react'
 import { Competition } from '../types'
 import EventCalendar from '../components/EventCalendar'
@@ -13,59 +14,24 @@ function CompetitionsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const location = useLocation()
-  const { competitions, loading, error, pagination, currentPage } = useSelector((state: RootState) => state.competitions)
-  const [activeTab, setActiveTab] = useState<'list' | 'schedule'>('list')
-
-  // 检查URL hash来设置默认标签和滚动位置
+  const [params, setParams] = useSearchParams()
+  const currentPage = parsePage(params.get('page'))
+  const { competitions, loading, error, pagination } = useSelector((state: RootState) => state.competitions)
+  const activeTab = location.hash === '#schedule' ? 'schedule' : 'list'
   useEffect(() => {
-    const hash = location.hash
-    if (hash === '#schedule') {
-      setActiveTab('schedule')
-      // 滚动到赛程标签区域
-      setTimeout(() => {
-        const scheduleElement = document.querySelector('#schedule-tab')
-        if (scheduleElement) {
-          scheduleElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }, 100)
-    } else {
-      // 如果没有hash或者hash为list，滚动到页面顶部
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }, [location.hash])
-
-  useEffect(() => {
-    if (competitions.length === 0) {
-      dispatch(fetchCompetitions({ page: 1 }))
-    }
-  }, [dispatch, competitions.length])
-
-  const handleCompetitionClick = (competition: Competition) => {
-    navigate(`/competitions/${competition.id}`)
-  }
-
-  // 处理标签切换，更新URL hash和滚动位置
+    const request = dispatch(fetchCompetitions({ page: currentPage, page_size: 12, append: false }))
+    return () => request.abort()
+  }, [dispatch, currentPage])
+  const handleCompetitionClick = (competition: Competition) => navigate(`/competitions/${competition.id}`)
   const handleTabChange = (tab: 'list' | 'schedule') => {
-    setActiveTab(tab)
-    if (tab === 'schedule') {
-      window.location.hash = 'schedule'
-      // 滚动到赛程标签区域
-      setTimeout(() => {
-        const scheduleElement = document.querySelector('#schedule-tab')
-        if (scheduleElement) {
-          scheduleElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }, 100)
-    } else {
-      window.location.hash = ''
-      // 滚动到页面顶部
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+    if (tab === activeTab) return
+    navigate({ pathname: location.pathname, search: location.search, hash: tab === 'schedule' ? '#schedule' : '' },
+      { state: { scrollTarget: tab === 'schedule' ? 'schedule' : 'competition-results' } })
   }
 
   if (loading && competitions.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-96">
+      <div data-route-loading="true" className="flex items-center justify-center min-h-96">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">正在加载比赛...</p>
@@ -76,11 +42,11 @@ function CompetitionsPage() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
+      <div id="competition-results" className="text-center py-12">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
           <p className="text-red-600">加载失败: {error}</p>
           <button
-            onClick={() => dispatch(fetchCompetitions())}
+            onClick={() => dispatch(fetchCompetitions({ page: currentPage, page_size: 12, append: false }))}
             className="mt-4 btn-primary"
           >
             重新加载
@@ -91,7 +57,7 @@ function CompetitionsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div id="competition-results" data-route-loading={loading} aria-busy={loading} className="container mx-auto px-4 py-8 max-w-7xl">
       {/* 页面标题 */}
       <div className="relative group mb-12">
         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 z-0"></div>
@@ -213,10 +179,11 @@ function CompetitionsPage() {
         currentPage={currentPage}
         totalCount={pagination.count}
         pageSize={12}
+        disabled={loading}
         onPageChange={(page) => {
-          dispatch(setCurrentPage(page))
-          dispatch(fetchCompetitions({ page }))
-          window.scrollTo({ top: 0, behavior: 'smooth' })
+          const next = new URLSearchParams(params)
+          if (page > 1) next.set('page', String(page)); else next.delete('page')
+          setParams(next, { state: { scrollTarget: 'competition-results' } })
         }}
       />
 
@@ -238,7 +205,7 @@ function CompetitionsPage() {
       </>
       )}
 
-      {activeTab === 'schedule' && <div id="schedule-tab"><ScheduleTab /></div>}
+      {activeTab === 'schedule' && <div id="schedule"><ScheduleTab /></div>}
     </div>
   )
 }

@@ -10,6 +10,7 @@ interface VideoQueryParams {
   year?: number
   tags?: string[]
   styleTag?: string
+  ipTags?: string[]
   ipTag?: string
   ordering?: string
 }
@@ -28,6 +29,7 @@ class VideoService {
       tags: params?.tags?.length ? params.tags.join(',') : undefined,
       styleTag: params?.styleTag,
       ipTag: params?.ipTag,
+      ipTags: params?.ipTags?.length ? params.ipTags.join(',') : undefined,
     }
 
     const queryString = api.buildQueryParams(queryParams)

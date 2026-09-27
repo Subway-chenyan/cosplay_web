@@ -7,6 +7,20 @@ from apps.videos.models import Video
 
 
 class VideoServerFilteringTests(APITestCase):
+    def test_ip_filter_combines_with_year_and_deduplicates(self):
+        from apps.tags.models import Tag, VideoTag
+        first = Tag.objects.create(name='火影忍者', category='IP')
+        second = Tag.objects.create(name='死神', category='IP')
+        for tag in (first, second):
+            VideoTag.objects.create(video=self.target, tag=tag)
+        response = self.client.get('/api/videos/', {'ipTags': f'{first.id},{second.id}', 'year': 2025})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(self.client.get('/api/videos/', {'ipTags': 'bad'}).status_code, 400)
+        options = self.client.get('/api/videos/filter-options/').data['ips']
+        self.assertEqual({item['name'] for item in options}, {'火影忍者', '死神'})
+        self.assertTrue(all(item['count'] == 1 for item in options))
+
     def setUp(self):
         self.competition_a = Competition.objects.create(name='比赛 A')
         self.competition_b = Competition.objects.create(name='比赛 B')
@@ -96,6 +110,7 @@ class VideoServerFilteringTests(APITestCase):
         self.assertEqual(
             response.data,
             {
+                'ips': [],
                 'years': [
                     {'value': 2025, 'count': 2},
                     {'value': 2024, 'count': 1},

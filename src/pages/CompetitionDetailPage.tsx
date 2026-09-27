@@ -126,8 +126,9 @@ function CompetitionDetailPage() {
   }, [id])
 
   const updateFilters = useCallback((nextFilters: CompetitionFilterState) => {
-    setSearchParams(serializeCompetitionFilterParams(nextFilters))
-  }, [setSearchParams])
+    const next = serializeCompetitionFilterParams(nextFilters)
+    if (next.toString() !== searchParams.toString()) setSearchParams(next, { state: { scrollTarget: 'competition-filter-results' } })
+  }, [setSearchParams, searchParams])
 
   const groupedEntries = useMemo(() => {
     const grouped = groupCompetitionEntries(entries)
@@ -192,7 +193,7 @@ function CompetitionDetailPage() {
 
   if (competitionLoading) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center">
+      <div data-route-loading="true" className="flex min-h-[300px] items-center justify-center">
         <Loader className="h-12 w-12 animate-spin text-p5-red" />
       </div>
     )
@@ -282,7 +283,7 @@ function CompetitionDetailPage() {
       )}
 
       {/* 筛选器 */}
-      <div className="relative group">
+      <div id="competition-filter-results" data-route-loading={loading} aria-busy={loading} className="relative group">
         <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 -skew-x-1 z-0" />
         <div className="relative z-10 bg-white border-4 border-black p-8 transform -skew-x-1">
           <div className="flex items-center justify-between mb-8 transform skew-x-1">

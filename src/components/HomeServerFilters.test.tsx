@@ -23,6 +23,7 @@ describe('HomeServerFilters', () => {
           page: 1,
         }}
         years={[{ value: 2025, count: 8 }]}
+        ips={[{ id: 'naruto', name: '火影忍者' }]}
         competitionOptions={[]}
         groupOptions={[]}
         loadCompetitions={async () => []}
@@ -34,6 +35,9 @@ describe('HomeServerFilters', () => {
 
     fireEvent.change(screen.getByLabelText('年份'), { target: { value: '2025' } })
     expect(onApply).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: '选择 IP 作品' }))
+    await userEvent.click(screen.getByRole('button', { name: '火影忍者' }))
+    await userEvent.click(screen.getByRole('button', { name: '完成选择' }))
 
     await userEvent.click(screen.getByRole('button', { name: '应用筛选' }))
     expect(onApply).toHaveBeenCalledWith({
@@ -41,6 +45,7 @@ describe('HomeServerFilters', () => {
       year: 2025,
       competitionIds: [],
       groupIds: [],
+      ipTagIds: ['naruto'],
       page: 1,
     })
 
@@ -50,7 +55,7 @@ describe('HomeServerFilters', () => {
 })
 
 describe('AsyncMultiSelect', () => {
-  it('loads server options and preserves the selected option', async () => {
+  it('only shows recommendations after the field receives focus', async () => {
     const option: AsyncSelectOption = { id: 'competition-id', name: '主比赛' }
     const onChange = vi.fn()
     const loadOptions = vi.fn(async (query: string) => (
@@ -66,6 +71,7 @@ describe('AsyncMultiSelect', () => {
       />,
     )
 
+    expect(screen.queryByRole('button', { name: '选择主比赛' })).toBeNull()
     await userEvent.type(screen.getByLabelText('搜索比赛'), '主')
     await waitFor(() => expect(loadOptions).toHaveBeenCalledWith('主', expect.any(AbortSignal)))
     await userEvent.click(await screen.findByRole('button', { name: '选择主比赛' }))

@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
+import RouteScrollManager from './features/navigation/RouteScrollManager'
 import AuthExpiredDialog from './components/AuthExpiredDialog'
 import HomePage from './pages/HomePage'
 import { authService } from './services/authService'
@@ -29,7 +30,7 @@ const UserCenterPage = lazy(() => import('./pages/UserCenterPage'))
 // 页面加载中的占位
 function PageFallback() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
+    <div data-route-loading="true" className="min-h-[60vh] flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
     </div>
   )
@@ -39,7 +40,7 @@ function PageFallback() {
 function RequireAuth({ children }: { children: JSX.Element }) {
   const location = useLocation()
   if (!authService.isAuthenticated()) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />
+    return <Navigate to="/login" state={{ from: location.pathname + location.search + location.hash }} replace />
   }
   return children
 }
@@ -67,6 +68,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
+      <RouteScrollManager />
       {!usesHomeVisual && <P5MinimalBackground />}
 
       <div className="relative z-10">

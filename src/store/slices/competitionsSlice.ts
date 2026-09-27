@@ -11,6 +11,7 @@ interface CompetitionsState {
     next?: string
     previous?: string
   }
+  currentRequestId?: string
   currentPage: number
 }
 
@@ -27,19 +28,20 @@ const initialState: CompetitionsState = {
 // 异步thunk - 获取比赛列表
 export const fetchCompetitions = createAsyncThunk(
   'competitions/fetchCompetitions',
-  async (params?: { 
+  async (params: {
     page?: number
+    page_size?: number
     search?: string
     year?: number
     append?: boolean
-  }) => {
+  } | undefined = undefined, thunkApi) => {
     const response = await competitionService.getCompetitions({
       page: params?.page || 1,
-      page_size: 50, // 增加每页数量
+      page_size: params?.page_size || 50,
       search: params?.search,
       year: params?.year,
-    })
-    return { ...response, append: params?.append || (params?.page || 1) > 1 }
+    }, thunkApi.signal)
+    return { ...response, page: params?.page || 1, append: params?.append ?? false }
   }
 )
 
@@ -81,12 +83,16 @@ const competitionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // 处理 fetchCompetitions
-      .addCase(fetchCompetitions.pending, (state) => {
+      .addCase(fetchCompetitions.pending, (state, action) => {
+        state.currentRequestId = action.meta.requestId
         state.loading = true
         state.error = null
       })
       .addCase(fetchCompetitions.fulfilled, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return
+        state.currentRequestId = undefined
         state.loading = false
+        state.currentPage = action.payload.page
         if (action.payload.append) {
           // 追加模式：将新数据添加到现有数据中
           state.competitions = [...state.competitions, ...action.payload.results]
@@ -101,8 +107,10 @@ const competitionsSlice = createSlice({
         }
       })
       .addCase(fetchCompetitions.rejected, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return
+        state.currentRequestId = undefined
         state.loading = false
-        state.error = action.error.message || '获取比赛失败'
+        state.error = action.meta.aborted ? null : action.error.message || '获取比赛失败'
       })
       // 处理其他异步操作
       .addCase(fetchCompetitionsByYear.fulfilled, (state, action) => {

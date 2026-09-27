@@ -46,6 +46,7 @@ function HomePage() {
     (state: RootState) => state.homeVideos,
   )
   const [inputValue, setInputValue] = useState(appliedFilters.query)
+  const [ipOptions, setIpOptions] = useState<AsyncSelectOption[]>([])
   const [yearOptions, setYearOptions] = useState<CountFilterOption[]>([])
   const [selectedCompetitions, setSelectedCompetitions] = useState<AsyncSelectOption[]>([])
   const [selectedGroups, setSelectedGroups] = useState<AsyncSelectOption[]>([])
@@ -77,9 +78,12 @@ function HomePage() {
   useEffect(() => {
     const controller = new AbortController()
     videoService.getFilterOptions(controller.signal)
-      .then((options) => setYearOptions(options.years))
+      .then((options) => {
+        setYearOptions(options.years)
+        setIpOptions(options.ips || [])
+      })
       .catch((optionsError) => {
-        if (!controller.signal.aborted) console.error('获取年份筛选项失败', optionsError)
+        if (!controller.signal.aborted) console.error('获取筛选项失败', optionsError)
       })
     return () => controller.abort()
   }, [])
@@ -124,8 +128,10 @@ function HomePage() {
   }, [])
 
   const applyFilters = useCallback((filters: HomeFilterState) => {
-    setSearchParams(serializeHomeFilterParams(filters))
-  }, [setSearchParams])
+    const next = serializeHomeFilterParams(filters)
+    if (next.toString() === searchParams.toString()) return
+    setSearchParams(next, { state: { scrollTarget: 'video-records' } })
+  }, [setSearchParams, searchParams])
 
   const fetchStats = useCallback(async () => {
     try {
@@ -368,6 +374,7 @@ function HomePage() {
           <HomeServerFilters
             value={appliedFilters}
             years={yearOptions}
+            ips={ipOptions}
             competitionOptions={selectedCompetitions}
             groupOptions={selectedGroups}
             loadCompetitions={loadCompetitions}
@@ -443,7 +450,7 @@ function HomePage() {
         )}
 
         {(searchMode === 'regular' || (!agentResults && searchMode === 'smart')) && !isAgentLoading && (
-          <section id="video-records" className="mt-6">
+          <section id="video-records" data-route-loading={loading} aria-busy={loading} className="mt-6">
             <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
                 <Star className="h-9 w-9 text-white" />
@@ -505,9 +512,9 @@ function HomePage() {
             currentPage={appliedFilters.page}
             totalCount={count}
             pageSize={12}
+            disabled={loading}
             onPageChange={(page) => {
               applyFilters({ ...appliedFilters, page })
-              window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
           />
         )}

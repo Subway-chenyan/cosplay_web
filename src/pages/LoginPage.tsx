@@ -21,7 +21,7 @@ function LoginPage() {
   useEffect(() => {
     if (location.state?.message) {
       setMessage(location.state.message)
-      window.history.replaceState({}, document.title)
+
     }
   }, [location])
 
@@ -46,7 +46,8 @@ function LoginPage() {
 
     try {
       await authService.login(formData)
-      navigate('/user-center', { replace: true })
+      const from = location.state?.from
+      navigate(typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/user-center', { replace: true })
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const detail =

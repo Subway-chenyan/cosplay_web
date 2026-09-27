@@ -11,10 +11,24 @@ class Tag(models.Model):
         ('风格', '风格'),
         ('其他', '其他'),
     ]
+    IP_CATEGORY_CHOICES = [
+        ('国漫', '国漫'),
+        ('日漫', '日漫'),
+        ('游戏', '游戏'),
+        ('影视', '影视'),
+        ('其他', '其他'),
+    ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, verbose_name='标签名称')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name='分类')
+    ip_category = models.CharField(
+        max_length=10,
+        choices=IP_CATEGORY_CHOICES,
+        blank=True,
+        default='',
+        verbose_name='IP 分类',
+    )
     description = models.TextField(blank=True, verbose_name='描述')
     color = models.CharField(max_length=7, default='#007bff', verbose_name='颜色')
     

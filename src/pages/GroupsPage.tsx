@@ -1,74 +1,48 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { RootState, AppDispatch } from '../store/store'
-import { fetchGroups, searchGroups, setCurrentPage } from '../store/slices/groupsSlice'
+import { fetchGroups } from '../store/slices/groupsSlice'
 import SearchBar from '../components/SearchBar'
 import Pagination from '../components/Pagination'
 import ClubCard from '../components/ClubCard'
 import ChinaMapModule from '../components/ChinaMapModule'
 import { Users, MapPin } from 'lucide-react'
-import { Group } from '../types'
+import { parsePage } from '../features/serverFilters/query'
 
 function GroupsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { groups, loading, error, pagination, currentPage } = useSelector((state: RootState) => state.groups)
-  const [inputValue, setInputValue] = useState('')
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null)
-  const [filteredGroups, setFilteredGroups] = useState<Group[]>([])
-
-  // Calculate display groups based on province filter and search
-  const displayGroups = selectedProvince ? filteredGroups : groups
-
+  const [params, setParams] = useSearchParams()
+  const currentPage = parsePage(params.get('page'))
+  const query = params.get('q') || ''
+  const selectedProvince = params.get('province') || ''
+  const { groups, loading, error, pagination } = useSelector((state: RootState) => state.groups)
+  const [inputValue, setInputValue] = useState(query)
+  const displayGroups = groups
+  useEffect(() => { setInputValue(query) }, [query])
   useEffect(() => {
-    console.log('GroupsPage - useEffect triggered')
-    if (groups.length === 0) {
-      dispatch(fetchGroups({ page: 1 }))
-    }
-  }, [dispatch, groups.length])
-
-  const handleInputChange = useCallback((value: string) => {
-    console.log('GroupsPage - handleInputChange:', value)
-    setInputValue(value)
-  }, [])
-
-  const handleClearSearch = useCallback(() => {
-    console.log('GroupsPage - handleClearSearch')
-    setInputValue('')
-    dispatch(fetchGroups())
-  }, [dispatch])
-
-  const handleProvinceSelect = useCallback((province: string, groups: Group[]) => {
-    console.log('GroupsPage - handleProvinceSelect:', province, groups)
-    setSelectedProvince(province)
-    setFilteredGroups(groups)
-  }, [])
-
-  const clearProvinceFilter = useCallback(() => {
-    console.log('GroupsPage - clearProvinceFilter')
-    setSelectedProvince(null)
-    setFilteredGroups([])
-  }, [])
-
-  const handleSearch = useCallback(() => {
-    if (inputValue.trim()) {
-      console.log('GroupsPage - dispatching searchGroups')
-      dispatch(searchGroups(inputValue))
-    } else {
-      console.log('GroupsPage - dispatching fetchGroups')
-      dispatch(fetchGroups({ page: 1 }))
-    }
-  }, [dispatch, inputValue])
-
+    const request = dispatch(fetchGroups({ page: currentPage, search: query, province: selectedProvince }))
+    return () => request.abort()
+  }, [dispatch, currentPage, query, selectedProvince])
+  const update = useCallback((changes: Record<string, string>) => {
+    const next = new URLSearchParams(params)
+    Object.entries(changes).forEach(([key, value]) => value ? next.set(key, value) : next.delete(key))
+    if (next.toString() !== params.toString()) setParams(next, { state: { scrollTarget: 'group-results' } })
+  }, [params, setParams])
+  const handleInputChange = setInputValue
+  const handleClearSearch = () => { setInputValue(''); update({ q: '', page: '' }) }
+  const handleProvinceSelect = (province: string) => update({ province, page: '' })
+  const clearProvinceFilter = () => update({ province: '', page: '' })
+  const handleSearch = () => update({ q: inputValue.trim(), page: '' })
 
   const handleGroupClick = (groupId: string) => {
     navigate(`/group/${groupId}`)
   }
 
-  if (loading) {
+  if (loading && groups.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-96">
+      <div data-route-loading="true" className="flex items-center justify-center min-h-96">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">正在加载社团...</p>
@@ -79,9 +53,10 @@ function GroupsPage() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
+      <div id="group-results" className="text-center py-12">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
           <p className="text-red-600">加载失败: {error}</p>
+          <button type="button" className="mt-4 btn-primary" onClick={() => dispatch(fetchGroups({ page: currentPage, search: query, province: selectedProvince }))}>重新加载</button>
         </div>
       </div>
     )
@@ -143,7 +118,7 @@ function GroupsPage() {
                 <div className="flex flex-col">
                   <span className="text-sm font-black text-p5-red italic tracking-tighter">已锁定地区：</span>
                   <h2 className="text-2xl md:text-5xl font-black text-white italic leading-none p5-text-shadow-red">
-                    {selectedProvince} <span className="text-p5-red">/</span> {filteredGroups.length} <span className="text-lg md:text-2xl">个社团</span>
+                    {selectedProvince} <span className="text-p5-red">/</span> {pagination.count} <span className="text-lg md:text-2xl">个社团</span>
                   </h2>
                 </div>
               </div>
@@ -160,7 +135,7 @@ function GroupsPage() {
       )}
 
       {/* Groups Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div id="group-results" data-route-loading={loading} aria-busy={loading} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayGroups.length > 0 ? (
           displayGroups.map((group: any) => (
             <ClubCard
@@ -196,10 +171,9 @@ function GroupsPage() {
         currentPage={currentPage}
         totalCount={pagination.count}
         pageSize={12}
+        disabled={loading}
         onPageChange={(page) => {
-          dispatch(setCurrentPage(page))
-          dispatch(fetchGroups({ page }))
-          window.scrollTo({ top: 0, behavior: 'smooth' })
+          update({ page: page > 1 ? String(page) : '' })
         }}
       />
 

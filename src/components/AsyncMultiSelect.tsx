@@ -1,10 +1,12 @@
 import { Loader, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 
 export interface AsyncSelectOption {
   id: string
   name: string
+  count?: number
+  ip_category?: string
 }
 
 interface AsyncMultiSelectProps {
@@ -24,6 +26,16 @@ function AsyncMultiSelect({
   const [options, setOptions] = useState<AsyncSelectOption[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const close = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -59,11 +71,11 @@ function AsyncMultiSelect({
   }
 
   return (
-    <div className="space-y-2">
+    <div ref={rootRef} className="relative space-y-2">
       <label className="block text-sm font-black text-white" htmlFor={`search-${label}`}>
         {label}（可多选）
       </label>
-      <div className="flex flex-wrap gap-2">
+      {value.length > 0 && <div className="flex flex-wrap gap-2">
         {value.map((option) => (
           <span
             key={option.id}
@@ -80,7 +92,7 @@ function AsyncMultiSelect({
             </button>
           </span>
         ))}
-      </div>
+      </div>}
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-black/55" />
         <input
@@ -88,21 +100,22 @@ function AsyncMultiSelect({
           aria-label={`搜索${label}`}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          onFocus={() => setOpen(true)}
           placeholder={`搜索${label}`}
           className="h-10 w-full bg-white pl-9 pr-9 text-sm font-semibold text-black outline-none ring-1 ring-white/20 focus:ring-2 focus:ring-p5-red"
         />
         {loading && <Loader className="absolute right-3 top-3 h-4 w-4 animate-spin text-p5-red" />}
       </div>
-      {error && <p className="text-xs font-bold text-p5-red">{error}</p>}
-      {availableOptions.length > 0 && (
-        <div className="max-h-40 overflow-y-auto border border-white/20 bg-[#121212] p-1">
+      {open && error && <p className="absolute z-30 mt-1 w-full bg-black p-3 text-xs font-bold text-p5-red">{error}</p>}
+      {open && availableOptions.length > 0 && (
+        <div className="absolute z-30 mt-1 max-h-52 w-full overflow-y-auto border border-white/20 bg-[#121212] p-1 shadow-2xl">
           {availableOptions.map((option) => (
             <button
               key={option.id}
               type="button"
               aria-label={`选择${option.name}`}
               onClick={() => addOption(option)}
-              className="block w-full px-3 py-2 text-left text-sm font-bold text-white hover:bg-p5-red"
+              className="block min-h-11 w-full cursor-pointer px-3 py-2 text-left text-sm font-bold text-white transition-colors duration-200 hover:bg-p5-red focus:bg-p5-red focus:outline-none"
             >
               {option.name}
             </button>

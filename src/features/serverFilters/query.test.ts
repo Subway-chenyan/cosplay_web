@@ -9,6 +9,12 @@ import {
 
 
 describe('home filter URL contract', () => {
+  it('preserves selected IPs when sharing or paging', () => {
+    const state = parseHomeFilterParams(new URLSearchParams('ips=b,a,a&page=2'))
+    expect(state.ipTagIds).toEqual(['a', 'b'])
+    expect(serializeHomeFilterParams(state).get('ips')).toBe('a,b')
+    expect(serializeHomeFilterParams(state).get('page')).toBe('2')
+  })
   it('normalizes CSV IDs, year and invalid page', () => {
     const parsed = parseHomeFilterParams(new URLSearchParams(
       'q=%E5%8E%9F%E7%A5%9E&year=2025&competitions=b,a,a&groups=x,,x&page=0',
@@ -19,6 +25,7 @@ describe('home filter URL contract', () => {
       year: 2025,
       competitionIds: ['a', 'b'],
       groupIds: ['x'],
+      ipTagIds: [],
       page: 1,
     })
     expect(serializeHomeFilterParams(parsed).toString()).toBe(
