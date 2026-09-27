@@ -45,6 +45,25 @@ axiosInstance.interceptors.request.use(
   }
 )
 
+// 登录态过期提醒：刷新 token 失败时派发全局事件，由 AuthExpiredDialog 监听并弹窗。
+// 首页初始请求是并行的，会同时收到多个 401，因此只派发一次；
+// 登录成功（authService.storeTokens）后重置，下次过期才会再次提醒
+export const AUTH_EXPIRED_EVENT = 'cosdrama:auth-expired'
+
+let authExpiredNotified = false
+
+const notifyAuthExpired = () => {
+  if (!authExpiredNotified) {
+    authExpiredNotified = true
+    window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT))
+  }
+}
+
+// 供 authService 在登录成功后重置提醒状态
+export const resetAuthExpiredFlag = () => {
+  authExpiredNotified = false
+}
+
 // 刷新 token 的单例 Promise：并发请求收到 401 时共享同一次刷新，
 // 避免后端 refresh token 轮换（ROTATE_REFRESH_TOKENS）下出现竞态
 let refreshPromise: Promise<string> | null = null
@@ -68,8 +87,15 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 登录/刷新接口的 401 不能再进入刷新流程：/token/refresh/ 本身也带 Authorization 头，
+    // 它的 401 若触发 refreshTokenSingleFlight 会等待自己所在的刷新 Promise，造成死锁，
+    // 所有请求永久挂起（token 不被清理、页面数据全部不加载）。直接放行给调用方处理。
+    const isAuthEndpoint = originalRequest.url?.includes('/token/')
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true
+      // 原请求是否带了登录态：匿名请求被 401 拒绝属于正常鉴权，不走过期提醒流程
+      const hadAuthToken = !!originalRequest.headers?.Authorization
 
       try {
         // 尝试刷新token（并发请求共享同一次刷新）
@@ -85,7 +111,14 @@ axiosInstance.interceptors.response.use(
         // 刷新失败，清除所有token
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
-        // 可以在这里触发重新登录
+
+        if (hadAuthToken) {
+          // 登录态已过期：弹窗提醒重新登录，并去掉认证头重试一次，
+          // 保证视频列表等公开接口的数据仍能正常加载
+          notifyAuthExpired()
+          originalRequest.headers.delete('Authorization')
+          return axiosInstance(originalRequest)
+        }
       }
     }
     return Promise.reject(error)

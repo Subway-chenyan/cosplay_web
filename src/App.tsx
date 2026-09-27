@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
+import AuthExpiredDialog from './components/AuthExpiredDialog'
 import HomePage from './pages/HomePage'
 import { authService } from './services/authService'
 
@@ -95,6 +96,9 @@ function App() {
           </Routes>
         </Suspense>
       </div>
+
+      {/* 登录态过期提醒弹窗（挂在路由外，任何页面都能弹出） */}
+      <AuthExpiredDialog />
     </div>
   )
 }

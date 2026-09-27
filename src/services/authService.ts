@@ -1,4 +1,4 @@
-import { api, getBaseURL } from './api'
+import { api, getBaseURL, resetAuthExpiredFlag } from './api'
 import { PaginatedResponse, UserSearchResult } from '../types'
 
 interface LoginData {
@@ -23,6 +23,8 @@ class AuthService {
   storeTokens(access: string, refresh: string): void {
     localStorage.setItem('access_token', access)
     localStorage.setItem('refresh_token', refresh)
+    // 新登录生效，解除"登录已过期"提醒的一次性锁，下次过期才会再提醒
+    resetAuthExpiredFlag()
   }
 
   // 登录
