@@ -137,3 +137,6 @@ AGENTS.md
 .agents/
 .superpowers/
 .worktrees/
+
+# Local generated artifacts
+output/
